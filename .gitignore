@@ -1,0 +1,14 @@
+# Operating System & IDE Files
+.DS_Store
+Thumbs.db
+*.swp
+*.bak
+*~
+.vscode/
+.idea/
+
+# Node / Build artifacts (if extending later)
+node_modules/
+dist/
+build/
+.cache/
