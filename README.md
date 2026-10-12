@@ -41,6 +41,39 @@ A Progressive Web App (PWA) built for the **Alamdar Company Sports Club Box Cric
 
 ---
 
+## 🔐 Role-Based Access Control (RBAC) & Credentials
+
+Anyone opening the website without logging in is restricted to the **Audience Projector Screen (Public Viewer)**. They can watch live bids, player stats, and team budgets, but cannot place bids or control the auctioneer gavel.
+
+To access Master Admin or Team Owner dashboards, users must sign in via the top-right **"🔐 Login"** button:
+
+### 👑 Tournament Committee / Master Admin
+* **Username:** `admin`
+* **Password:** `alamdar@admin2026`
+* **Access:** Full control over stone set selection, triggering players live, 3-2-1 countdown, and HAMMER SOLD / UNSOLD decisions.
+
+### 🏏 The 12 Team Owners (Restricted Bidding Access)
+Each team owner can only place bids and join the 2-player battle ring for their own franchise:
+
+| Team Name | Playing Owner (Captain) | Username | Password |
+| :--- | :--- | :--- | :--- |
+| **Burhani Blasters** | Murtaza (C) | `burhani` | `burhani@2026` |
+| **Saifee Strikers** | Mustafa (C) | `saifee` | `saifee@2026` |
+| **Husaini Hawks** | Shabbir (C) | `husaini` | `husaini@2026` |
+| **Najmi Knights** | Ali Asgar (C) | `najmi` | `najmi@2026` |
+| **Tayyebi Titans** | Huzefa (C) | `tayyebi` | `tayyebi@2026` |
+| **Qutbi Challengers** | Taha (C) | `qutbi` | `qutbi@2026` |
+| **Badri Royals** | Abbas (C) | `badri` | `badri@2026` |
+| **Fakhri Fighters** | Zainuddin (C) | `fakhri` | `fakhri@2026` |
+| **Hakimi Super Kings** | Mohammed (C) | `hakimi` | `hakimi@2026` |
+| **Imadi Warriors** | Adnan (C) | `imadi` | `imadi@2026` |
+| **Mohammedi Mavericks** | Ibrahim (C) | `mohammedi` | `mohammedi@2026` |
+| **Zahra Superstars** | Burhanuddin (C) | `zahra` | `zahra@2026` |
+
+* **Single-Active-Session Protection:** If an owner shares their password or logs in on a second device during the live auction, their previous device will be immediately revoked and logged out.
+
+---
+
 ## 🚀 How to Run Locally
 
 You can run this project with any local HTTP server or open directly:

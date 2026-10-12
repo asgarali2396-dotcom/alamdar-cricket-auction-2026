@@ -18,7 +18,7 @@
 <body>
 
   <!-- Top App Navigation Bar -->
-  <nav class="sticky top-0 z-50 bg-slate-950/80 backdrop-blur-xl border-b border-white/10 px-4 py-3 flex justify-between items-center">
+  <nav class="sticky top-0 z-50 bg-slate-950/90 backdrop-blur-xl border-b border-white/10 px-4 py-3 flex justify-between items-center">
     <div class="flex items-center gap-3">
       <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-600 flex items-center justify-center font-black text-black text-lg shadow-lg shadow-amber-500/20">
         🏏
@@ -31,30 +31,30 @@
 
     <!-- View Switcher Pills -->
     <div class="flex items-center gap-1 bg-white/5 p-1 rounded-full border border-white/10">
-      <button data-view-tab="live" class="nav-pill active">Audience Screen</button>
-      <button data-view-tab="owner" class="nav-pill">Owner Dashboard</button>
-      <button data-view-tab="admin" class="nav-pill">Admin Control</button>
+      <button data-view-tab="live" class="nav-pill active">Audience Screen (Viewer)</button>
+      <button data-view-tab="owner" class="nav-pill" id="nav-owner-tab">Owner Dashboard</button>
+      <button data-view-tab="admin" class="nav-pill" id="nav-admin-tab">Admin Control</button>
     </div>
 
-    <!-- Active User & Identity Dropdown -->
+    <!-- Right Controls: User Profile / Login Button & Sound -->
     <div class="flex items-center gap-2">
-      <select id="header-owner-select" class="text-xs font-semibold py-1.5 px-2.5 rounded-lg bg-slate-900 border border-white/10 text-slate-200">
-        <option value="admin">Master Admin</option>
-        <optgroup label="Select Team Identity (12 Teams)">
-          <option value="team_01">Burhani Blasters (Murtaza)</option>
-          <option value="team_02">Saifee Strikers (Mustafa)</option>
-          <option value="team_03" selected>Husaini Hawks (Shabbir)</option>
-          <option value="team_04">Najmi Knights (Ali Asgar)</option>
-          <option value="team_05">Tayyebi Titans (Huzefa)</option>
-          <option value="team_06">Qutbi Challengers (Taha)</option>
-          <option value="team_07">Badri Royals (Abbas)</option>
-          <option value="team_08">Fakhri Fighters (Zainuddin)</option>
-          <option value="team_09">Hakimi Super Kings (Mohammed)</option>
-          <option value="team_10">Imadi Warriors (Adnan)</option>
-          <option value="team_11">Mohammedi Mavericks (Ibrahim)</option>
-          <option value="team_12">Zahra Superstars (Burhanuddin)</option>
-        </optgroup>
-      </select>
+      <!-- Guest (Default Viewer) -->
+      <div id="auth-guest-controls" class="flex items-center gap-2">
+        <span class="text-xs text-slate-400 font-medium hidden md:inline">👁️ Public Viewer</span>
+        <button id="open-login-btn" class="btn-primary text-xs py-1.5 px-3">
+          🔐 Login (Admin / Owner)
+        </button>
+      </div>
+
+      <!-- Authenticated User Tag -->
+      <div id="auth-user-controls" class="items-center gap-2" style="display:none;">
+        <span id="auth-user-badge" class="stone-badge text-amber-300 border-amber-500/40 bg-amber-950/40 text-[11px] py-1 px-2.5">
+          Admin
+        </span>
+        <button id="logout-btn" class="btn-outline text-xs py-1.5 px-3 text-rose-300 border-rose-800 hover:bg-rose-950/40">
+          Sign Out
+        </button>
+      </div>
 
       <button id="sound-toggle-btn" class="btn-outline text-xs py-1.5 px-3">
         🔊 Audio ON
@@ -63,7 +63,7 @@
   </nav>
 
   <!-- ============================================================== -->
-  <!-- 1. LIVE AUDIENCE PROJECTOR DISPLAY (CINEMATIC VIEW) -->
+  <!-- 1. LIVE AUDIENCE PROJECTOR DISPLAY (DEFAULT PUBLIC VIEWER) -->
   <!-- ============================================================== -->
   <main id="view-live" class="p-6 max-w-7xl mx-auto space-y-6">
     <div class="flex justify-between items-center">
@@ -139,7 +139,7 @@
   </main>
 
   <!-- ============================================================== -->
-  <!-- 2. TEAM OWNER INTERACTIVE DASHBOARD -->
+  <!-- 2. TEAM OWNER INTERACTIVE DASHBOARD (PROTECTED) -->
   <!-- ============================================================== -->
   <main id="view-owner" class="p-4 max-w-md mx-auto space-y-4" style="display:none;">
     <!-- Sticky Budget & Slot Meter -->
@@ -214,7 +214,7 @@
   </main>
 
   <!-- ============================================================== -->
-  <!-- 3. ADMIN MASTER CONTROLLER DASHBOARD -->
+  <!-- 3. ADMIN MASTER CONTROLLER DASHBOARD (PROTECTED) -->
   <!-- ============================================================== -->
   <main id="view-admin" class="p-6 max-w-6xl mx-auto space-y-6" style="display:none;">
     <div class="flex justify-between items-center border-b border-white/10 pb-4">
@@ -264,6 +264,53 @@
       </div>
     </div>
   </main>
+
+  <!-- ============================================================== -->
+  <!-- 4. AUTHENTICATION & LOGIN MODAL -->
+  <!-- ============================================================== -->
+  <div id="login-modal" class="modal-overlay" style="display:none;">
+    <div class="modal-content p-6 space-y-4 max-w-md">
+      <div class="flex justify-between items-center border-b border-white/10 pb-3">
+        <h3 class="text-lg font-black text-white flex items-center gap-2">
+          🔐 Sign In to Auction System
+        </h3>
+        <button id="close-login-btn" class="text-slate-400 hover:text-white text-lg font-bold">✕</button>
+      </div>
+
+      <p class="text-xs text-slate-400">
+        Enter your credentials. Master Admin can manage bidding; Team Owners can bid for their respective teams.
+      </p>
+
+      <form id="login-form" class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Username / ID</label>
+          <input type="text" id="login-username" class="w-full text-sm" placeholder="e.g. admin or husaini" required autocomplete="username">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Password</label>
+          <input type="password" id="login-password" class="w-full text-sm" placeholder="••••••••" required autocomplete="current-password">
+        </div>
+
+        <div id="login-error-msg" class="text-xs text-rose-400 font-semibold" style="display:none;"></div>
+
+        <button type="submit" class="btn-primary w-full py-3 text-sm font-bold">
+          Authenticate & Enter
+        </button>
+      </form>
+
+      <!-- Quick Reference Credentials for Demo/Testing -->
+      <div class="pt-2 border-t border-white/10">
+        <p class="text-[11px] font-bold text-amber-400 uppercase tracking-wider mb-1">Demo Quick Credentials:</p>
+        <div class="text-[11px] text-slate-400 space-y-0.5 bg-black/40 p-2.5 rounded-lg border border-white/5 font-mono">
+          <div>👑 <strong>Admin:</strong> user: <span class="text-white">admin</span> | pass: <span class="text-white">alamdar@admin2026</span></div>
+          <div>🏏 <strong>Team 01:</strong> user: <span class="text-white">burhani</span> | pass: <span class="text-white">burhani@2026</span></div>
+          <div>🏏 <strong>Team 03:</strong> user: <span class="text-white">husaini</span> | pass: <span class="text-white">husaini@2026</span></div>
+          <div class="text-[10px] text-slate-500 pt-1">*Other teams follow: `&lt;team_name&gt;` & `&lt;team_name&gt;@2026`</div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Session Eviction Modal (Single-Active-Session Rule) -->
   <div id="session-eviction-modal" class="modal-overlay" style="display:none;">

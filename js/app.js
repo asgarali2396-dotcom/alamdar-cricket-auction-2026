@@ -46,7 +46,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Periodic heartbeat session validator (every 3 seconds)
   setInterval(checkSingleSessionHealth, 3000);
-});
+// Modal Helpers
+function openLoginModal() {
+  const modal = document.getElementById('login-modal');
+  const err = document.getElementById('login-error-msg');
+  if (err) err.style.display = 'none';
+  if (modal) modal.style.display = 'flex';
+}
+
+function closeLoginModal() {
+  const modal = document.getElementById('login-modal');
+  if (modal) modal.style.display = 'none';
+}
 
 // Toast notification helper
 function showToast(message, type = 'info') {
@@ -124,32 +135,87 @@ function triggerBidFlash() {
 
 // Setup Event Listeners
 function setupEventListeners() {
-  // Navigation Tabs
+  // Navigation Tabs with RBAC Protection
   document.querySelectorAll('[data-view-tab]').forEach((button) => {
     button.addEventListener('click', () => {
       const target = button.getAttribute('data-view-tab');
+      
+      // Enforce Role Protections:
+      if (target === 'admin') {
+        if (!activeUser || activeUser.role !== 'admin') {
+          showToast('Master Admin login required to access Admin Control.', 'error');
+          openLoginModal();
+          return;
+        }
+      }
+
+      if (target === 'owner') {
+        if (!activeUser || activeUser.role !== 'owner') {
+          showToast('Team Owner login required to access Bidding Dashboard.', 'error');
+          openLoginModal();
+          return;
+        }
+      }
+
       switchView(target);
     });
   });
 
-  // Owner Selector dropdown in navbar
-  const ownerSelect = document.getElementById('header-owner-select');
-  if (ownerSelect) {
-    ownerSelect.addEventListener('change', (e) => {
-      const selectedTeamId = e.target.value;
-      if (selectedTeamId === 'admin') {
-        const sessId = AuctionEngine.registerSession('admin_user', 'admin');
-        activeUser = { userId: 'admin_user', role: 'admin', teamId: null, sessionId: sessId };
-        showToast('Logged in as Master Administrator', 'gold');
-        switchView('admin');
+  // Login Modal triggers
+  const openLoginBtn = document.getElementById('open-login-btn');
+  if (openLoginBtn) {
+    openLoginBtn.addEventListener('click', openLoginModal);
+  }
+
+  const closeLoginBtn = document.getElementById('close-login-btn');
+  if (closeLoginBtn) {
+    closeLoginBtn.addEventListener('click', closeLoginModal);
+  }
+
+  // Login Form Submission
+  const loginForm = document.getElementById('login-form');
+  if (loginForm) {
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const userVal = document.getElementById('login-username').value;
+      const passVal = document.getElementById('login-password').value;
+      const errorEl = document.getElementById('login-error-msg');
+
+      const authRes = AuctionEngine.authenticate(userVal, passVal);
+      if (authRes.success) {
+        activeUser = authRes;
+        closeLoginModal();
+        showToast(`Welcome, ${authRes.name}!`, 'success');
+        
+        // Auto-navigate to appropriate view
+        if (authRes.role === 'admin') {
+          switchView('admin');
+        } else if (authRes.role === 'owner') {
+          switchView('owner');
+        }
+        renderApp();
       } else {
-        const team = currentTeams.find((t) => t.id === selectedTeamId);
-        const userId = `user_${selectedTeamId}`;
-        const sessId = AuctionEngine.registerSession(userId, 'owner', selectedTeamId);
-        activeUser = { userId, role: 'owner', teamId: selectedTeamId, sessionId: sessId };
-        showToast(`Logged in as ${team.ownerName} (${team.name})`, 'success');
-        switchView('owner');
+        if (errorEl) {
+          errorEl.innerText = authRes.error;
+          errorEl.style.display = 'block';
+        }
       }
+    });
+  }
+
+  // Logout Trigger
+  const logoutBtn = document.getElementById('logout-btn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+      AuctionEngine.logout();
+      activeUser = {
+        userId: 'guest_audience',
+        role: 'audience',
+        teamId: null,
+        sessionId: 'sess_audience'
+      };
+      showToast('Signed out. Switched to Public Audience Viewer mode.', 'info');
+      switchView('live');
       renderApp();
     });
   }
@@ -329,9 +395,54 @@ function triggerCountdown() {
 
 // Master Render Function
 function renderApp() {
+  renderAuthBar();
   renderLiveDisplay();
   renderOwnerDashboard();
   renderAdminDashboard();
+}
+
+// Render Top Navbar Auth Controls & Tabs based on active role
+function renderAuthBar() {
+  const guestControls = document.getElementById('auth-guest-controls');
+  const userControls = document.getElementById('auth-user-controls');
+  const userBadge = document.getElementById('auth-user-badge');
+  const ownerTab = document.getElementById('nav-owner-tab');
+  const adminTab = document.getElementById('nav-admin-tab');
+
+  if (!activeUser || activeUser.role === 'audience') {
+    if (guestControls) guestControls.style.display = 'flex';
+    if (userControls) userControls.style.display = 'none';
+
+    // Public Viewer: Show lock indicators
+    if (ownerTab) {
+      ownerTab.innerHTML = '🔒 Owner Dashboard';
+      ownerTab.title = 'Login required';
+    }
+    if (adminTab) {
+      adminTab.innerHTML = '🔒 Admin Control';
+      adminTab.title = 'Admin login required';
+    }
+  } else {
+    if (guestControls) guestControls.style.display = 'none';
+    if (userControls) userControls.style.display = 'flex';
+
+    if (activeUser.role === 'admin') {
+      if (userBadge) {
+        userBadge.innerText = 'Master Admin';
+        userBadge.className = 'stone-badge text-amber-300 border-amber-500/40 bg-amber-950/40 text-[11px] py-1 px-2.5';
+      }
+      if (adminTab) adminTab.innerHTML = '⚡ Admin Control';
+      if (ownerTab) ownerTab.innerHTML = '🔒 Owner Dashboard';
+    } else if (activeUser.role === 'owner') {
+      const team = currentTeams.find((t) => t.id === activeUser.teamId);
+      if (userBadge) {
+        userBadge.innerText = team ? `${team.name}` : 'Owner';
+        userBadge.className = 'stone-badge text-emerald-300 border-emerald-500/40 bg-emerald-950/40 text-[11px] py-1 px-2.5';
+      }
+      if (ownerTab) ownerTab.innerHTML = '🏏 My Bidding Dashboard';
+      if (adminTab) adminTab.innerHTML = '🔒 Admin Control';
+    }
+  }
 }
 
 // -------------------------------------------------------------

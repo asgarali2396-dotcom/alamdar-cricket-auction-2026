@@ -365,6 +365,66 @@ const AuctionEngine = {
     const active = sessions[userId];
     if (!active) return false;
     return active.sessionId === currentSessionId;
+  },
+
+  // Authentication method: checks admin or team credentials
+  authenticate(username, password) {
+    if (!username || !password) {
+      return { success: false, error: 'Please enter both username and password.' };
+    }
+
+    const cleanUser = username.trim().toLowerCase();
+    const cleanPass = password.trim();
+
+    // 1. Check Admin Credentials
+    const adminCfg = window.ALAMDAR_DATA.ADMIN_CREDENTIALS;
+    if (cleanUser === adminCfg.username.toLowerCase()) {
+      if (cleanPass === adminCfg.password) {
+        const sessId = this.registerSession('admin_root', 'admin');
+        return {
+          success: true,
+          role: 'admin',
+          userId: 'admin_root',
+          teamId: null,
+          name: adminCfg.name,
+          sessionId: sessId
+        };
+      } else {
+        return { success: false, error: 'Incorrect password for Master Admin.' };
+      }
+    }
+
+    // 2. Check 12 Team Owner Credentials
+    const teams = StorageManager.get(STORAGE_KEYS.TEAMS) || window.ALAMDAR_DATA.INITIAL_TEAMS;
+    const team = teams.find((t) => t.username && t.username.toLowerCase() === cleanUser);
+
+    if (team) {
+      if (cleanPass === team.password) {
+        const userId = `owner_${team.id}`;
+        const sessId = this.registerSession(userId, 'owner', team.id);
+        return {
+          success: true,
+          role: 'owner',
+          userId: userId,
+          teamId: team.id,
+          name: `${team.ownerName} (${team.name})`,
+          sessionId: sessId
+        };
+      } else {
+        return { success: false, error: `Incorrect password for team owner "${team.name}".` };
+      }
+    }
+
+    return { success: false, error: 'Invalid Username. User does not exist.' };
+  },
+
+  logout() {
+    StorageManager.set(STORAGE_KEYS.CURRENT_USER, {
+      userId: 'guest_audience',
+      role: 'audience',
+      teamId: null,
+      sessionId: 'sess_audience'
+    });
   }
 };
 
