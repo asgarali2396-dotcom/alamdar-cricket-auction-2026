@@ -469,11 +469,15 @@ function renderLiveDisplay() {
     specEl.innerText = hasPlayer ? p.specialization : 'BOX CRICKET 2026';
     specEl.style.display = hasPlayer ? 'inline-block' : 'none';
   }
-  if (detailsEl) {
-    detailsEl.innerHTML = hasPlayer
-      ? `<span>Age: <strong>${p.age}</strong></span> • <span>Bat: <strong>${p.batsmanType}</strong></span> • <span>Bowl: <strong>${p.bowlerType}</strong></span>`
-      : '<span>12 Teams • 96 Players • 8 Sets</span>';
-  }
+
+  // Structured Stat Pills
+  const ageEl = document.getElementById('live-stat-age');
+  const batEl = document.getElementById('live-stat-bat');
+  const bowlEl = document.getElementById('live-stat-bowl');
+  if (ageEl) ageEl.innerText = hasPlayer ? `${p.age} Yrs` : '--';
+  if (batEl) batEl.innerText = hasPlayer ? p.batsmanType : '--';
+  if (bowlEl) bowlEl.innerText = hasPlayer ? p.bowlerType : '--';
+
   if (basePriceEl) {
     basePriceEl.innerText = hasPlayer ? `₹${p.basePrice.toLocaleString()}` : '₹1,000';
   }
@@ -481,7 +485,10 @@ function renderLiveDisplay() {
   // Bid Display
   const bidEl = document.getElementById('live-bid-display');
   const bidderEl = document.getElementById('live-highest-bidder-name');
+  const nextStepEl = document.getElementById('live-next-step-display');
+
   if (bidEl) bidEl.innerText = `₹${currentAuctionState.currentBid.toLocaleString()}`;
+  if (nextStepEl) nextStepEl.innerText = `₹${currentAuctionState.nextMinBid.toLocaleString()}`;
   if (bidderEl) {
     bidderEl.innerText = currentAuctionState.highestBidderTeamName
       ? `Leading: ${currentAuctionState.highestBidderTeamName}`
@@ -576,6 +583,13 @@ function renderOwnerDashboard() {
   if (bannerEl) bannerEl.innerText = `${team.name} • ${team.ownerName}`;
   if (budgetEl) budgetEl.innerText = `₹${team.remainingBudget.toLocaleString()}`;
   if (slotsEl) slotsEl.innerText = `${team.acquiredCount} / 8`;
+
+  // Squad Progress Bar
+  const progBar = document.getElementById('owner-roster-progress-bar');
+  if (progBar) {
+    const pct = Math.min(100, Math.round((team.acquiredCount / 8) * 100));
+    progBar.style.width = `${pct}%`;
+  }
 
   // On-the-block details
   const p = currentAuctionState.currentPlayer;
