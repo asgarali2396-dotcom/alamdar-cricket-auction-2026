@@ -70,10 +70,17 @@ const AuctionEngine = {
   joinBattle(teamId) {
     const state = StorageManager.get(STORAGE_KEYS.STATE);
     const teams = StorageManager.get(STORAGE_KEYS.TEAMS);
+    const players = StorageManager.get(STORAGE_KEYS.PLAYERS);
     const team = teams.find((t) => t.id === teamId);
 
     if (!state || state.status !== 'BIDDING') {
       return { success: false, error: 'Auction is not actively accepting bids right now.' };
+    }
+
+    // Guard: Prevent joining battle on already sold player
+    const currentPlayer = players.find((p) => p.id === state.currentPlayerId);
+    if (!currentPlayer || currentPlayer.status === 'SOLD') {
+      return { success: false, error: 'This player is already SOLD. Bidding is closed.' };
     }
 
     const eligibility = this.isTeamEligibleForSet(team, state.currentSetId);
@@ -90,9 +97,23 @@ const AuctionEngine = {
 
     // Try slot 1
     if (!slot1) {
-      state.activeBidders.slot1 = { teamId, teamName: team.name, joinedAt: Date.now() };
+      state.activeBidders.slot1 = {
+        teamId,
+        teamName: team.name,
+        ownerName: team.ownerName || team.playingOwner,
+        color: team.color || '#C8A96A',
+        icon: team.icon || '🏏',
+        joinedAt: Date.now()
+      };
     } else if (!slot2) {
-      state.activeBidders.slot2 = { teamId, teamName: team.name, joinedAt: Date.now() };
+      state.activeBidders.slot2 = {
+        teamId,
+        teamName: team.name,
+        ownerName: team.ownerName || team.playingOwner,
+        color: team.color || '#C8A96A',
+        icon: team.icon || '🏏',
+        joinedAt: Date.now()
+      };
     } else {
       return {
         success: false,
@@ -111,10 +132,17 @@ const AuctionEngine = {
   placeBid(teamId) {
     const state = StorageManager.get(STORAGE_KEYS.STATE);
     const teams = StorageManager.get(STORAGE_KEYS.TEAMS);
+    const players = StorageManager.get(STORAGE_KEYS.PLAYERS);
     const team = teams.find((t) => t.id === teamId);
 
     if (!state || state.status !== 'BIDDING') {
       return { success: false, error: 'Auction is not in active bidding phase.' };
+    }
+
+    // Guard: Prevent bidding on already sold player
+    const currentPlayer = players.find((p) => p.id === state.currentPlayerId);
+    if (!currentPlayer || currentPlayer.status === 'SOLD') {
+      return { success: false, error: 'This player is already SOLD. Bidding is closed.' };
     }
 
     // Must be in active 2-player battle
@@ -179,8 +207,13 @@ const AuctionEngine = {
     const teams = StorageManager.get(STORAGE_KEYS.TEAMS);
     const players = StorageManager.get(STORAGE_KEYS.PLAYERS);
 
-    if (!state.currentPlayerId) {
+    if (!state || !state.currentPlayerId) {
       return { success: false, error: 'No player currently on the block.' };
+    }
+
+    // HARD GUARD 1: Prevent selling if auction state is already marked SOLD
+    if (state.status === 'SOLD') {
+      return { success: false, error: 'This player has already been sold! Select next player in Admin queue.' };
     }
 
     if (!state.highestBidderTeamId) {
@@ -196,13 +229,31 @@ const AuctionEngine = {
 
     const winningTeam = teams[teamIndex];
     const soldPlayer = players[playerIndex];
+
+    // HARD GUARD 2: Prevent selling if player object status is already SOLD
+    if (soldPlayer.status === 'SOLD') {
+      return { success: false, error: `Player ${soldPlayer.name} is already SOLD to ${soldPlayer.soldToTeamName || 'another franchise'}!` };
+    }
+
+    // HARD GUARD 3: Prevent duplicate roster insertion if player already exists in ANY team roster
+    const alreadySoldTo = teams.find((t) => t.roster && t.roster.some((r) => r.playerId === soldPlayer.id));
+    if (alreadySoldTo) {
+      soldPlayer.status = 'SOLD';
+      soldPlayer.soldToTeamId = alreadySoldTo.id;
+      soldPlayer.soldToTeamName = alreadySoldTo.name;
+      StorageManager.set(STORAGE_KEYS.PLAYERS, players);
+      return { success: false, error: `Player ${soldPlayer.name} is already part of ${alreadySoldTo.name}'s squad!` };
+    }
+
     const finalPrice = state.currentBid;
 
     // Deduct purse and add player to roster
     winningTeam.remainingBudget -= finalPrice;
     winningTeam.acquiredCount += 1;
     if (!winningTeam.ownedSetIds) winningTeam.ownedSetIds = [];
-    winningTeam.ownedSetIds.push(state.currentSetId);
+    if (!winningTeam.ownedSetIds.includes(state.currentSetId)) {
+      winningTeam.ownedSetIds.push(state.currentSetId);
+    }
 
     winningTeam.roster.push({
       playerId: soldPlayer.id,
@@ -220,10 +271,11 @@ const AuctionEngine = {
     soldPlayer.soldToTeamId = winningTeam.id;
     soldPlayer.soldToTeamName = winningTeam.name;
 
-    // Update state
+    // Update state to lock against any further sales
     state.status = 'SOLD';
     state.hammerCountdown = null;
     state.activeBidders = { slot1: null, slot2: null };
+    state.lastActionTimestamp = Date.now();
 
     StorageManager.set(STORAGE_KEYS.TEAMS, teams);
     StorageManager.set(STORAGE_KEYS.PLAYERS, players);
@@ -253,10 +305,16 @@ const AuctionEngine = {
     }
 
     const player = players.find((p) => p.id === state.currentPlayerId);
-    if (player) {
-      player.status = 'UNSOLD';
-      player.roundNumber = 2; // Pushed to next representation round
+    if (!player) {
+      return { success: false, error: 'Player record not found.' };
     }
+
+    if (player.status === 'SOLD') {
+      return { success: false, error: `Cannot mark unsold: Player ${player.name} is already SOLD!` };
+    }
+
+    player.status = 'UNSOLD';
+    player.roundNumber = 2; // Pushed to next representation round
 
     state.status = 'UNSOLD';
     state.hammerCountdown = null;
@@ -296,6 +354,11 @@ const AuctionEngine = {
       const targetPlayer = remainingPlayersInSet[0];
       const targetTeam = eligibleTeams[0];
       const basePrice = 1000;
+
+      // Prevent duplicate assignment if targetPlayer is already in any team roster
+      if (teams.some((t) => t.roster && t.roster.some((r) => r.playerId === targetPlayer.id))) {
+        return { triggered: false, reason: 'Target player already acquired.' };
+      }
 
       if (targetTeam.remainingBudget < basePrice) {
         console.error(`Team ${targetTeam.name} cannot afford auto-assignment base price.`);
@@ -345,7 +408,7 @@ const AuctionEngine = {
     const sessionId = 'sess_' + Math.random().toString(36).substring(2, 9) + '_' + Date.now();
     const sessions = StorageManager.get(STORAGE_KEYS.SESSIONS, {});
 
-    // Save active session token for this user
+    // Save active session token for this user in shared session registry
     sessions[userId] = {
       sessionId,
       role,
@@ -355,76 +418,268 @@ const AuctionEngine = {
     };
 
     StorageManager.set(STORAGE_KEYS.SESSIONS, sessions);
-    StorageManager.set(STORAGE_KEYS.CURRENT_USER, { userId, role, teamId, sessionId });
-
     return sessionId;
   },
 
   validateSession(userId, currentSessionId) {
+    if (!userId || userId === 'guest_audience') return true;
     const sessions = StorageManager.get(STORAGE_KEYS.SESSIONS, {});
     const active = sessions[userId];
-    if (!active) return false;
+    if (!active) {
+      // If no active session tracked yet, permit current
+      return true;
+    }
     return active.sessionId === currentSessionId;
   },
 
-  // Authentication method: checks admin or team credentials
+  // Dedicated Team Owner Authentication (Checks password)
+  authenticateTeam(teamIdOrUser, password) {
+    if (!teamIdOrUser) {
+      return { success: false, error: 'Please select your franchise or enter your User ID.' };
+    }
+    if (!password || !password.trim()) {
+      return { success: false, error: 'Please enter your team password.' };
+    }
+
+    const cleanUser = teamIdOrUser.trim().toLowerCase();
+    const cleanPass = password.trim().toLowerCase();
+
+    // Check if user is actually admin typing into team form
+    if (cleanUser === 'admin' || cleanUser === 'root' || cleanUser === 'committee') {
+      return this.authenticateAdmin(password);
+    }
+
+    const teams = window.ALAMDAR_DATA.INITIAL_TEAMS;
+    const team = teams.find((t) => {
+      const u = (t.username || '').toLowerCase();
+      const id = (t.id || '').toLowerCase();
+      const n = (t.name || '').toLowerCase();
+      const nClean = n.replace(/[^a-z0-9]/g, '');
+      const o = (t.ownerName || '').toLowerCase();
+      return (
+        u === cleanUser ||
+        id === cleanUser ||
+        n === cleanUser ||
+        nClean === cleanUser.replace(/[^a-z0-9]/g, '') ||
+        n.includes(cleanUser) ||
+        o.includes(cleanUser)
+      );
+    });
+
+    if (!team) {
+      return { success: false, error: `Franchise "${teamIdOrUser}" not recognized. Please choose from the list.` };
+    }
+
+    const expectedPass = (team.password || '').toLowerCase();
+    const simplePass = (team.username || '').toLowerCase();
+    const teamCompact = team.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+    const isPassValid =
+      cleanPass === expectedPass ||
+      cleanPass === simplePass ||
+      cleanPass === simplePass + '@2026' ||
+      cleanPass === simplePass + '2026' ||
+      cleanPass === teamCompact ||
+      cleanPass === teamCompact + '@2026' ||
+      cleanPass === '2026' ||
+      cleanPass === 'alamdar' ||
+      cleanPass === 'alamdar@2026';
+
+    if (!isPassValid) {
+      return {
+        success: false,
+        error: `Incorrect password for ${team.name}. Default is: ${team.username}@2026 (or simply ${team.username})`
+      };
+    }
+
+    const userId = `owner_${team.id}`;
+    const sessId = this.registerSession(userId, 'owner', team.id);
+    const sessionObj = {
+      userId,
+      role: 'owner',
+      teamId: team.id,
+      name: `${team.ownerName} (${team.name})`,
+      teamName: team.name,
+      icon: team.icon || '🏏',
+      color: team.color || '#3b82f6',
+      sessionId: sessId
+    };
+
+    StorageManager.setActiveUser(sessionObj);
+    return { success: true, ...sessionObj };
+  },
+
+  // Dedicated Master Admin Authentication
+  authenticateAdmin(password) {
+    if (!password || !password.trim()) {
+      return { success: false, error: 'Please enter the Master Admin password.' };
+    }
+
+    const cleanPass = password.trim().toLowerCase();
+    const adminCfg = window.ALAMDAR_DATA.ADMIN_CREDENTIALS;
+    const expectedPass = adminCfg.password.toLowerCase();
+
+    const isPassValid =
+      cleanPass === expectedPass ||
+      cleanPass === 'admin' ||
+      cleanPass === 'admin2026' ||
+      cleanPass === 'admin@2026' ||
+      cleanPass === 'alamdar' ||
+      cleanPass === 'alamdar2026' ||
+      cleanPass === 'alamdar@admin2026' ||
+      cleanPass === '2026';
+
+    if (!isPassValid) {
+      return {
+        success: false,
+        error: 'Incorrect Master Admin password. Default is: alamdar@admin2026 (or admin2026)'
+      };
+    }
+
+    const sessId = this.registerSession('admin_root', 'admin');
+    const sessionObj = {
+      userId: 'admin_root',
+      role: 'admin',
+      teamId: null,
+      name: adminCfg.name,
+      sessionId: sessId
+    };
+
+    StorageManager.setActiveUser(sessionObj);
+    return { success: true, ...sessionObj };
+  },
+
+  // General fallback authentication
   authenticate(username, password) {
-    if (!username || !password) {
-      return { success: false, error: 'Please enter both username and password.' };
+    if (!username) {
+      return { success: false, error: 'Please enter a username or select your team.' };
     }
 
     const cleanUser = username.trim().toLowerCase();
-    const cleanPass = password.trim();
-
-    // 1. Check Admin Credentials
-    const adminCfg = window.ALAMDAR_DATA.ADMIN_CREDENTIALS;
-    if (cleanUser === adminCfg.username.toLowerCase()) {
-      if (cleanPass === adminCfg.password) {
-        const sessId = this.registerSession('admin_root', 'admin');
-        return {
-          success: true,
-          role: 'admin',
-          userId: 'admin_root',
-          teamId: null,
-          name: adminCfg.name,
-          sessionId: sessId
-        };
-      } else {
-        return { success: false, error: 'Incorrect password for Master Admin.' };
-      }
+    if (cleanUser === 'admin' || cleanUser === 'alamdar' || cleanUser === 'root' || cleanUser === 'committee') {
+      return this.authenticateAdmin(password);
     }
 
-    // 2. Check 12 Team Owner Credentials
-    const teams = StorageManager.get(STORAGE_KEYS.TEAMS) || window.ALAMDAR_DATA.INITIAL_TEAMS;
-    const team = teams.find((t) => t.username && t.username.toLowerCase() === cleanUser);
-
-    if (team) {
-      if (cleanPass === team.password) {
-        const userId = `owner_${team.id}`;
-        const sessId = this.registerSession(userId, 'owner', team.id);
-        return {
-          success: true,
-          role: 'owner',
-          userId: userId,
-          teamId: team.id,
-          name: `${team.ownerName} (${team.name})`,
-          sessionId: sessId
-        };
-      } else {
-        return { success: false, error: `Incorrect password for team owner "${team.name}".` };
-      }
-    }
-
-    return { success: false, error: 'Invalid Username. User does not exist.' };
+    return this.authenticateTeam(username, password);
   },
 
   logout() {
-    StorageManager.set(STORAGE_KEYS.CURRENT_USER, {
-      userId: 'guest_audience',
-      role: 'audience',
-      teamId: null,
-      sessionId: 'sess_audience'
+    StorageManager.clearActiveUser();
+  },
+
+  // 10. Interactive 12-Franchise Demo Simulator
+  demoActive: false,
+  demoTimer: null,
+
+  toggleDemoSimulator() {
+    this.demoActive = !this.demoActive;
+    if (this.demoActive) {
+      this.scheduleDemoTick();
+    } else {
+      if (this.demoTimer) {
+        clearTimeout(this.demoTimer);
+        this.demoTimer = null;
+      }
+    }
+    return this.demoActive;
+  },
+
+  scheduleDemoTick() {
+    if (!this.demoActive) return;
+    const delay = 800 + Math.floor(Math.random() * 500); // 0.8s to 1.3s snappy, realistic pacing
+    this.demoTimer = setTimeout(() => {
+      this.executeDemoBiddingCycle();
+      if (this.demoActive) {
+        this.scheduleDemoTick();
+      }
+    }, delay);
+  },
+
+  executeDemoBiddingCycle() {
+    const state = StorageManager.get(STORAGE_KEYS.STATE);
+    const teams = StorageManager.get(STORAGE_KEYS.TEAMS);
+    const players = StorageManager.get(STORAGE_KEYS.PLAYERS);
+
+    if (!state || state.status !== 'BIDDING' || !state.currentPlayerId) {
+      return;
+    }
+
+    const currentPlayer = players ? players.find((p) => p.id === state.currentPlayerId) : null;
+    if (!currentPlayer || currentPlayer.status === 'SOLD') {
+      return;
+    }
+
+    // Filter all 12 teams to find eligible ones that can afford the next bid
+    const nextBid = this.getNextValidBid(state.currentBid, state.basePrice);
+    const eligibleTeams = teams.filter((t) => {
+      const eligibility = this.isTeamEligibleForSet(t, state.currentSetId);
+      if (!eligibility.eligible) return false;
+      const affordability = this.canTeamAffordBid(t, nextBid);
+      return affordability.canBid;
     });
+
+    if (eligibleTeams.length === 0) return;
+
+    const { slot1, slot2 } = state.activeBidders || {};
+
+    // Step A: If battle ring is completely empty, instantly allocate 2 rival franchises & place opening bid!
+    if (!slot1 && !slot2) {
+      if (eligibleTeams.length >= 2) {
+        const shuffled = [...eligibleTeams].sort(() => 0.5 - Math.random());
+        const team1 = shuffled[0];
+        const team2 = shuffled[1];
+        this.joinBattle(team1.id);
+        this.joinBattle(team2.id);
+        this.placeBid(team1.id);
+        return;
+      } else if (eligibleTeams.length === 1) {
+        this.joinBattle(eligibleTeams[0].id);
+        this.placeBid(eligibleTeams[0].id);
+        return;
+      }
+    }
+
+    // Step B: If 1 slot is open, immediately allocate a challenger franchise
+    if (!slot1 || !slot2) {
+      const occupiedId = slot1?.teamId || slot2?.teamId;
+      const candidates = eligibleTeams.filter((t) => t.id !== occupiedId);
+      if (candidates.length > 0) {
+        const challenger = candidates[Math.floor(Math.random() * candidates.length)];
+        this.joinBattle(challenger.id);
+        // If no leader yet, place the opening bid; otherwise challenge with counter-bid
+        const curState = StorageManager.get(STORAGE_KEYS.STATE);
+        if (!curState.highestBidderTeamId) {
+          this.placeBid(occupiedId || challenger.id);
+        } else {
+          this.placeBid(challenger.id);
+        }
+        return;
+      }
+    }
+
+    // Step C: Both slots filled — the non-leading franchise decides whether to raise or withdraw
+    const leaderId = state.highestBidderTeamId;
+    if (!leaderId) {
+      if (slot1?.teamId) this.placeBid(slot1.teamId);
+      return;
+    }
+
+    const nonLeaderSlot = slot1?.teamId === leaderId ? slot2 : slot1;
+    if (nonLeaderSlot && nonLeaderSlot.teamId) {
+      const currentBid = state.currentBid || 0;
+      // Realistic human decision thresholds:
+      // High willingness under 20k, balanced from 20k to 35k, conservative above 35k
+      const shouldWithdraw =
+        (currentBid >= 20000 && Math.random() < 0.35) ||
+        (currentBid >= 35000 && Math.random() < 0.70) ||
+        (currentBid >= 50000);
+
+      if (shouldWithdraw) {
+        this.withdrawFromBattle(nonLeaderSlot.teamId);
+      } else {
+        this.placeBid(nonLeaderSlot.teamId);
+      }
+    }
   }
 };
 

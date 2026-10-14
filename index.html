@@ -3,416 +3,643 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Alamdar Sports Club - Box Cricket Premier Auction 2026</title>
+  <title>Alamdar Sports Club - Box Cricket Auction 2026</title>
   
   <!-- PWA Metadata -->
   <link rel="manifest" href="./manifest.json">
-  <meta name="theme-color" content="#06080d">
+  <meta name="theme-color" content="#0F3D34">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="description" content="Premier Cricket Auction Progressive Web App for Alamdar Company Sports Club. 12 Teams, 96 Players, 8 Islamic Stone Sets.">
+  <meta name="description" content="Alamdar Sports Club Box Cricket Auction 2026 PWA.">
 
-  <!-- Stylesheet -->
-  <link rel="stylesheet" href="./css/style.css">
+  <!-- Tailwind CSS CDN + Theme Extension -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            pine: '#0F3D34',
+            teal: '#134E43',
+            mint: '#E6F0E9',
+            ivory: '#F7F6F1',
+            gold: '#C8A96A',
+            goldLight: '#DFC897',
+            goldDark: '#A98748',
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Custom Stylesheet (with cache-bust) -->
+  <link rel="stylesheet" href="./css/style.css?v=2026.7">
 </head>
-<body>
-
-  <!-- Top App Navigation Bar -->
-  <header class="sticky top-0 z-50 bg-[#06080d]/90 backdrop-blur-2xl border-b border-white/[0.08] px-5 py-3">
-    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-3">
-      
-      <!-- Brand & Tournament Identity -->
-      <div class="flex items-center gap-3.5">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-300 via-amber-500 to-amber-700 flex items-center justify-center font-black text-black text-xl shadow-lg shadow-amber-500/20 border border-amber-200/40">
-          🏏
-        </div>
-        <div>
-          <div class="flex items-center gap-2">
-            <h1 class="text-base font-extrabold tracking-wide uppercase font-brand text-slate-100">
-              ALAMDAR SPORTS CLUB
-            </h1>
-            <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500/10 text-amber-300 border border-amber-500/30">
-              2026
-            </span>
-          </div>
-          <p class="text-xs text-slate-400 font-medium">Box Cricket Premier Auction Arena</p>
-        </div>
-      </div>
-
-      <!-- Center View Switcher Tabs -->
-      <nav class="flex items-center gap-1.5 bg-white/[0.04] p-1.5 rounded-full border border-white/[0.08]">
-        <button data-view-tab="live" class="nav-pill active">
-          <span>📽️</span> <span>Audience Display</span>
-        </button>
-        <button data-view-tab="owner" class="nav-pill" id="nav-owner-tab">
-          <span>🏏</span> <span>Owner Bidding</span>
-        </button>
-        <button data-view-tab="admin" class="nav-pill" id="nav-admin-tab">
-          <span>⚡</span> <span>Auctioneer Admin</span>
-        </button>
-      </nav>
-
-      <!-- Right Controls: Profile / Login & Audio -->
-      <div class="flex items-center gap-2.5">
-        <!-- Public Viewer State -->
-        <div id="auth-guest-controls" class="flex items-center gap-2">
-          <span class="text-xs text-slate-400 font-medium hidden lg:inline">👁️ Public Viewer</span>
-          <button id="open-login-btn" class="btn-primary text-xs py-2 px-4">
-            🔐 Sign In
-          </button>
-        </div>
-
-        <!-- Authenticated Profile State -->
-        <div id="auth-user-controls" class="items-center gap-2" style="display:none;">
-          <span id="auth-user-badge" class="stone-badge text-amber-300 border-amber-500/40 bg-amber-950/40 text-[11px] py-1 px-3">
-            Admin
-          </span>
-          <button id="logout-btn" class="btn-outline text-xs py-1.5 px-3 text-rose-300 border-rose-800/80 hover:bg-rose-950/40">
-            Sign Out
-          </button>
-        </div>
-
-        <button id="sound-toggle-btn" class="btn-outline text-xs py-1.5 px-3" title="Toggle Sound">
-          🔊 Audio ON
-        </button>
-      </div>
-
-    </div>
-  </header>
+<body class="bg-[#0F3D34] text-[#F7F6F1] min-h-screen">
 
   <!-- ============================================================== -->
-  <!-- 1. LIVE AUDIENCE PROJECTOR DISPLAY (CINEMATIC LUXURY VIEW) -->
+  <!-- TOP NAVIGATION BAR (WITH ROLE BADGE & AUTHENTICATION CONTROLS) -->
   <!-- ============================================================== -->
-  <main id="view-live" class="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto space-y-6">
+  <nav class="sticky top-0 z-50 bg-[#0F3D34]/95 backdrop-blur-xl border-b border-[#C8A96A]/20 px-4 md:px-6 py-2.5 flex flex-wrap justify-between items-center gap-3">
     
-    <!-- Header Status Row -->
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-      <div class="flex items-center gap-3">
-        <span class="stone-badge text-emerald-400 border-emerald-500/40 bg-emerald-950/40" id="live-set-badge">
-          SET: AQEEQ
-        </span>
-        <span class="text-xs text-slate-400 font-medium">
-          ₹1,00,000 Purse Cap • 8 Player Mandatory Squad
-        </span>
+    <!-- Left: Tournament Brand -->
+    <div class="flex items-center gap-2.5">
+      <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-[#C8A96A] to-[#DFC897] flex items-center justify-center font-black text-[#0F3D34] text-base shadow-md">
+        🏏
       </div>
-      <div id="live-hammer-countdown-box" style="display:none;" class="items-center gap-2 px-5 py-2 rounded-full bg-rose-950/80 border border-rose-500 text-rose-200 font-mono-num font-black text-sm tracking-widest animate-pulse shadow-lg shadow-rose-950/50">
-        <span>🔨</span> <span id="live-countdown-text">COUNT 3</span>
+      <div>
+        <h1 class="text-sm sm:text-base font-extrabold text-[#F7F6F1] leading-tight">Alamdar Sports Club</h1>
+        <p class="text-[11px] text-[#C8A96A] font-semibold">Box Cricket Auction 2026</p>
       </div>
     </div>
 
-    <!-- Main Projector Stage -->
-    <div class="grid grid-cols-12 gap-6">
-      
-      <!-- Player Spotlight Card (7 Columns) -->
-      <section class="col-span-12 lg:col-span-7 classic-card p-6 md:p-8 flex flex-col justify-between border-amber-500/20 relative overflow-hidden">
-        <div class="absolute -right-20 -top-20 w-72 h-72 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+    <!-- Center: View Switcher Pills -->
+    <div class="flex items-center gap-1.5 bg-[#134E43]/70 p-1 rounded-full border border-[#C8A96A]/20">
+      <button data-view-tab="live" class="nav-pill active">Audience Screen</button>
+      <button data-view-tab="owner" class="nav-pill" id="nav-owner-tab">Owner Dashboard</button>
+      <button data-view-tab="admin" class="nav-pill" id="nav-admin-tab">Admin Control</button>
+    </div>
 
-        <!-- Top Player Header -->
-        <div>
-          <div class="flex justify-between items-start">
-            <span id="live-player-spec" class="stone-badge text-amber-300 border-amber-500/40 bg-amber-950/30">
-              All-Rounder
-            </span>
-            <span class="text-xs font-mono font-bold text-slate-500 uppercase tracking-widest">
-              BASE: <span id="live-player-base-price" class="text-slate-300 font-mono-num">₹1,000</span>
-            </span>
+    <!-- Right: Authentication State & Audio Toggle -->
+    <div class="flex items-center gap-2.5">
+      
+      <!-- State 1: Public Viewer (Not Logged In) -->
+      <div id="auth-guest-controls" class="flex items-center gap-2">
+        <span class="text-xs text-[#E6F0E9] font-semibold hidden sm:inline">👁️ Public Viewer</span>
+        <button id="open-login-btn" class="btn-primary text-xs py-1.5 px-3.5 rounded-xl font-bold shadow-md">
+          🔐 Sign In
+        </button>
+      </div>
+
+      <!-- State 2: Authenticated (Team Owner or Admin Locked Session) -->
+      <div id="auth-user-controls" class="items-center gap-2" style="display:none;">
+        <span id="auth-user-badge" class="stone-badge text-[#C8A96A] border-[#C8A96A]/60 bg-[#134E43]/80 text-xs py-1 px-3 font-bold">
+          Husaini Hawks
+        </span>
+        <button id="logout-btn" class="btn-outline text-xs py-1.5 px-3 text-rose-300 border-rose-800 hover:bg-rose-950/60 font-bold rounded-xl" title="Click to logout and switch account">
+          🚪 Log Out
+        </button>
+      </div>
+
+      <!-- Audio Toggle -->
+      <button id="sound-toggle-btn" class="btn-outline text-xs py-1.5 px-3 font-semibold rounded-xl text-[#F7F6F1]">
+        🔊 Audio ON
+      </button>
+
+    </div>
+
+  </nav>
+
+  <!-- ============================================================== -->
+  <!-- 1. AUDIENCE SCREEN VIEW (EXACTLY AS SCREENSHOT 3) -->
+  <!-- ============================================================== -->
+  <main id="view-live" class="p-4 md:p-6 max-w-[1600px] mx-auto space-y-6">
+    
+    <!-- Top Row: Left Sidebar (Budget + Slots + Mini List) & Right Spotlight Card -->
+    <div class="grid grid-cols-12 gap-5">
+      
+      <!-- Left Column (Budget & Teams Summary) -->
+      <div class="col-span-12 lg:col-span-4 space-y-4">
+        
+        <!-- Top Stats Box: Remaining Budget & Auction Slots -->
+        <div class="glass-panel p-4 grid grid-cols-2 gap-3">
+          <!-- Remaining Budget -->
+          <div>
+            <p class="text-[11px] font-bold text-slate-400">Remaining Budget</p>
+            <p class="text-xl sm:text-2xl font-black text-white font-mono-num mt-0.5">
+              <span id="live-sidebar-budget">₹100,000</span> <span class="text-[11px] font-medium text-slate-400 font-sans">/ ₹1,00,000 Purse Cap</span>
+            </p>
+            <div class="w-full bg-slate-900 rounded-full h-1.5 mt-2.5 overflow-hidden">
+              <div id="live-sidebar-budget-bar" class="bg-emerald-400 h-1.5 rounded-full" style="width: 100%;"></div>
+            </div>
+            <p class="text-[10px] text-slate-400 mt-1">Progress/ Purse Cap</p>
           </div>
 
-          <h2 id="live-player-name" class="text-3xl md:text-5xl font-black text-white mt-4 tracking-tight font-brand">
-            Husain Merchant
-          </h2>
-
-          <!-- Structured Player Attributes Pill Row -->
-          <div class="grid grid-cols-3 gap-3 mt-6">
-            <div class="stat-pill">
-              <span class="stat-pill-label">Age</span>
-              <span id="live-stat-age" class="stat-pill-value font-mono-num">24 Years</span>
-            </div>
-            <div class="stat-pill">
-              <span class="stat-pill-label">Batting Style</span>
-              <span id="live-stat-bat" class="stat-pill-value">Right-Hand</span>
-            </div>
-            <div class="stat-pill">
-              <span class="stat-pill-label">Bowling Style</span>
-              <span id="live-stat-bowl" class="stat-pill-value">Medium Fast</span>
+          <!-- Auction Slots Semicircular Meter -->
+          <div class="border-l border-white/10 pl-3 flex flex-col justify-between">
+            <p class="text-[11px] font-bold text-slate-400">Auction Slots</p>
+            <div class="gauge-container">
+              <div class="gauge-arc"></div>
+              <div class="gauge-text">
+                <span id="live-sidebar-slots" class="text-lg font-black text-white font-mono-num">0 / 8</span>
+                <p class="text-[10px] text-slate-400 -mt-0.5">Players</p>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Grand Bid Showcase Container -->
-        <div id="live-bid-showcase-box" class="mt-8 bg-black/60 border border-amber-500/30 rounded-2xl p-6 md:p-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 backdrop-blur-xl relative">
+        <!-- Team Purse & Roster (Left List) -->
+        <div class="glass-panel p-4 space-y-2.5">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">Team Purse & Roster</h3>
+          <div id="live-sidebar-teams-list" class="space-y-2 max-h-[360px] overflow-y-auto pr-1">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Column: Player Spotlight Card (Blue Glowing Box) -->
+      <div class="col-span-12 lg:col-span-8">
+        <div class="live-spotlight-box p-6 md:p-8 flex flex-col justify-between h-full space-y-6">
+          
+          <!-- Top Tag Row -->
           <div>
-            <p class="text-xs uppercase tracking-widest text-slate-400 font-semibold flex items-center gap-1.5">
-              <span>⚡</span> Current Highest Bid
-            </p>
-            <div id="live-bid-display" class="text-5xl md:text-7xl font-black text-amber-400 font-mono-num tracking-tight mt-1">
-              ₹14,000
+            <div class="flex justify-between items-center">
+              <span id="live-countdown-banner" class="px-3.5 py-1 rounded-full text-xs font-black tracking-wider text-cyan-300 border border-cyan-500/50 bg-cyan-950/40 flex items-center gap-1.5">
+                <span class="animate-pulse">((•))</span> COUNT GOING, GOING...
+              </span>
+              <span class="px-3.5 py-1 rounded-full text-xs font-black tracking-wider text-rose-300 border border-rose-500/50 bg-rose-950/40 flex items-center gap-1.5">
+                <span class="animate-ping">((•))</span> LIVE
+              </span>
             </div>
-            <div class="flex items-center gap-2 mt-2">
-              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
-              <p id="live-highest-bidder-name" class="text-sm font-bold text-emerald-400">
-                Leading: Husaini Hawks
+
+            <!-- Giant Player Name & Role Pill -->
+            <div class="flex flex-wrap items-center gap-3 mt-4">
+              <h2 id="live-player-name" class="text-3xl md:text-5xl font-black text-white uppercase tracking-tight">
+                FAROOQ BAGASRAWALA
+              </h2>
+              <span id="live-player-spec" class="px-3 py-1 rounded-full text-xs font-extrabold uppercase bg-cyan-950/80 border border-cyan-400 text-cyan-300">
+                BOWLING ALL-ROUNDER
+              </span>
+            </div>
+
+            <!-- Player Attributes Subtext -->
+            <p id="live-player-details" class="text-xs sm:text-sm text-slate-300 mt-2 font-medium">
+              Age: 36 • Bat: Right-Hand Anchor • Bowl: Right-Arm Fast Yorker Specialist
+            </p>
+            <!-- Active 2-Franchise Bidding Battle Ring -->
+            <div id="live-active-bidders-ring" class="mt-4"></div>
+          </div>
+
+          <!-- Middle: 2 Huge Colorful Bidding Cards -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            
+            <!-- Gold Card: Current Highest Bid -->
+            <div class="bg-[#C8A96A] text-[#0F3D34] p-5 rounded-2xl flex flex-col justify-between shadow-xl">
+              <p class="text-xs uppercase font-black tracking-wider text-[#0F3D34]/80">CURRENT HIGHEST BID</p>
+              <p id="live-bid-display" class="text-4xl md:text-5xl font-black font-mono-num my-2 text-[#0F3D34]">
+                ₹1,000
               </p>
+              <div class="inline-block">
+                <span id="live-highest-bidder-name" class="bg-[#0F3D34] text-[#F7F6F1] text-xs font-bold px-3 py-1 rounded-full">
+                  Leading: Husaini Hawks
+                </span>
+              </div>
             </div>
+
+            <!-- Emerald Jewel Card: Base Price -->
+            <div class="bg-[#134E43] text-[#F7F6F1] border-2 border-[#C8A96A]/50 p-5 rounded-2xl flex flex-col justify-between shadow-xl">
+              <p class="text-xs uppercase font-black tracking-wider text-[#C8A96A]">BASE PRICE</p>
+              <p id="live-player-base-price" class="text-4xl md:text-5xl font-black font-mono-num my-2 text-[#F7F6F1]">
+                ₹1,000
+              </p>
+              <div class="text-xs text-[#E6F0E9] font-bold">Opening Price</div>
+            </div>
+
           </div>
 
-          <div class="sm:text-right border-t sm:border-t-0 sm:border-l border-white/10 pt-3 sm:pt-0 sm:pl-6">
-            <p class="text-xs uppercase tracking-widest text-slate-400 font-semibold">Next Minimum Raise</p>
-            <p id="live-next-step-display" class="text-2xl md:text-3xl font-black text-slate-200 font-mono-num mt-1">
-              ₹16,000
-            </p>
-            <span class="text-[11px] text-slate-500 font-semibold block mt-0.5">Dynamic Tier Rule</span>
-          </div>
         </div>
-
-        <!-- Two-Player Battle Arena Ring Status -->
-        <div class="mt-6 pt-5 border-t border-white/[0.08]">
-          <div class="flex justify-between items-center mb-3">
-            <p class="text-xs uppercase font-extrabold text-slate-300 tracking-wider flex items-center gap-1.5">
-              <span>⚔️</span> Two-Player Bidding Ring
-            </p>
-            <span class="text-[11px] text-slate-500">Only 2 teams can compete at a time</span>
-          </div>
-          <div class="grid grid-cols-2 gap-3 text-center">
-            <div id="live-battle-slot1"></div>
-            <div id="live-battle-slot2"></div>
-          </div>
-        </div>
-      </section>
-
-      <!-- 12-Team Matrix Table (5 Columns) -->
-      <section class="col-span-12 lg:col-span-5 classic-card p-5 flex flex-col justify-between">
-        <div class="classic-card-header !px-0 !pt-0 pb-3 mb-3">
-          <div>
-            <h3 class="text-xs uppercase tracking-wider font-extrabold text-slate-300">
-              Tournament Purse & Squads
-            </h3>
-            <p class="text-[11px] text-slate-500">12 Franchise Teams • Exactly 8 Players</p>
-          </div>
-          <span class="text-[11px] font-mono font-bold text-amber-400/80 bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20">
-            1,00,000 Max
-          </span>
-        </div>
-
-        <div id="live-team-matrix-grid" class="grid grid-cols-2 gap-2.5 max-h-[580px] overflow-y-auto pr-1">
-          <!-- Dynamically populated -->
-        </div>
-      </section>
+      </div>
 
     </div>
+
+    <!-- Bottom Section: 12-Team Matrix Table (4 Columns as in Screenshot 3) -->
+    <div class="space-y-3 pt-2">
+      <h3 class="text-xs font-black uppercase tracking-wider text-[#E6F0E9]">
+        BOTTOM SECTION - TEAM PURSES & ROSTERS (12 TEAMS)
+      </h3>
+      <div id="live-bottom-teams-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <!-- Dynamically populated with 12 teams -->
+      </div>
+    </div>
+
   </main>
 
   <!-- ============================================================== -->
-  <!-- 2. TEAM OWNER INTERACTIVE DASHBOARD (CLEAN & MOBILE-FIRST) -->
+  <!-- 2. OWNER DASHBOARD VIEW (EXACTLY AS SCREENSHOT 1) -->
   <!-- ============================================================== -->
-  <main id="view-owner" class="p-4 max-w-lg mx-auto space-y-4" style="display:none;">
+  <main id="view-owner" class="p-4 md:p-6 max-w-[1600px] mx-auto space-y-6" style="display:none;">
     
-    <!-- Sticky Budget & Slot Meter -->
-    <div class="classic-card p-5 border-amber-500/30">
-      <div class="flex justify-between items-center">
-        <div>
-          <p class="text-[11px] uppercase tracking-wider text-slate-400 font-bold">Remaining Purse</p>
-          <p id="owner-remaining-budget" class="text-2xl md:text-3xl font-black text-amber-400 font-mono-num">
-            ₹1,00,000
-          </p>
-        </div>
-        <div class="text-right">
-          <p class="text-[11px] uppercase tracking-wider text-slate-400 font-bold">Squad Roster</p>
-          <p id="owner-slots-count" class="text-2xl md:text-3xl font-black text-emerald-400 font-mono-num">
-            0 / 8
-          </p>
-        </div>
-      </div>
-      <div class="w-full bg-slate-900 rounded-full h-1.5 mt-3 overflow-hidden border border-white/10">
-        <div id="owner-roster-progress-bar" class="bg-gradient-to-r from-emerald-500 to-amber-500 h-1.5 rounded-full transition-all duration-300" style="width: 0%;"></div>
-      </div>
-    </div>
-
-    <!-- Active Franchise Badge -->
-    <div class="text-center py-1">
-      <h2 id="owner-team-title" class="text-lg font-black text-white font-brand">Husaini Hawks</h2>
-      <p class="text-xs text-slate-400">Owner Session Active • Max 1 Player Per Set</p>
-    </div>
-
-    <!-- Player on the Block Card -->
-    <div class="classic-card p-6 text-center space-y-4">
+    <!-- 1. REMAINING BUDGET & AUCTION SLOTS (FIRST CONTAINER) -->
+    <div class="glass-panel p-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <!-- Remaining Budget -->
       <div>
-        <span class="stone-badge text-amber-300 border-amber-500/40 bg-amber-950/30 text-[10px] mb-2">
-          ON THE BLOCK
-        </span>
-        <h3 id="owner-current-player-name" class="text-2xl font-black text-white mt-1">
-          Husain Merchant
-        </h3>
-        <p id="owner-current-player-stats" class="text-xs text-slate-400 mt-1">
-          All-Rounder • Right-Hand Aggressive
+        <p class="text-[11px] font-bold text-[#E6F0E9]">Remaining Budget</p>
+        <p class="text-xl sm:text-2xl font-black text-[#F7F6F1] font-mono-num mt-0.5">
+          <span id="owner-remaining-budget">₹100,000</span> <span class="text-[11px] font-medium text-[#E6F0E9] font-sans">/ ₹1,00,000 Purse Cap</span>
         </p>
-      </div>
-
-      <div class="grid grid-cols-2 gap-3 bg-black/50 p-4 rounded-xl border border-white/5">
-        <div>
-          <p class="text-[10px] text-slate-500 uppercase font-semibold">Current Bid</p>
-          <p id="owner-current-bid-display" class="text-2xl font-black text-amber-400 font-mono-num">₹0</p>
+        <div class="w-full bg-[#0F3D34] rounded-full h-1.5 mt-2.5 overflow-hidden">
+          <div id="owner-budget-bar" class="bg-[#C8A96A] h-1.5 rounded-full" style="width: 100%;"></div>
         </div>
-        <div>
-          <p class="text-[10px] text-slate-500 uppercase font-semibold">Next Raise Step</p>
-          <p id="owner-next-bid-step" class="text-2xl font-black text-slate-200 font-mono-num">₹1,000</p>
+        <p class="text-[10px] text-[#E6F0E9] mt-1">Progress/ Purse Cap</p>
+      </div>
+
+      <!-- Auction Slots Semicircular Meter -->
+      <div class="border-t sm:border-t-0 sm:border-l border-[#C8A96A]/20 pt-3 sm:pt-0 sm:pl-4 flex flex-col justify-between">
+        <p class="text-[11px] font-bold text-[#E6F0E9]">Auction Slots</p>
+        <div class="gauge-container">
+          <div class="gauge-arc"></div>
+          <div class="gauge-text">
+            <span id="owner-slots-count" class="text-lg font-black text-[#F7F6F1] font-mono-num">0 / 8</span>
+            <p class="text-[10px] text-[#E6F0E9] -mt-0.5">Players</p>
+          </div>
         </div>
       </div>
-
-      <!-- Ring State Summary -->
-      <div class="flex justify-between items-center text-xs text-slate-400 px-2 pt-1 border-t border-white/[0.06]">
-        <span id="owner-ring-slot1" class="font-medium">Slot 1: Vacant</span>
-        <span id="owner-ring-slot2" class="font-medium">Slot 2: Vacant</span>
-      </div>
     </div>
 
-    <!-- Alert / Constraint Messages -->
-    <div id="owner-status-alert-box" style="display:none;"></div>
-
-    <!-- Action Buttons -->
-    <div class="space-y-2.5 pt-2">
-      <button id="owner-join-battle-btn" class="btn-primary btn-emerald w-full py-4 text-base">
-        ⚔️ Join Bidding Battle
-      </button>
-
-      <button id="owner-raise-bid-btn" class="btn-primary w-full py-4 text-base" style="display:none;">
-        🔥 Raise Bid
-      </button>
-
-      <button id="owner-withdraw-btn" class="btn-outline w-full py-2.5 text-xs text-rose-400 border-rose-800 hover:bg-rose-950/40" style="display:none;">
-        Withdraw From Battle Ring
-      </button>
-    </div>
-
-    <!-- My Squad Roster Drawer -->
-    <div class="classic-card p-5 space-y-3 mt-4">
-      <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex justify-between items-center">
-        <span>My Squad (1 Playing Owner + 8 Auctioned)</span>
-      </h4>
-      <div id="owner-roster-list" class="space-y-2 max-h-52 overflow-y-auto">
-        <!-- Populated dynamically -->
-      </div>
-    </div>
-  </main>
-
-  <!-- ============================================================== -->
-  <!-- 3. ADMIN MASTER CONTROLLER DASHBOARD -->
-  <!-- ============================================================== -->
-  <main id="view-admin" class="p-4 md:p-6 lg:p-8 max-w-6xl mx-auto space-y-6" style="display:none;">
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-white/10 pb-4">
-      <div>
-        <h2 class="text-2xl font-black text-white font-brand">Master Auction Controller</h2>
-        <p class="text-xs text-slate-400">Select Sets, Trigger Players, Hammer Gavel, and Manage Auto-Assignments</p>
-      </div>
-      <button id="admin-reset-btn" class="btn-rose text-xs py-2 px-4 rounded-xl font-bold">
-        ⚠️ Reset Tournament Data
-      </button>
-    </div>
-
-    <!-- Control Command Center -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- MAIN GRID: 2. ACTUAL BIDDING BOX & 3. TEAM PURSE & ROSTER -->
+    <div class="grid grid-cols-12 gap-5">
       
-      <!-- Stone Set Selector -->
-      <div class="classic-card p-5 space-y-3">
-        <label class="text-xs font-bold uppercase tracking-wider text-slate-400 block">
-          Select Active Stone Set
-        </label>
-        <select id="admin-set-select" class="w-full text-sm font-semibold"></select>
-        <p class="text-[11px] text-slate-500 leading-relaxed">
-          Each team can buy maximum 1 player per set. 12 players per set.
-        </p>
+      <!-- 2. ACTUAL BIDDING BOX (SECOND CONTAINER) -->
+      <div class="col-span-12 lg:col-span-8 space-y-4">
+        
+        <!-- Live Player Spotlight Box -->
+        <div class="live-spotlight-box p-6 md:p-8 flex flex-col justify-between space-y-6">
+          
+          <!-- Top Tag Row -->
+          <div>
+            <div class="flex justify-between items-center">
+              <span class="px-3.5 py-1 rounded-full text-xs font-black tracking-wider text-[#C8A96A] border border-[#C8A96A]/50 bg-[#0F3D34]/80 flex items-center gap-1.5">
+                <span class="animate-pulse">((•))</span> COUNT GOING, GOING...
+              </span>
+              <span class="px-3.5 py-1 rounded-full text-xs font-black tracking-wider text-[#F7F6F1] border border-[#9e2a2b]/60 bg-[#9e2a2b]/50 flex items-center gap-1.5">
+                <span class="animate-ping">((•))</span> LIVE
+              </span>
+            </div>
+
+            <!-- Player Name & Attributes -->
+            <h2 id="owner-current-player-name" class="text-3xl md:text-5xl font-black text-[#F7F6F1] uppercase tracking-tight mt-4">
+              FAROOQ BAGASRAWALA
+            </h2>
+            <p id="owner-current-player-stats" class="text-xs sm:text-sm text-[#E6F0E9] mt-2 font-medium">
+              Age: 36 • Bat: Right-Hand • Bowl: Right-Arm Fast • All-Rounder
+            </p>
+            <!-- Active 2-Franchise Bidding Battle Ring -->
+            <div id="owner-active-bidders-ring" class="mt-4"></div>
+          </div>
+
+          <!-- Middle 2 Large Cards: Current Bid & Base/Next Min -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            
+            <!-- Gold Card: Current Highest Bid -->
+            <div class="bg-[#C8A96A] text-[#0F3D34] p-5 rounded-2xl flex flex-col justify-between shadow-xl">
+              <p class="text-xs uppercase font-black tracking-wider text-[#0F3D34]/80">CURRENT HIGHEST BID</p>
+              <p id="owner-current-bid-display" class="text-4xl md:text-5xl font-black font-mono-num my-2 text-[#0F3D34]">
+                ₹1,000
+              </p>
+              <div class="inline-block">
+                <span id="owner-leading-badge" class="bg-[#0F3D34] text-[#F7F6F1] text-xs font-bold px-3 py-1 rounded-full">
+                  Leading: Husaini Hawks
+                </span>
+              </div>
+            </div>
+
+            <!-- Emerald Jewel Card: Base Price / Next Min -->
+            <div class="bg-[#134E43] text-[#F7F6F1] border-2 border-[#C8A96A]/50 p-5 rounded-2xl flex flex-col justify-between shadow-xl">
+              <p class="text-xs uppercase font-black tracking-wider text-[#C8A96A]">BASE PRICE / NEXT MIN</p>
+              <p id="owner-next-bid-step" class="text-3xl md:text-4xl font-black font-mono-num my-2 text-[#F7F6F1]">
+                ₹1,000 / ₹2,000
+              </p>
+              <div class="text-xs text-[#E6F0E9] font-bold">Tiered Increments</div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- Bottom Action Buttons: Giant Bidding Button + Withdraw Button -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          
+          <!-- Bidding / Status Button (Spans 2 columns) -->
+          <div class="sm:col-span-2">
+            <button id="owner-raise-bid-btn" class="w-full py-4 px-6 rounded-2xl font-black text-sm sm:text-base uppercase tracking-wider bg-[#134E43] text-[#F7F6F1] border border-[#C8A96A]/40 shadow-xl transition-all">
+              YOU HOLD THE HIGHEST BID (₹1,000)
+            </button>
+          </div>
+
+          <!-- Withdraw Button -->
+          <div>
+            <button id="owner-withdraw-btn" class="w-full py-4 px-6 rounded-2xl font-bold text-sm text-[#E6F0E9] bg-[#0a2c25] hover:bg-[#134E43] border border-[#C8A96A]/20 shadow-xl transition-all">
+              Withdraw From Battle
+            </button>
+          </div>
+
+        </div>
+
       </div>
 
-      <!-- Gavel Hammer Actions -->
-      <div class="classic-card p-5 md:col-span-2 flex flex-col justify-between">
-        <p class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Gavel Actions</p>
-        <div class="flex flex-wrap gap-3">
-          <button id="admin-countdown-btn" class="btn-outline text-amber-300 border-amber-500/40 hover:bg-amber-500/10">
-            ⏳ Count 3-2-1
-          </button>
-          <button id="admin-sold-btn" class="btn-primary btn-emerald font-black">
-            🔨 SOLD to Leading Team
-          </button>
-          <button id="admin-unsold-btn" class="btn-primary btn-rose font-black">
-            ❌ Mark UNSOLD (Queue End)
+      <!-- 3. TEAM PURSE & ROSTER (THIRD CONTAINER - SIDEBAR LIST) -->
+      <div class="col-span-12 lg:col-span-4 space-y-4">
+        
+        <!-- Team Purse & Roster (Left List) -->
+        <div class="glass-panel p-4 space-y-2.5">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-[#F7F6F1]">Team Purse & Roster</h3>
+          <div id="owner-sidebar-teams-list" class="space-y-2 max-h-[360px] overflow-y-auto pr-1">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- 3B. MY FRANCHISE SQUAD & ACQUIRED ROSTER SECTION -->
+    <div id="owner-team-squad-section" class="glass-panel p-5 md:p-6 space-y-5 border-2 border-[#C8A96A]/30 bg-[#134E43]/85 rounded-2xl shadow-2xl">
+      <!-- Header with Team info & Download Button -->
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-4 border-b border-[#C8A96A]/20">
+        <div>
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="px-3 py-1 rounded-full text-[11px] font-black bg-[#C8A96A]/20 text-[#C8A96A] border border-[#C8A96A]/40 uppercase tracking-widest">
+              🏏 OFFICIAL SQUAD ROSTER
+            </span>
+            <span id="owner-squad-slots-badge" class="px-3 py-1 rounded-full text-[11px] font-bold bg-[#0F3D34] text-[#E6F0E9] border border-[#C8A96A]/20">
+              0 / 8 Auction Slots Acquired
+            </span>
+          </div>
+          <h2 id="owner-squad-team-name" class="text-2xl md:text-3xl font-black text-[#F7F6F1] mt-1.5 flex items-center gap-2">
+            My Franchise Squad
+          </h2>
+          <p id="owner-squad-owner-caption" class="text-xs text-[#E6F0E9] mt-0.5">
+            Franchise Owner & Playing Captain Squad Details
+          </p>
+        </div>
+
+        <!-- Action: Download Squad Poster Button -->
+        <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+          <button id="owner-download-squad-btn" onclick="window.downloadTeamSquadPoster()" class="w-full sm:w-auto px-5 py-3 rounded-xl font-black text-xs uppercase tracking-wider bg-[#C8A96A] hover:bg-[#DFC897] text-[#0F3D34] shadow-xl transition-all flex items-center justify-center gap-2 cursor-pointer">
+            <span class="text-base">📥</span>
+            <span id="owner-download-btn-text">Download Squad Card (PNG)</span>
           </button>
         </div>
-        <p class="text-[11px] text-slate-500 mt-2.5">
-          "SOLD" automatically checks and executes auto-assignment if only 1 player and 1 team remain in this set.
-        </p>
       </div>
 
+      <!-- 8-Player Completed Celebration Card (Shows when squad is full) -->
+      <div id="owner-squad-celebration-banner" style="display:none;" class="p-4 rounded-xl bg-gradient-to-r from-[#C8A96A]/25 via-[#134E43] to-[#C8A96A]/25 border-2 border-[#C8A96A] shadow-lg flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+        <div class="flex items-center gap-3">
+          <span class="text-3xl">🏆</span>
+          <div>
+            <p class="font-black text-[#F7F6F1] text-sm uppercase">AUCTION COMPLETE! ALL 8 SLOTS FILLED</p>
+            <p class="text-xs text-[#E6F0E9]">Your official 2026 squad is locked. Download your official team poster below!</p>
+          </div>
+        </div>
+        <button onclick="window.downloadTeamSquadPoster()" class="px-4 py-2.5 rounded-lg bg-[#C8A96A] text-[#0F3D34] font-black text-xs uppercase tracking-wider shadow-lg hover:scale-105 transition-all shrink-0 cursor-pointer">
+          ⭐ Download Official Poster
+        </button>
+      </div>
+
+      <!-- 9 Player Cards Grid: Captain + 8 Auction Slots -->
+      <div id="owner-squad-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+        <!-- Dynamically populated -->
+      </div>
+
+      <!-- Financial Summary Footer -->
+      <div class="pt-3 border-t border-[#C8A96A]/20 flex flex-wrap justify-between items-center gap-3 text-xs">
+        <div class="text-[#E6F0E9]">
+          Squad Allocation: <strong class="text-[#F7F6F1] font-mono-num">1 Playing Captain + 8 Auction Slots (Max 9 Players)</strong>
+        </div>
+        <div class="flex items-center gap-4">
+          <span class="text-[#E6F0E9]">Purse Spent: <strong id="owner-squad-spent-total" class="text-[#C8A96A] font-mono-num font-black">₹0</strong></span>
+          <span class="text-[#E6F0E9]">Remaining: <strong id="owner-squad-remaining-total" class="text-emerald-400 font-mono-num font-black">₹100,000</strong></span>
+        </div>
+      </div>
     </div>
 
-    <!-- Player Queue in Set -->
-    <div class="classic-card p-5 space-y-3">
-      <div class="classic-card-header !px-0 !pt-0 pb-3">
-        <h3 class="text-sm font-bold uppercase tracking-wider text-slate-300">Set Player Roster & Queue</h3>
-        <span class="text-xs text-slate-500">12 Players in Set</span>
-      </div>
-      <div id="admin-player-queue-list" class="space-y-2 max-h-96 overflow-y-auto">
-        <!-- Populated dynamically -->
+    <!-- 4. BOTTOM SECTION - TEAM PURSES & ROSTERS (12 TEAMS) -->
+    <div class="space-y-3 pt-2">
+      <h3 class="text-xs font-black uppercase tracking-wider text-[#E6F0E9]">
+        BOTTOM SECTION - TEAM PURSES & ROSTERS (12 TEAMS)
+      </h3>
+      <div id="owner-bottom-teams-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <!-- Dynamically populated with 12 teams -->
       </div>
     </div>
+
   </main>
 
   <!-- ============================================================== -->
-  <!-- 4. AUTHENTICATION & LOGIN MODAL -->
+  <!-- 3. ADMIN CONTROL VIEW (EXACTLY AS SCREENSHOT 2) -->
+  <!-- ============================================================== -->
+  <main id="view-admin" class="p-4 md:p-6 max-w-[1600px] mx-auto space-y-5" style="display:none;">
+    
+    <!-- Top Card: Master Auction Controller & Set Selector -->
+    <div class="glass-panel p-5 space-y-3">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <div>
+          <span class="text-[10px] font-black uppercase tracking-widest text-[#C8A96A]">MASTER AUCTION CONTROLLERS</span>
+          <h2 class="text-2xl font-black text-[#F7F6F1] mt-0.5">Master Auction Controller</h2>
+          <p class="text-xs text-[#E6F0E9] mt-0.5">Select Sets, Trigger Players, Hammer Gavel, and Manage Auto-Assignments</p>
+          <p class="text-[11px] text-[#C8A96A]/80 mt-1">Each team can buy maximum 1 player per set.</p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3">
+          <button id="admin-demo-bot-btn" class="btn-outline text-[#C8A96A] border-2 border-[#C8A96A]/50 hover:bg-[#C8A96A]/20 text-xs py-2 px-3.5 rounded-xl font-black flex items-center gap-1.5 transition-all">
+            🤖 12-Team Demo Simulator: OFF
+          </button>
+          <button id="admin-reset-btn" class="btn-rose text-xs py-2 px-3.5 rounded-xl font-black">
+            ⚠️ Reset Tournament Data
+          </button>
+          <div class="flex items-center gap-2">
+            <label class="text-xs font-bold text-[#E6F0E9]">Select Active Stone Set</label>
+            <select id="admin-set-select" class="text-xs font-bold py-2 px-3 rounded-xl bg-[#0a2c25] border border-[#C8A96A]/30 text-[#F7F6F1]"></select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Middle Card: Official Auctioneer Gavel Hammer Actions -->
+    <div class="glass-panel p-5 space-y-3 border-2 border-[#C8A96A]/40 bg-[#134E43]/90">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-2 border-b border-[#C8A96A]/20">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">🔨</span>
+          <div>
+            <h3 class="text-sm font-black uppercase tracking-wider text-[#C8A96A]">Official Auctioneer Gavel Controls</h3>
+            <p class="text-[11px] text-[#E6F0E9]">Sole authority to count down, hammer gavel to sell, or pass player unsold</p>
+          </div>
+        </div>
+        <div id="admin-gavel-live-status" class="text-xs px-3 py-1 rounded-full bg-[#0F3D34] border border-[#C8A96A]/30 text-[#E6F0E9] font-semibold">
+          Stage: <span id="admin-gavel-player-label" class="font-bold text-[#F7F6F1]">No active player</span>
+        </div>
+      </div>
+
+      <!-- Active 2-Franchise Bidding Battle Ring in Admin Control -->
+      <div id="admin-active-bidders-ring" class="w-full"></div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+        <button id="admin-countdown-btn" class="btn-outline text-[#C8A96A] border-2 border-[#C8A96A]/50 hover:bg-[#C8A96A]/20 py-4 rounded-xl font-black text-sm shadow-lg transition-all cursor-pointer">
+          ⏳ Count 3-2-1 (Going...)
+        </button>
+        <button id="admin-sold-btn" class="btn-primary font-black py-4 rounded-xl text-sm shadow-xl transition-all cursor-pointer">
+          🔨 SOLD TO HIGHEST BIDDER
+        </button>
+        <button id="admin-unsold-btn" class="btn-rose font-black py-4 rounded-xl text-sm shadow-xl transition-all cursor-pointer">
+          ❌ MARK UNSOLD (QUEUE END)
+        </button>
+      </div>
+      <p class="text-xs text-slate-400">
+        "SOLD" triggers auto-assignment if exactly 1 player and 1 team remain in this set.
+      </p>
+    </div>
+
+    <!-- Bottom Card: Set Player Roster & Queue (2 Columns as in Screenshot 2) -->
+    <div class="glass-panel p-5 space-y-3">
+      <h3 class="text-sm font-black uppercase tracking-wider text-slate-200">Set Player Roster & Queue</h3>
+      <div id="admin-player-queue-list" class="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[500px] overflow-y-auto pr-1">
+        <!-- Dynamically populated with 2 columns of player cards -->
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ============================================================== -->
+  <!-- 4. AUTHENTICATION & LOGIN MODAL (TEAM & ADMIN PASSWORD GATED) -->
   <!-- ============================================================== -->
   <div id="login-modal" class="modal-overlay" style="display:none;">
-    <div class="modal-content p-6 space-y-4 max-w-md">
+    <div class="modal-content p-6 space-y-4 max-w-lg">
+      
+      <!-- Modal Header -->
       <div class="flex justify-between items-center border-b border-white/10 pb-3">
-        <h3 class="text-base font-black text-white flex items-center gap-2 font-brand">
-          🔐 Authenticate Session
-        </h3>
-        <button id="close-login-btn" class="text-slate-400 hover:text-white text-lg font-bold">✕</button>
+        <div>
+          <h3 class="text-lg font-black text-white flex items-center gap-2">
+            🔐 Sign In to Auction System
+          </h3>
+          <p class="text-xs text-slate-400 mt-0.5">Enter credentials once • Stays saved on your device</p>
+        </div>
+        <button id="close-login-btn" class="text-slate-400 hover:text-white text-2xl font-bold px-2">✕</button>
       </div>
 
-      <p class="text-xs text-slate-400">
-        Enter credentials to access Master Admin or your Team Owner Bidding Dashboard.
-      </p>
+      <!-- Mode Selector Tabs: Team Owner vs Admin -->
+      <div class="grid grid-cols-2 gap-2 bg-[#0a2923] p-1.5 rounded-xl border border-[#C8A96A]/25 text-xs font-bold">
+        <button type="button" id="tab-login-owner" class="py-2.5 px-3 rounded-lg bg-[#C8A96A] text-[#0F3D34] font-black transition-all">
+          🏏 Franchise Owner Login
+        </button>
+        <button type="button" id="tab-login-admin" class="py-2.5 px-3 rounded-lg text-[#E6F0E9] hover:text-[#F7F6F1] transition-all">
+          👑 Master Admin Login
+        </button>
+      </div>
 
-      <form id="login-form" class="space-y-3.5">
+      <!-- Form 1: Team Owner Login -->
+      <form id="owner-login-form" class="space-y-3.5">
+        
+        <!-- Franchise Dropdown & User ID Input -->
         <div>
-          <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Username / ID</label>
-          <input type="text" id="login-username" class="w-full text-sm" placeholder="e.g. admin or husaini" required autocomplete="username">
+          <label class="block text-xs font-bold uppercase tracking-wider text-[#E6F0E9] mb-1">
+            Franchise / Team Owner
+          </label>
+          <select id="login-team-select" class="w-full text-sm font-bold bg-[#0a2923] border border-[#C8A96A]/30 py-2.5 px-3 rounded-xl text-[#F7F6F1] outline-none">
+            <option value="" disabled selected>-- Select Your Franchise / Team --</option>
+            <option value="team_01" data-user="burhani">⚡ Burhani Blasters (User ID: burhani)</option>
+            <option value="team_02" data-user="saifee">🏏 Saifee Strikers (User ID: saifee)</option>
+            <option value="team_03" data-user="husaini">🦅 Husaini Hawks (User ID: husaini)</option>
+            <option value="team_04" data-user="najmi">🛡️ Najmi Knights (User ID: najmi)</option>
+            <option value="team_05" data-user="tayyebi">⚔️ Tayyebi Titans (User ID: tayyebi)</option>
+            <option value="team_06" data-user="qutbi">🦁 Qutbi Challengers (User ID: qutbi)</option>
+            <option value="team_07" data-user="badri">👑 Badri Royals (User ID: badri)</option>
+            <option value="team_08" data-user="fakhri">🥊 Fakhri Fighters (User ID: fakhri)</option>
+            <option value="team_09" data-user="hakimi">🏆 Hakimi Super Kings (User ID: hakimi)</option>
+            <option value="team_10" data-user="imadi">🏹 Imadi Warriors (User ID: imadi)</option>
+            <option value="team_11" data-user="mohammedi">🐎 Mohammedi Mavericks (User ID: mohammedi)</option>
+            <option value="team_12" data-user="zahra">⭐ Zahra Superstars (User ID: zahra)</option>
+          </select>
         </div>
 
         <div>
-          <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Password</label>
-          <input type="password" id="login-password" class="w-full text-sm" placeholder="••••••••" required autocomplete="current-password">
+          <label class="block text-xs font-bold uppercase tracking-wider text-[#E6F0E9] mb-1">
+            Or Type Your User ID
+          </label>
+          <input type="text" id="login-team-user-input" class="w-full text-sm py-2 px-3 rounded-xl bg-[#0a2923] border border-[#C8A96A]/30 text-[#F7F6F1] outline-none font-mono" placeholder="e.g. husaini, burhani, saifee...">
         </div>
 
-        <div id="login-error-msg" class="text-xs text-rose-400 font-semibold" style="display:none;"></div>
+        <!-- Password Field -->
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-[#E6F0E9] mb-1">
+            Team Password
+          </label>
+          <div class="relative">
+            <input type="password" id="login-team-password" class="w-full text-sm py-2.5 px-3 pr-10 rounded-xl bg-[#0a2923] border border-[#C8A96A]/30 text-[#F7F6F1] outline-none" placeholder="e.g. husaini@2026 or husaini" required autocomplete="current-password">
+            <button type="button" id="toggle-team-pass-btn" class="absolute right-3 top-2.5 text-[#E6F0E9] hover:text-[#F7F6F1] text-sm" title="Toggle password visibility">👁️</button>
+          </div>
+          <p class="text-[11px] text-[#E6F0E9] mt-1">
+            Password format: <span class="text-[#C8A96A] font-mono">&lt;team&gt;@2026</span> (or simply <span class="text-[#C8A96A] font-mono">&lt;team&gt;</span>).
+          </p>
+        </div>
 
-        <button type="submit" class="btn-primary w-full py-3 text-sm font-bold">
-          Sign In & Enter Arena
+        <!-- Collapsible Password Cheat-Sheet for Senior Owners -->
+        <div class="pt-1">
+          <button type="button" id="toggle-cheatsheet-btn" class="text-[11px] font-bold text-[#C8A96A] hover:text-[#DFC897] flex items-center gap-1">
+            <span>📋</span> <span id="cheatsheet-btn-label">Show All 12 Team Passwords List</span>
+          </button>
+          <div id="team-credentials-cheatsheet" class="mt-2 p-2.5 rounded-xl bg-[#0a2923] border border-[#C8A96A]/25 text-[11px] space-y-1.5 max-h-36 overflow-y-auto" style="display:none;">
+            <p class="text-[#E6F0E9] font-semibold mb-1">Click your team below to auto-fill:</p>
+            <div id="quick-fill-teams-grid" class="grid grid-cols-2 gap-1.5">
+              <!-- Dynamically rendered quick fill chips -->
+            </div>
+          </div>
+        </div>
+
+        <div id="login-owner-error-msg" class="text-xs text-[#F7F6F1] font-bold p-2 bg-[#9e2a2b]/40 rounded-lg border border-[#9e2a2b]" style="display:none;"></div>
+
+        <button type="submit" class="btn-primary w-full py-3.5 text-sm font-black rounded-xl cursor-pointer">
+          🏏 Sign In & Enter Franchise Terminal
         </button>
       </form>
 
-      <!-- Quick Credentials Cheat-sheet -->
-      <div class="pt-3 border-t border-white/10">
-        <p class="text-[11px] font-bold text-amber-400 uppercase tracking-wider mb-1">Reference Logins:</p>
-        <div class="text-[11px] text-slate-400 space-y-1 bg-black/50 p-3 rounded-xl border border-white/5 font-mono">
-          <div>👑 <strong>Admin:</strong> user: <span class="text-white">admin</span> | pass: <span class="text-white">alamdar@admin2026</span></div>
-          <div>🏏 <strong>Team 01:</strong> user: <span class="text-white">burhani</span> | pass: <span class="text-white">burhani@2026</span></div>
-          <div>🏏 <strong>Team 03:</strong> user: <span class="text-white">husaini</span> | pass: <span class="text-white">husaini@2026</span></div>
-          <div class="text-[10px] text-slate-500 pt-1">*Other teams: `&lt;team_name&gt;` & `&lt;team_name&gt;@2026`</div>
+      <!-- Form 2: Master Admin Login -->
+      <form id="admin-login-form" class="space-y-4" style="display:none;">
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-[#E6F0E9] mb-1.5">
+            Admin User ID
+          </label>
+          <input type="text" id="login-admin-user" class="w-full text-sm py-2.5 px-3 rounded-xl bg-[#0a2923] border border-[#C8A96A]/30 text-[#F7F6F1] outline-none font-mono" value="admin">
         </div>
+
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-[#E6F0E9] mb-1.5">
+            Master Admin Password
+          </label>
+          <div class="relative">
+            <input type="password" id="login-admin-password" class="w-full text-sm py-2.5 px-3 pr-10 rounded-xl bg-[#0a2923] border border-[#C8A96A]/30 text-[#F7F6F1] outline-none" placeholder="alamdar@admin2026" required autocomplete="current-password">
+            <button type="button" id="toggle-admin-pass-btn" class="absolute right-3 top-2.5 text-[#E6F0E9] hover:text-[#F7F6F1] text-sm" title="Toggle password visibility">👁️</button>
+          </div>
+          <div class="flex justify-between items-center mt-1">
+            <p class="text-[11px] text-[#E6F0E9]">
+              Admin Password: <span class="text-[#C8A96A] font-mono">alamdar@admin2026</span>
+            </p>
+            <button type="button" id="quick-fill-admin-btn" class="text-[10px] font-bold text-[#C8A96A] hover:text-[#DFC897] underline">
+              Auto-fill Admin Pass
+            </button>
+          </div>
+        </div>
+
+        <div id="login-admin-error-msg" class="text-xs text-[#F7F6F1] font-bold p-2 bg-[#9e2a2b]/40 rounded-lg border border-[#9e2a2b]" style="display:none;"></div>
+
+        <button type="submit" class="btn-primary w-full py-3.5 text-sm font-black rounded-xl cursor-pointer">
+          👑 Sign In as Master Admin
+        </button>
+      </form>
+
+      <!-- Security Notice -->
+      <div class="pt-2 border-t border-white/10 text-center space-y-1">
+        <p class="text-[11px] text-slate-300">
+          🔒 <strong>Single Login Guard:</strong> Only 1 active login allowed per team at a time to prevent bidding conflicts.
+        </p>
+        <p class="text-[10px] text-slate-500">
+          To switch teams, simply click <strong>Log Out</strong> in the top header.
+        </p>
       </div>
+
     </div>
   </div>
 
-  <!-- Session Eviction Modal (Single-Active-Session Rule) -->
+  <!-- Session Eviction Modal (Single-Active-Session Conflict Resolution) -->
   <div id="session-eviction-modal" class="modal-overlay" style="display:none;">
-    <div class="modal-content p-6 text-center space-y-4">
+    <div class="modal-content p-6 text-center space-y-4 max-w-md">
       <div class="text-4xl">⚠️</div>
-      <h3 class="text-xl font-bold text-white font-brand">Concurrent Session Detected</h3>
-      <p class="text-sm text-slate-400 leading-relaxed">
-        You have been signed out on this device because your team account was logged in from another browser or phone.
+      <h3 class="text-xl font-bold text-white">Concurrent Session Detected</h3>
+      <p class="text-sm text-slate-300 leading-relaxed">
+        Your franchise account was signed in from another device or browser. To prevent bidding conflicts, this session has been automatically logged out.
       </p>
-      <button id="session-reauth-btn" class="btn-primary w-full">
-        Re-claim Active Session on this Device
+      <button id="session-reauth-btn" class="btn-primary w-full py-3 text-sm font-bold rounded-xl">
+        Re-claim Session on this Device
       </button>
     </div>
   </div>
@@ -421,10 +648,10 @@
   <div id="toast-container"></div>
 
   <!-- Scripts -->
-  <script src="./js/data.js"></script>
-  <script src="./js/storage.js"></script>
-  <script src="./js/sound.js"></script>
-  <script src="./js/auction-engine.js"></script>
-  <script src="./js/app.js"></script>
+  <script src="./js/data.js?v=2026.7"></script>
+  <script src="./js/storage.js?v=2026.7"></script>
+  <script src="./js/sound.js?v=2026.7"></script>
+  <script src="./js/auction-engine.js?v=2026.7"></script>
+  <script src="./js/app.js?v=2026.7"></script>
 </body>
 </html>

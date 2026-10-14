@@ -25,18 +25,18 @@ const ADMIN_CREDENTIALS = {
 
 // 12 Teams with Individual Credentials
 const INITIAL_TEAMS = [
-  { id: 'team_01', name: 'Burhani Blasters', username: 'burhani', password: 'burhani@2026', ownerName: 'Murtaza Bhai', phone: '9820011111', playingOwner: 'Murtaza (C)', color: '#3b82f6' },
-  { id: 'team_02', name: 'Saifee Strikers', username: 'saifee', password: 'saifee@2026', ownerName: 'Mustafa Bhai', phone: '9820022222', playingOwner: 'Mustafa (C)', color: '#10b981' },
-  { id: 'team_03', name: 'Husaini Hawks', username: 'husaini', password: 'husaini@2026', ownerName: 'Shabbir Bhai', phone: '9820033333', playingOwner: 'Shabbir (C)', color: '#f59e0b' },
-  { id: 'team_04', name: 'Najmi Knights', username: 'najmi', password: 'najmi@2026', ownerName: 'Ali Asgar Bhai', phone: '9820044444', playingOwner: 'Ali Asgar (C)', color: '#ef4444' },
-  { id: 'team_05', name: 'Tayyebi Titans', username: 'tayyebi', password: 'tayyebi@2026', ownerName: 'Huzefa Bhai', phone: '9820055555', playingOwner: 'Huzefa (C)', color: '#8b5cf6' },
-  { id: 'team_06', name: 'Qutbi Challengers', username: 'qutbi', password: 'qutbi@2026', ownerName: 'Taha Bhai', phone: '9820066666', playingOwner: 'Taha (C)', color: '#ec4899' },
-  { id: 'team_07', name: 'Badri Royals', username: 'badri', password: 'badri@2026', ownerName: 'Abbas Bhai', phone: '9820077777', playingOwner: 'Abbas (C)', color: '#14b8a6' },
-  { id: 'team_08', name: 'Fakhri Fighters', username: 'fakhri', password: 'fakhri@2026', ownerName: 'Zainuddin Bhai', phone: '9820088888', playingOwner: 'Zainuddin (C)', color: '#6366f1' },
-  { id: 'team_09', name: 'Hakimi Super Kings', username: 'hakimi', password: 'hakimi@2026', ownerName: 'Mohammed Bhai', phone: '9820099999', playingOwner: 'Mohammed (C)', color: '#eab308' },
-  { id: 'team_10', name: 'Imadi Warriors', username: 'imadi', password: 'imadi@2026', ownerName: 'Adnan Bhai', phone: '9820010101', playingOwner: 'Adnan (C)', color: '#06b6d4' },
-  { id: 'team_11', name: 'Mohammedi Mavericks', username: 'mohammedi', password: 'mohammedi@2026', ownerName: 'Ibrahim Bhai', phone: '9820020202', playingOwner: 'Ibrahim (C)', color: '#f97316' },
-  { id: 'team_12', name: 'Zahra Superstars', username: 'zahra', password: 'zahra@2026', ownerName: 'Burhanuddin Bhai', phone: '9820030303', playingOwner: 'Burhanuddin (C)', color: '#84cc16' }
+  { id: 'team_01', name: 'Burhani Blasters', icon: '⚡', username: 'burhani', password: 'burhani@2026', ownerName: 'Murtaza Bhai', phone: '9820011111', playingOwner: 'Murtaza (C)', color: '#3b82f6' },
+  { id: 'team_02', name: 'Saifee Strikers', icon: '🏏', username: 'saifee', password: 'saifee@2026', ownerName: 'Mustafa Bhai', phone: '9820022222', playingOwner: 'Mustafa (C)', color: '#10b981' },
+  { id: 'team_03', name: 'Husaini Hawks', icon: '🦅', username: 'husaini', password: 'husaini@2026', ownerName: 'Shabbir Bhai', phone: '9820033333', playingOwner: 'Shabbir (C)', color: '#f59e0b' },
+  { id: 'team_04', name: 'Najmi Knights', icon: '🛡️', username: 'najmi', password: 'najmi@2026', ownerName: 'Ali Asgar Bhai', phone: '9820044444', playingOwner: 'Ali Asgar (C)', color: '#ef4444' },
+  { id: 'team_05', name: 'Tayyebi Titans', icon: '⚔️', username: 'tayyebi', password: 'tayyebi@2026', ownerName: 'Huzefa Bhai', phone: '9820055555', playingOwner: 'Huzefa (C)', color: '#8b5cf6' },
+  { id: 'team_06', name: 'Qutbi Challengers', icon: '🦁', username: 'qutbi', password: 'qutbi@2026', ownerName: 'Taha Bhai', phone: '9820066666', playingOwner: 'Taha (C)', color: '#ec4899' },
+  { id: 'team_07', name: 'Badri Royals', icon: '👑', username: 'badri', password: 'badri@2026', ownerName: 'Abbas Bhai', phone: '9820077777', playingOwner: 'Abbas (C)', color: '#14b8a6' },
+  { id: 'team_08', name: 'Fakhri Fighters', icon: '🥊', username: 'fakhri', password: 'fakhri@2026', ownerName: 'Zainuddin Bhai', phone: '9820088888', playingOwner: 'Zainuddin (C)', color: '#6366f1' },
+  { id: 'team_09', name: 'Hakimi Super Kings', icon: '🏆', username: 'hakimi', password: 'hakimi@2026', ownerName: 'Mohammed Bhai', phone: '9820099999', playingOwner: 'Mohammed (C)', color: '#eab308' },
+  { id: 'team_10', name: 'Imadi Warriors', icon: '🏹', username: 'imadi', password: 'imadi@2026', ownerName: 'Adnan Bhai', phone: '9820010101', playingOwner: 'Adnan (C)', color: '#06b6d4' },
+  { id: 'team_11', name: 'Mohammedi Mavericks', icon: '🐎', username: 'mohammedi', password: 'mohammedi@2026', ownerName: 'Ibrahim Bhai', phone: '9820020202', playingOwner: 'Ibrahim (C)', color: '#f97316' },
+  { id: 'team_12', name: 'Zahra Superstars', icon: '⭐', username: 'zahra', password: 'zahra@2026', ownerName: 'Burhanuddin Bhai', phone: '9820030303', playingOwner: 'Burhanuddin (C)', color: '#84cc16' }
 ];
 
 const FIRST_NAMES = [

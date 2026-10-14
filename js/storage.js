@@ -1,6 +1,6 @@
 /**
- * Real-time Multi-Tab Storage & Broadcast Channel
- * Supports local peer-to-peer tab sync + optional Firebase Realtime Database
+ * Real-time Multi-Device Storage & Wi-Fi Sync Engine
+ * Synchronizes live auction state, teams, players, bids, and gavel status across all phones & laptops.
  */
 
 const STORAGE_KEYS = {
@@ -62,11 +62,13 @@ const StorageManager = {
     try {
       localStorage.setItem(key, JSON.stringify(value));
       bus.emit('DATA_CHANGED', { key, value });
+      this.syncToServer(key, value);
     } catch (e) {
       console.error('Storage save error:', e);
     }
   },
 
+  // Safe local-only default initialization (NEVER pushes blank data to the server!)
   initializeDefaults() {
     let teams = this.get(STORAGE_KEYS.TEAMS);
     if (!teams || teams.length === 0) {
@@ -88,19 +90,40 @@ const StorageManager = {
           }
         ]
       }));
-      this.set(STORAGE_KEYS.TEAMS, teams);
+      localStorage.setItem(STORAGE_KEYS.TEAMS, JSON.stringify(teams));
+    } else {
+      // Ensure existing teams in localStorage have valid credentials
+      let updated = false;
+      teams = teams.map((team) => {
+        const canonical = window.ALAMDAR_DATA.INITIAL_TEAMS.find((t) => t.id === team.id);
+        if (canonical && (!team.username || !team.password || !team.color)) {
+          updated = true;
+          return {
+            ...team,
+            username: canonical.username,
+            password: canonical.password,
+            color: canonical.color || team.color || '#3b82f6',
+            ownerName: canonical.ownerName || team.ownerName,
+            playingOwner: canonical.playingOwner || team.playingOwner
+          };
+        }
+        return team;
+      });
+      if (updated) {
+        localStorage.setItem(STORAGE_KEYS.TEAMS, JSON.stringify(teams));
+      }
     }
 
     let players = this.get(STORAGE_KEYS.PLAYERS);
     if (!players || players.length === 0) {
       players = window.ALAMDAR_DATA.generate96Players();
-      this.set(STORAGE_KEYS.PLAYERS, players);
+      localStorage.setItem(STORAGE_KEYS.PLAYERS, JSON.stringify(players));
     }
 
     let state = this.get(STORAGE_KEYS.STATE);
     if (!state) {
       state = {
-        status: 'IDLE', // 'IDLE' | 'BIDDING' | 'COUNTDOWN' | 'SOLD' | 'UNSOLD'
+        status: 'IDLE',
         currentSetId: 'set_aqeeq',
         currentSetName: 'Aqeeq',
         currentPlayerId: null,
@@ -119,10 +142,129 @@ const StorageManager = {
         lastActionTimestamp: Date.now(),
         version: 1
       };
-      this.set(STORAGE_KEYS.STATE, state);
+      localStorage.setItem(STORAGE_KEYS.STATE, JSON.stringify(state));
+    }
+
+    // Deduplication & Integrity Sentinel
+    if (teams && teams.length > 0 && players && players.length > 0) {
+      let teamsDirty = false;
+      let playersDirty = false;
+      const seenSoldPlayerIds = new Set();
+
+      teams.forEach((team) => {
+        if (!team.roster || team.roster.length === 0) return;
+        const cleanRoster = [];
+        let refundedAmount = 0;
+        let removedCount = 0;
+
+        team.roster.forEach((item) => {
+          if (item.isOwner) {
+            cleanRoster.push(item);
+            return;
+          }
+          if (seenSoldPlayerIds.has(item.playerId)) {
+            teamsDirty = true;
+            refundedAmount += (item.price || 0);
+            removedCount += 1;
+            console.warn(`[Integrity] Removed duplicate player ${item.name} (${item.playerId}) from team ${team.name}`);
+          } else {
+            seenSoldPlayerIds.add(item.playerId);
+            cleanRoster.push(item);
+          }
+        });
+
+        if (removedCount > 0) {
+          team.roster = cleanRoster;
+          team.remainingBudget += refundedAmount;
+          team.acquiredCount = cleanRoster.filter((r) => !r.isOwner).length;
+          team.ownedSetIds = [...new Set(cleanRoster.filter((r) => !r.isOwner).map((r) => r.setId))];
+        }
+      });
+
+      players.forEach((p) => {
+        const ownerTeam = teams.find((t) => t.roster && t.roster.some((r) => r.playerId === p.id && !r.isOwner));
+        if (ownerTeam) {
+          const rItem = ownerTeam.roster.find((r) => r.playerId === p.id);
+          if (p.status !== 'SOLD' || p.soldToTeamId !== ownerTeam.id) {
+            p.status = 'SOLD';
+            p.soldToTeamId = ownerTeam.id;
+            p.soldToTeamName = ownerTeam.name;
+            if (rItem) p.soldPrice = rItem.price;
+            playersDirty = true;
+          }
+        } else if (p.status === 'SOLD' && !seenSoldPlayerIds.has(p.id)) {
+          p.status = 'AVAILABLE';
+          p.soldToTeamId = null;
+          p.soldToTeamName = null;
+          p.soldPrice = null;
+          playersDirty = true;
+        }
+      });
+
+      if (teamsDirty) {
+        localStorage.setItem(STORAGE_KEYS.TEAMS, JSON.stringify(teams));
+      }
+      if (playersDirty) {
+        localStorage.setItem(STORAGE_KEYS.PLAYERS, JSON.stringify(players));
+      }
     }
 
     return { teams, players, state };
+  },
+
+  getActiveUser() {
+    try {
+      const tabData = sessionStorage.getItem('alamdar_tab_user_v1');
+      if (tabData) {
+        return JSON.parse(tabData);
+      }
+      const deviceData = localStorage.getItem('alamdar_device_user_v1') || localStorage.getItem(STORAGE_KEYS.CURRENT_USER);
+      if (deviceData) {
+        const parsed = JSON.parse(deviceData);
+        sessionStorage.setItem('alamdar_tab_user_v1', JSON.stringify(parsed));
+        return parsed;
+      }
+    } catch (e) {
+      console.error('Storage getActiveUser error:', e);
+    }
+    return {
+      userId: 'guest_audience',
+      role: 'audience',
+      teamId: null,
+      sessionId: 'sess_audience'
+    };
+  },
+
+  setActiveUser(user) {
+    try {
+      if (!user || user.role === 'audience') {
+        this.clearActiveUser();
+        return;
+      }
+      sessionStorage.setItem('alamdar_tab_user_v1', JSON.stringify(user));
+      localStorage.setItem('alamdar_device_user_v1', JSON.stringify(user));
+      localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(user));
+      bus.emit('DATA_CHANGED', { key: STORAGE_KEYS.CURRENT_USER, value: user });
+    } catch (e) {
+      console.error('Storage setActiveUser error:', e);
+    }
+  },
+
+  clearActiveUser() {
+    try {
+      sessionStorage.removeItem('alamdar_tab_user_v1');
+      localStorage.removeItem('alamdar_device_user_v1');
+      localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
+      const guest = {
+        userId: 'guest_audience',
+        role: 'audience',
+        teamId: null,
+        sessionId: 'sess_audience'
+      };
+      bus.emit('DATA_CHANGED', { key: STORAGE_KEYS.CURRENT_USER, value: guest });
+    } catch (e) {
+      console.error('Storage clearActiveUser error:', e);
+    }
   },
 
   resetTournament() {
@@ -130,10 +272,117 @@ const StorageManager = {
     localStorage.removeItem(STORAGE_KEYS.PLAYERS);
     localStorage.removeItem(STORAGE_KEYS.STATE);
     localStorage.removeItem(STORAGE_KEYS.SESSIONS);
+    this.clearActiveUser();
+    if (typeof fetch !== 'undefined') {
+      fetch('/api/reset', { method: 'POST' }).catch(() => {});
+    }
     return this.initializeDefaults();
+  },
+
+  // Multi-Device Real-Time Wi-Fi Sync
+  _serverVersion: 0,
+  _syncDisabled: false,
+  _pollIntervalId: null,
+
+  syncToServer(key, value) {
+    if (this._syncDisabled || typeof fetch === 'undefined') return;
+    const keyMap = {
+      [STORAGE_KEYS.STATE]: 'state',
+      [STORAGE_KEYS.TEAMS]: 'teams',
+      [STORAGE_KEYS.PLAYERS]: 'players',
+      [STORAGE_KEYS.SESSIONS]: 'sessions'
+    };
+    const field = keyMap[key];
+    if (!field) return;
+
+    fetch('/api/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ [field]: value })
+    })
+      .then((res) => {
+        if (!res.ok) {
+          if (res.status === 404) {
+            this._syncDisabled = true;
+            if (this._pollIntervalId) clearInterval(this._pollIntervalId);
+          }
+          return null;
+        }
+        return res.json();
+      })
+      .then((data) => {
+        if (data && data.version) {
+          this._serverVersion = Math.max(this._serverVersion, data.version);
+        }
+      })
+      .catch((err) => {
+        // DO NOT disable sync on temporary network hiccup! Phones recover automatically.
+        console.warn('Sync POST error (will retry on next poll):', err);
+      });
+  },
+
+  startServerSync() {
+    if (typeof fetch === 'undefined') return;
+
+    const pollServer = async () => {
+      if (this._syncDisabled) return;
+      try {
+        const res = await fetch('/api/sync?t=' + Date.now(), { cache: 'no-store' });
+        if (!res.ok) {
+          if (res.status === 404) {
+            this._syncDisabled = true;
+            if (this._pollIntervalId) {
+              clearInterval(this._pollIntervalId);
+              this._pollIntervalId = null;
+            }
+          }
+          return;
+        }
+        const data = await res.json();
+        if (!data) return;
+
+        // Synchronize whenever server has a newer version OR on initial connection
+        const isNewVersion = data.version && data.version > this._serverVersion;
+        const isInitialSync = this._serverVersion === 0;
+
+        if (isNewVersion || isInitialSync) {
+          this._serverVersion = data.version || this._serverVersion;
+
+          if (data.state) {
+            localStorage.setItem(STORAGE_KEYS.STATE, JSON.stringify(data.state));
+          }
+          if (data.teams) {
+            localStorage.setItem(STORAGE_KEYS.TEAMS, JSON.stringify(data.teams));
+          }
+          if (data.players) {
+            localStorage.setItem(STORAGE_KEYS.PLAYERS, JSON.stringify(data.players));
+          }
+          if (data.sessions) {
+            localStorage.setItem(STORAGE_KEYS.SESSIONS, JSON.stringify(data.sessions));
+          }
+
+          // Directly invoke application render hook so UI reflects changes instantly
+          if (typeof window.onServerDataReceived === 'function') {
+            window.onServerDataReceived(data);
+          }
+          bus.emit('DATA_CHANGED', { key: STORAGE_KEYS.STATE, value: data.state });
+        }
+      } catch (e) {
+        // Wi-Fi packet drop or momentary sleep on mobile device:
+        // DO NOT disable polling! Next tick in 400ms will seamlessly reconnect.
+      }
+    };
+
+    if (this._pollIntervalId) clearInterval(this._pollIntervalId);
+    // 400ms polling interval ensures sub-half-second updates across all 12 devices
+    this._pollIntervalId = setInterval(pollServer, 400);
+    pollServer();
   }
 };
 
 window.STORAGE_KEYS = STORAGE_KEYS;
 window.StorageManager = StorageManager;
 window.auctionBus = bus;
+
+// Automatically initiate sync loop
+StorageManager.startServerSync();

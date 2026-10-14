@@ -3,8 +3,8 @@
   "short_name": "Alamdar Auction",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#090d16",
-  "theme_color": "#090d16",
+  "background_color": "#0F3D34",
+  "theme_color": "#0F3D34",
   "orientation": "portrait-primary",
   "icons": [
     {

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'alamdar-auction-v1';
+const CACHE_NAME = 'alamdar-auction-v10';
 const ASSETS = [
   './',
   './index.html',
@@ -14,7 +14,7 @@ const ASSETS = [
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS).catch(err => console.log('Cache addAll warning:', err));
+      return cache.addAll(ASSETS).catch((err) => console.log('Cache addAll warning:', err));
     })
   );
   self.skipWaiting();
@@ -35,13 +35,22 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
+// Network-first fetch strategy for assets; BYPASS SERVICE WORKER ENTIRELY FOR ALL API REQUESTS
 self.addEventListener('fetch', (event) => {
+  // CRITICAL: Live sync and API calls MUST bypass service worker cache completely
+  if (event.request.url.includes('/api/') || event.request.method !== 'GET') {
+    return; // Fall through to standard browser network request
+  }
+
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      return cachedResponse || fetch(event.request).catch(() => {
-        // Return offline fallback if needed
-        return caches.match('./index.html');
-      });
-    })
+    fetch(event.request)
+      .then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200) {
+          const responseClone = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
+        }
+        return networkResponse;
+      })
+      .catch(() => caches.match(event.request))
   );
 });

@@ -1,0 +1,2 @@
+# Alamdar Box Cricket Auction 2026
+# Built using Python Standard Library (zero external dependencies required)
