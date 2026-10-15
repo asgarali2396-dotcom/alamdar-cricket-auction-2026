@@ -34,13 +34,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Restore saved active user session (stays saved permanently on device across reloads)
   activeUser = StorageManager.getActiveUser();
-  if (activeUser && activeUser.role === 'owner') {
-    currentTab = 'owner';
-  } else if (activeUser && activeUser.role === 'admin') {
-    currentTab = 'admin';
-  } else {
-    currentTab = 'live';
-  }
+
+  // The website should load on the audience screen by default
+  currentTab = 'live';
 
   setupEventListeners();
   setupRealtimeListeners();
@@ -50,49 +46,79 @@ document.addEventListener('DOMContentLoaded', () => {
   // Periodic heartbeat single-session monitor (every 2.5 seconds)
   setInterval(checkSingleSessionHealth, 2500);
 
-  // Modal Helpers
-  function openLoginModal(mode = 'owner') {
-    const modal = document.getElementById('login-modal');
+  // Modal Helpers (Dual-Slider Campus Fix Model - Default Admin)
+  function openLoginModal(mode = 'admin') {
+    const modal = document.getElementById('auth-page-modal') || document.getElementById('login-modal');
     const errOwner = document.getElementById('login-owner-error-msg');
     const errAdmin = document.getElementById('login-admin-error-msg');
     if (errOwner) errOwner.style.display = 'none';
     if (errAdmin) errAdmin.style.display = 'none';
 
-    switchLoginTab(mode);
-    if (modal) modal.style.display = 'flex';
+    setAuthSliderMode(mode);
+    if (modal) {
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden', 'false');
+      modal.style.display = 'flex';
+    }
+    document.body.style.overflow = 'hidden';
   }
 
   function closeLoginModal() {
-    const modal = document.getElementById('login-modal');
-    if (modal) modal.style.display = 'none';
+    const modal = document.getElementById('auth-page-modal') || document.getElementById('login-modal');
+    if (modal) {
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden', 'true');
+      modal.style.display = 'none';
+    }
+    document.body.style.overflow = '';
   }
 
-  function switchLoginTab(mode) {
-    const tabOwner = document.getElementById('tab-login-owner');
-    const tabAdmin = document.getElementById('tab-login-admin');
-    const formOwner = document.getElementById('owner-login-form');
-    const formAdmin = document.getElementById('admin-login-form');
+  function setAuthSliderMode(mode = 'admin') {
+    const container = document.getElementById('auth-slider-container');
+    const mobileAdminTab = document.getElementById('mobile-tab-admin');
+    const mobileOwnerTab = document.getElementById('mobile-tab-owner');
 
     if (mode === 'owner') {
-      if (tabOwner) {
-        tabOwner.className = 'py-2.5 px-3 rounded-lg bg-amber-500 text-slate-950 font-black transition-all';
-      }
-      if (tabAdmin) {
-        tabAdmin.className = 'py-2.5 px-3 rounded-lg text-slate-400 hover:text-white transition-all';
-      }
-      if (formOwner) formOwner.style.display = 'block';
-      if (formAdmin) formAdmin.style.display = 'none';
+      if (container) container.classList.add('right-panel-active');
+      if (mobileOwnerTab) mobileOwnerTab.classList.add('active');
+      if (mobileAdminTab) mobileAdminTab.classList.remove('active');
     } else {
-      if (tabAdmin) {
-        tabAdmin.className = 'py-2.5 px-3 rounded-lg bg-amber-500 text-slate-950 font-black transition-all';
-      }
-      if (tabOwner) {
-        tabOwner.className = 'py-2.5 px-3 rounded-lg text-slate-400 hover:text-white transition-all';
-      }
-      if (formAdmin) formAdmin.style.display = 'block';
-      if (formOwner) formOwner.style.display = 'none';
+      // By default at Admin
+      if (container) container.classList.remove('right-panel-active');
+      if (mobileAdminTab) mobileAdminTab.classList.add('active');
+      if (mobileOwnerTab) mobileOwnerTab.classList.remove('active');
     }
   }
+
+  // Cinematic JAFAR Creation Animation Burst
+  function triggerCinematicLoginBurst(roleName = 'Tournament Portal', callback = null) {
+    const burstLayer = document.getElementById('auth-burst-effect');
+    const targetRoleEl = document.getElementById('burst-target-role');
+    if (targetRoleEl) {
+      targetRoleEl.innerText = `⚡ Authenticating & Entering ${roleName}...`;
+    }
+
+    // Play triumphant chime / sound
+    if (window.soundEffects && typeof window.soundEffects.playBattleJoin === 'function') {
+      window.soundEffects.playBattleJoin();
+    }
+
+    if (!burstLayer) {
+      if (callback) callback();
+      return;
+    }
+
+    burstLayer.classList.add('active');
+
+    setTimeout(() => {
+      if (callback) callback();
+      setTimeout(() => {
+        burstLayer.classList.remove('active');
+        closeLoginModal();
+      }, 350);
+    }, 850);
+  }
+
 
   // Toast notification helper
   function showToast(message, type = 'info') {
@@ -240,7 +266,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // Login Modal Open / Close triggers
     const openLoginBtn = document.getElementById('open-login-btn');
     if (openLoginBtn) {
-      openLoginBtn.addEventListener('click', () => openLoginModal('owner'));
+      // By default open in Admin mode as required
+      openLoginBtn.addEventListener('click', () => openLoginModal('admin'));
+    }
+
+    const authUserBadge = document.getElementById('auth-user-badge');
+    if (authUserBadge) {
+      authUserBadge.addEventListener('click', () => {
+        openLoginModal(activeUser && activeUser.role === 'owner' ? 'owner' : 'admin');
+      });
     }
 
     const closeLoginBtn = document.getElementById('close-login-btn');
@@ -248,16 +282,35 @@ document.addEventListener('DOMContentLoaded', () => {
       closeLoginBtn.addEventListener('click', closeLoginModal);
     }
 
-    // Modal Tabs Switcher
-    const tabOwner = document.getElementById('tab-login-owner');
-    if (tabOwner) {
-      tabOwner.addEventListener('click', () => switchLoginTab('owner'));
+    // Dual-Panel Sliding Overlay Switchers
+    const btnSwitchToOwner = document.getElementById('btn-switch-to-owner');
+    if (btnSwitchToOwner) {
+      btnSwitchToOwner.addEventListener('click', () => setAuthSliderMode('owner'));
     }
 
-    const tabAdmin = document.getElementById('tab-login-admin');
-    if (tabAdmin) {
-      tabAdmin.addEventListener('click', () => switchLoginTab('admin'));
+    const btnSwitchToAdmin = document.getElementById('btn-switch-to-admin');
+    if (btnSwitchToAdmin) {
+      btnSwitchToAdmin.addEventListener('click', () => setAuthSliderMode('admin'));
     }
+
+    // Mobile Switcher Tabs
+    const mobileTabAdmin = document.getElementById('mobile-tab-admin');
+    if (mobileTabAdmin) {
+      mobileTabAdmin.addEventListener('click', () => setAuthSliderMode('admin'));
+    }
+
+    const mobileTabOwner = document.getElementById('mobile-tab-owner');
+    if (mobileTabOwner) {
+      mobileTabOwner.addEventListener('click', () => setAuthSliderMode('owner'));
+    }
+
+    // JAFAR Creation animation preview triggers
+    document.querySelectorAll('.jafar-anim-trigger').forEach((el) => {
+      el.addEventListener('click', (e) => {
+        e.stopPropagation();
+        triggerCinematicLoginBurst('JAFAR Creation Showcase', null);
+      });
+    });
 
     // Bidirectional sync between Franchise Select dropdown and User ID text input
     const teamSelect = document.getElementById('login-team-select');
@@ -376,10 +429,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const authRes = AuctionEngine.authenticateTeam(teamVal, passVal);
         if (authRes.success) {
           activeUser = authRes;
-          closeLoginModal();
-          showToast(`Welcome, ${authRes.name}! Your franchise terminal is ready.`, 'success');
-          switchView('owner');
-          renderApp();
+          triggerCinematicLoginBurst(authRes.name || 'Franchise Terminal', () => {
+            showToast(`Welcome, ${authRes.name}! Your franchise terminal is ready.`, 'success');
+            switchView('owner');
+            renderApp();
+          });
         } else {
           if (errorEl) {
             errorEl.innerText = authRes.error;
@@ -400,10 +454,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const authRes = AuctionEngine.authenticateAdmin(passVal);
         if (authRes.success) {
           activeUser = authRes;
-          closeLoginModal();
-          showToast('Authenticated as Tournament Committee Admin!', 'success');
-          switchView('admin');
-          renderApp();
+          triggerCinematicLoginBurst('Tournament Committee Admin', () => {
+            showToast('Authenticated as Tournament Committee Admin!', 'success');
+            switchView('admin');
+            renderApp();
+          });
         } else {
           if (errorEl) {
             errorEl.innerText = authRes.error;
@@ -422,7 +477,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showToast('Signed out. You can now sign in with a different Franchise or Admin ID.', 'info');
         switchView('live');
         renderApp();
-        openLoginModal('owner');
+        openLoginModal('admin');
       });
     }
 
