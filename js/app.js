@@ -1257,7 +1257,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // -------------------------------------------------------------
   // HTML5 CANVAS HIGH-RES TEAM POSTER GENERATOR & DOWNLOADER
   // -------------------------------------------------------------
-  window.downloadTeamSquadPoster = function () {
+  window.downloadTeamSquadPoster = async function () {
     let team = null;
     if (activeUser && activeUser.role === 'owner' && activeUser.teamId) {
       team = currentTeams.find((t) => t.id === activeUser.teamId);
@@ -1276,6 +1276,14 @@ document.addEventListener('DOMContentLoaded', () => {
     canvas.height = 1500;
     const ctx = canvas.getContext('2d');
 
+    // Load Official Club Crest for Poster
+    const logoImg = await new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => resolve(null);
+      img.src = './icons/logo.png';
+    });
+
     // 1. Background Gradient (Pine & Emerald tones)
     const bgGrad = ctx.createLinearGradient(0, 0, 0, 1500);
     bgGrad.addColorStop(0, '#0F3D34');
@@ -1292,11 +1300,28 @@ document.addEventListener('DOMContentLoaded', () => {
     ctx.strokeStyle = 'rgba(200, 169, 106, 0.45)';
     ctx.strokeRect(40, 40, 1120, 1420);
 
-    // 3. Header Tournament Branding
+    // 3. Header Tournament Branding with Club Crests
+    if (logoImg) {
+      [180, 1020].forEach((cx) => {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(cx, 106, 36, 0, Math.PI * 2);
+        ctx.closePath();
+        ctx.clip();
+        ctx.drawImage(logoImg, cx - 36, 106 - 36, 72, 72);
+        ctx.restore();
+        ctx.strokeStyle = '#C8A96A';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.arc(cx, 106, 36, 0, Math.PI * 2);
+        ctx.stroke();
+      });
+    }
+
     ctx.fillStyle = '#C8A96A';
     ctx.font = '900 24px "Segoe UI", "Apple Color Emoji", Inter, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('ALAMDAR COMPANY SPORTS CLUB', 600, 90);
+    ctx.fillText('ALAMDAR SPORTS CLUB • AMRAVATI', 600, 90);
 
     ctx.fillStyle = '#E6F0E9';
     ctx.font = '700 16px "Segoe UI", Inter, sans-serif';

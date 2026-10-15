@@ -10,7 +10,16 @@
   <meta name="theme-color" content="#0F3D34">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Alamdar Auction">
   <meta name="description" content="Alamdar Sports Club Box Cricket Auction 2026 PWA.">
+
+  <!-- Favicon and App Icons for Web Page & Mobile Devices -->
+  <link rel="icon" type="image/x-icon" href="./favicon.ico?v=2026.9">
+  <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png?v=2026.9">
+  <link rel="icon" type="image/png" sizes="16x16" href="./icons/favicon-16.png?v=2026.9">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png?v=2026.9">
+  <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png?v=2026.9">
+  <link rel="shortcut icon" href="./favicon.ico?v=2026.9">
 
   <!-- Tailwind CSS CDN + Theme Extension -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -33,7 +42,7 @@
   </script>
 
   <!-- Custom Stylesheet (with cache-bust) -->
-  <link rel="stylesheet" href="./css/style.css?v=2026.7">
+  <link rel="stylesheet" href="./css/style.css?v=2026.8">
 </head>
 <body class="bg-[#0F3D34] text-[#F7F6F1] min-h-screen">
 
@@ -42,14 +51,17 @@
   <!-- ============================================================== -->
   <nav class="sticky top-0 z-50 bg-[#0F3D34]/95 backdrop-blur-xl border-b border-[#C8A96A]/20 px-4 md:px-6 py-2.5 flex flex-wrap justify-between items-center gap-3">
     
-    <!-- Left: Tournament Brand -->
-    <div class="flex items-center gap-2.5">
-      <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-[#C8A96A] to-[#DFC897] flex items-center justify-center font-black text-[#0F3D34] text-base shadow-md">
-        🏏
+    <!-- Left: Tournament Brand with Official Crest -->
+    <div class="flex items-center gap-3">
+      <div class="relative shrink-0">
+        <img src="./icons/logo.png" alt="Alamdar Sports Club Amravati" class="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover shadow-lg border-2 border-[#C8A96A]/60 ring-2 ring-[#C8A96A]/20 transition-transform hover:scale-105">
       </div>
       <div>
-        <h1 class="text-sm sm:text-base font-extrabold text-[#F7F6F1] leading-tight">Alamdar Sports Club</h1>
-        <p class="text-[11px] text-[#C8A96A] font-semibold">Box Cricket Auction 2026</p>
+        <h1 class="text-sm sm:text-base font-extrabold text-[#F7F6F1] leading-tight flex items-center gap-1.5">
+          Alamdar Sports Club
+          <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-[#C8A96A]/20 text-[#DFC897] border border-[#C8A96A]/30">Amravati</span>
+        </h1>
+        <p class="text-[11px] text-[#C8A96A] font-semibold tracking-wide">Box Cricket Auction 2026</p>
       </div>
     </div>
 
@@ -498,11 +510,14 @@
       
       <!-- Modal Header -->
       <div class="flex justify-between items-center border-b border-white/10 pb-3">
-        <div>
-          <h3 class="text-lg font-black text-white flex items-center gap-2">
-            🔐 Sign In to Auction System
-          </h3>
-          <p class="text-xs text-slate-400 mt-0.5">Enter credentials once • Stays saved on your device</p>
+        <div class="flex items-center gap-3">
+          <img src="./icons/logo.png" alt="Alamdar Sports Club Crest" class="w-11 h-11 rounded-full object-cover border-2 border-[#C8A96A]/60 shadow-md ring-1 ring-[#C8A96A]/20 shrink-0">
+          <div>
+            <h3 class="text-base sm:text-lg font-black text-white flex items-center gap-1.5 leading-tight">
+              🔐 Sign In to Auction System
+            </h3>
+            <p class="text-xs text-[#DFC897] font-medium mt-0.5">Alamdar Sports Club Amravati • Stays saved on your device</p>
+          </div>
         </div>
         <button id="close-login-btn" class="text-slate-400 hover:text-white text-2xl font-bold px-2">✕</button>
       </div>
@@ -648,10 +663,10 @@
   <div id="toast-container"></div>
 
   <!-- Scripts -->
-  <script src="./js/data.js?v=2026.7"></script>
-  <script src="./js/storage.js?v=2026.7"></script>
-  <script src="./js/sound.js?v=2026.7"></script>
-  <script src="./js/auction-engine.js?v=2026.7"></script>
-  <script src="./js/app.js?v=2026.7"></script>
+  <script src="./js/data.js?v=2026.8"></script>
+  <script src="./js/storage.js?v=2026.8"></script>
+  <script src="./js/sound.js?v=2026.8"></script>
+  <script src="./js/auction-engine.js?v=2026.8"></script>
+  <script src="./js/app.js?v=2026.8"></script>
 </body>
 </html>

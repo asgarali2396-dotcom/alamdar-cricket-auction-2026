@@ -1,14 +1,23 @@
-const CACHE_NAME = 'alamdar-auction-v10';
+const CACHE_NAME = 'alamdar-auction-v12';
 const ASSETS = [
   './',
   './index.html',
+  './favicon.ico',
   './css/style.css',
   './js/data.js',
   './js/storage.js',
   './js/auction-engine.js',
   './js/sound.js',
   './js/app.js',
-  './manifest.json'
+  './manifest.json',
+  './icons/logo.png',
+  './icons/icon-192.png',
+  './icons/icon-512.png',
+  './icons/apple-touch-icon.png',
+  './icons/favicon.png',
+  './icons/favicon-48.png',
+  './icons/favicon-32.png',
+  './icons/favicon-16.png'
 ];
 
 self.addEventListener('install', (event) => {
