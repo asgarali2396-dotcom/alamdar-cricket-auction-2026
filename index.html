@@ -42,7 +42,7 @@
   </script>
 
   <!-- Custom Stylesheet (with cache-bust) -->
-  <link rel="stylesheet" href="./css/style.css?v=2026.10">
+  <link rel="stylesheet" href="./css/style.css?v=2026.11">
 </head>
 <body class="bg-[#0F3D34] text-[#F7F6F1] min-h-screen">
 
@@ -765,6 +765,17 @@
           <div class="burst-status-role" id="burst-target-role">
             ⚡ Entering Tournament Terminal...
           </div>
+
+          <!-- 10-Second Progress Bar & Skip Control -->
+          <div class="burst-progress-wrap">
+            <div class="burst-progress-bar" id="burst-progress-fill"></div>
+          </div>
+          <div class="burst-timer-row">
+            <span id="burst-timer-countdown" class="burst-countdown-pill">⏱️ 10s</span>
+            <button type="button" id="burst-skip-btn" class="burst-skip-btn" title="Skip to dashboard immediately">
+              Skip Intro ⏭️
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -789,10 +800,10 @@
   <div id="toast-container"></div>
 
   <!-- Scripts -->
-  <script src="./js/data.js?v=2026.10"></script>
-  <script src="./js/storage.js?v=2026.10"></script>
-  <script src="./js/sound.js?v=2026.10"></script>
-  <script src="./js/auction-engine.js?v=2026.10"></script>
-  <script src="./js/app.js?v=2026.10"></script>
+  <script src="./js/data.js?v=2026.11"></script>
+  <script src="./js/storage.js?v=2026.11"></script>
+  <script src="./js/sound.js?v=2026.11"></script>
+  <script src="./js/auction-engine.js?v=2026.11"></script>
+  <script src="./js/app.js?v=2026.11"></script>
 </body>
 </html>

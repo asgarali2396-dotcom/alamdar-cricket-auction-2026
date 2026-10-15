@@ -1118,6 +1118,68 @@ select:focus, input:focus {
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
 }
 
+/* 10-Second Progress Bar & Countdown Row */
+.burst-progress-wrap {
+  width: 100%;
+  max-width: 440px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 99px;
+  overflow: hidden;
+  margin-top: 14px;
+  border: 1px solid rgba(200, 169, 106, 0.35);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.burst-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #10b981, #C8A96A, #DFC897);
+  box-shadow: 0 0 12px rgba(200, 169, 106, 0.8);
+  border-radius: 99px;
+}
+
+.burst-timer-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.burst-countdown-pill {
+  font-family: var(--font-mono);
+  font-size: 0.84rem;
+  font-weight: 800;
+  color: #F7F6F1;
+  background: rgba(200, 169, 106, 0.2);
+  border: 1px solid rgba(200, 169, 106, 0.45);
+  padding: 4px 14px;
+  border-radius: 99px;
+  letter-spacing: 0.05em;
+}
+
+.burst-skip-btn {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #F7F6F1;
+  padding: 5px 16px;
+  border-radius: 99px;
+  font-size: 0.80rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(8px);
+}
+
+.burst-skip-btn:hover {
+  background: var(--gold-primary);
+  color: #0F3D34;
+  border-color: var(--gold-light);
+  transform: scale(1.04);
+}
+
+
 /* ==========================================================================
    4. RESPONSIVE DESIGN (Tablets & Mobile Screens)
    ========================================================================== */

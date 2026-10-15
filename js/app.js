@@ -90,15 +90,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Cinematic JAFAR Creation Animation Burst
+  // Cinematic JAFAR Creation Animation Burst (Configured for 10 Seconds)
+  let burstCountdownTimer = null;
+  let burstFinishTimeout = null;
+
   function triggerCinematicLoginBurst(roleName = 'Tournament Portal', callback = null) {
     const burstLayer = document.getElementById('auth-burst-effect');
     const targetRoleEl = document.getElementById('burst-target-role');
+    const countdownEl = document.getElementById('burst-timer-countdown');
+    const progressFill = document.getElementById('burst-progress-fill');
+    const skipBtn = document.getElementById('burst-skip-btn');
+
     if (targetRoleEl) {
       targetRoleEl.innerText = `⚡ Authenticating & Entering ${roleName}...`;
     }
 
-    // Play triumphant chime / sound
+    // Play opening fanfare / chime
     if (window.soundEffects && typeof window.soundEffects.playBattleJoin === 'function') {
       window.soundEffects.playBattleJoin();
     }
@@ -108,15 +115,78 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
+    // Clear any previous active burst timers
+    if (burstCountdownTimer) {
+      clearInterval(burstCountdownTimer);
+      burstCountdownTimer = null;
+    }
+    if (burstFinishTimeout) {
+      clearTimeout(burstFinishTimeout);
+      burstFinishTimeout = null;
+    }
+
+    let timeLeft = 10;
+    if (countdownEl) countdownEl.innerText = `⏱️ ${timeLeft}s`;
+    if (progressFill) {
+      progressFill.style.transition = 'none';
+      progressFill.style.width = '0%';
+      setTimeout(() => {
+        progressFill.style.transition = 'width 10s linear';
+        progressFill.style.width = '100%';
+      }, 50);
+    }
+
     burstLayer.classList.add('active');
 
-    setTimeout(() => {
+    let finished = false;
+    function finishBurst() {
+      if (finished) return;
+      finished = true;
+
+      if (burstCountdownTimer) {
+        clearInterval(burstCountdownTimer);
+        burstCountdownTimer = null;
+      }
+      if (burstFinishTimeout) {
+        clearTimeout(burstFinishTimeout);
+        burstFinishTimeout = null;
+      }
+
       if (callback) callback();
       setTimeout(() => {
         burstLayer.classList.remove('active');
         closeLoginModal();
       }, 350);
-    }, 850);
+    }
+
+    // Connect skip button
+    if (skipBtn) {
+      skipBtn.onclick = (e) => {
+        e.stopPropagation();
+        finishBurst();
+      };
+    }
+
+    // 1-second interval countdown for 10 seconds
+    burstCountdownTimer = setInterval(() => {
+      timeLeft -= 1;
+      if (countdownEl) {
+        countdownEl.innerText = `⏱️ ${Math.max(1, timeLeft)}s`;
+      }
+      // Mid-point harmonic chime at 5 seconds
+      if (timeLeft === 5 && window.soundEffects && typeof window.soundEffects.playBidChime === 'function') {
+        window.soundEffects.playBidChime();
+      }
+      if (timeLeft <= 0) {
+        clearInterval(burstCountdownTimer);
+        burstCountdownTimer = null;
+      }
+    }, 1000);
+
+    // Conclude after exactly 10 seconds (10,000ms)
+    burstFinishTimeout = setTimeout(() => {
+      finishBurst();
+    }, 10000);
   }
 
 
