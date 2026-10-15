@@ -1139,44 +1139,35 @@ select:focus, input:focus {
   border-radius: 99px;
 }
 
-.burst-timer-row {
+.burst-actions-row {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  margin-top: 12px;
-}
-
-.burst-countdown-pill {
-  font-family: var(--font-mono);
-  font-size: 0.84rem;
-  font-weight: 800;
-  color: #F7F6F1;
-  background: rgba(200, 169, 106, 0.2);
-  border: 1px solid rgba(200, 169, 106, 0.45);
-  padding: 4px 14px;
-  border-radius: 99px;
-  letter-spacing: 0.05em;
+  margin-top: 14px;
 }
 
 .burst-skip-btn {
   background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(200, 169, 106, 0.4);
   color: #F7F6F1;
-  padding: 5px 16px;
+  padding: 6px 20px;
   border-radius: 99px;
-  font-size: 0.80rem;
+  font-size: 0.82rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
   backdrop-filter: blur(8px);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .burst-skip-btn:hover {
   background: var(--gold-primary);
   color: #0F3D34;
   border-color: var(--gold-light);
-  transform: scale(1.04);
+  transform: scale(1.05);
+  box-shadow: 0 4px 14px rgba(200, 169, 106, 0.4);
 }
 
 
