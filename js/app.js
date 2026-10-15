@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Cinematic JAFAR Creation Animation Burst (7 Seconds Duration)
+  // Cinematic JAFAR Creation Animation Burst (5 Seconds Duration)
   let burstFinishTimeout = null;
 
   function triggerCinematicLoginBurst(roleName = 'Tournament Portal', callback = null) {
@@ -123,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
       progressFill.style.transition = 'none';
       progressFill.style.width = '0%';
       setTimeout(() => {
-        progressFill.style.transition = 'width 7s linear';
+        progressFill.style.transition = 'width 5s linear';
         progressFill.style.width = '100%';
       }, 50);
     }
@@ -155,10 +155,10 @@ document.addEventListener('DOMContentLoaded', () => {
       };
     }
 
-    // Conclude after exactly 7 seconds (7,000ms)
+    // Conclude after exactly 5 seconds (5,000ms)
     burstFinishTimeout = setTimeout(() => {
       finishBurst();
-    }, 7000);
+    }, 5000);
   }
 
 
