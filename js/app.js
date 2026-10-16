@@ -856,9 +856,33 @@ document.addEventListener('DOMContentLoaded', () => {
     const ownerView = document.getElementById('view-owner');
     const adminView = document.getElementById('view-admin');
 
-    if (liveView) liveView.style.display = tab === 'live' ? 'block' : 'none';
-    if (ownerView) ownerView.style.display = tab === 'owner' ? 'block' : 'none';
-    if (adminView) adminView.style.display = tab === 'admin' ? 'block' : 'none';
+    if (liveView) {
+      if (tab === 'live') {
+        liveView.style.setProperty('display', 'block', 'important');
+        liveView.classList.remove('hidden');
+      } else {
+        liveView.style.setProperty('display', 'none', 'important');
+        liveView.classList.add('hidden');
+      }
+    }
+    if (ownerView) {
+      if (tab === 'owner') {
+        ownerView.style.setProperty('display', 'block', 'important');
+        ownerView.classList.remove('hidden');
+      } else {
+        ownerView.style.setProperty('display', 'none', 'important');
+        ownerView.classList.add('hidden');
+      }
+    }
+    if (adminView) {
+      if (tab === 'admin') {
+        adminView.style.setProperty('display', 'block', 'important');
+        adminView.classList.remove('hidden');
+      } else {
+        adminView.style.setProperty('display', 'none', 'important');
+        adminView.classList.add('hidden');
+      }
+    }
 
     renderApp();
   }

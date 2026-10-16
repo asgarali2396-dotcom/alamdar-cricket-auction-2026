@@ -1526,14 +1526,32 @@ body.is-fullscreen #view-live .owner-attr-value,
    Fits Purse Header + Spotlight + Bidding Buttons + Photo Card
    Completely into 100vh without ANY buttons or options cutting off!
    (Squad roster table is below the fold, scroll for more)
-   --------------------------------------------------------- */
-body.is-fullscreen #view-owner,
-:fullscreen #view-owner {
+/* Strictly prevent any hidden view from being shown in fullscreen or normal mode */
+#view-live.hidden,
+#view-owner.hidden,
+#view-admin.hidden,
+#view-live[style*="display: none"],
+#view-owner[style*="display: none"],
+#view-admin[style*="display: none"],
+body.is-fullscreen #view-live[style*="display: none"],
+body.is-fullscreen #view-owner[style*="display: none"],
+body.is-fullscreen #view-admin[style*="display: none"],
+body.is-fullscreen #view-live.hidden,
+body.is-fullscreen #view-owner.hidden,
+body.is-fullscreen #view-admin.hidden,
+:fullscreen #view-live[style*="display: none"],
+:fullscreen #view-owner[style*="display: none"],
+:fullscreen #view-admin[style*="display: none"],
+:fullscreen #view-live.hidden,
+:fullscreen #view-owner.hidden,
+:fullscreen #view-admin.hidden {
+  display: none !important;
+}
+
+body.is-fullscreen #view-owner:not(.hidden):not([style*="display: none"]),
+:fullscreen #view-owner:not(.hidden):not([style*="display: none"]) {
   padding-top: 0.5rem !important;
   padding-bottom: 2rem !important;
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 0.5rem !important;
 }
 
 /* 1. Remaining Budget & Slots Header (Compact Sleek Fit) */
