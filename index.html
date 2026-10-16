@@ -43,7 +43,7 @@
   </script>
 
   <!-- Custom Stylesheet (with cache-bust) -->
-  <link rel="stylesheet" href="./css/style.css?v=2026.30">
+  <link rel="stylesheet" href="./css/style.css?v=2026.31">
 </head>
 
 <body class="bg-[#0F3D34] text-[#F7F6F1] min-h-screen flex flex-col">
@@ -71,7 +71,8 @@
     </div>
 
     <!-- Center: View Switcher Pills -->
-    <div class="flex items-center gap-1 sm:gap-1.5 bg-[#134E43]/70 p-1 rounded-full border border-[#C8A96A]/20 max-w-full overflow-x-auto">
+    <div
+      class="flex items-center gap-1 sm:gap-1.5 bg-[#134E43]/70 p-1 rounded-full border border-[#C8A96A]/20 max-w-full overflow-x-auto">
       <button data-view-tab="live" class="nav-pill active">Audience Screen</button>
       <button data-view-tab="owner" class="nav-pill" id="nav-owner-tab">Owner Dashboard</button>
       <button data-view-tab="admin" class="nav-pill" id="nav-admin-tab">Admin Control</button>
@@ -81,7 +82,8 @@
     <div class="flex items-center gap-2 sm:gap-2.5">
 
       <!-- Live Multi-Device Sync Indicator -->
-      <div id="sync-status-indicator" class="sync-status-pill connected" title="Real-time multi-device sync active (Render Server)">
+      <div id="sync-status-indicator" class="sync-status-pill connected"
+        title="Real-time multi-device sync active (Render Server)">
         <span class="sync-dot"></span>
         <span class="sync-text hidden sm:inline">Live Sync</span>
       </div>
@@ -125,7 +127,8 @@
       </button>
 
       <!-- Audio Toggle -->
-      <button id="sound-toggle-btn" class="btn-outline text-xs py-1.5 px-2.5 sm:px-3 font-semibold rounded-xl text-[#F7F6F1]"
+      <button id="sound-toggle-btn"
+        class="btn-outline text-xs py-1.5 px-2.5 sm:px-3 font-semibold rounded-xl text-[#F7F6F1]"
         title="Toggle Sound Effects">
         🔊 <span class="hidden sm:inline">Audio</span>
       </button>
@@ -161,7 +164,8 @@
 
             <!-- Giant Player Name & Role Pill -->
             <div class="flex flex-wrap items-center gap-2.5 sm:gap-3 mt-3 sm:mt-4">
-              <h2 id="live-player-name" class="text-2xl sm:text-3xl md:text-5xl font-black text-white uppercase tracking-tight break-words">
+              <h2 id="live-player-name"
+                class="text-2xl sm:text-3xl md:text-5xl font-black text-white uppercase tracking-tight break-words">
                 WAITING FOR PLAYER ON STAGE...
               </h2>
               <span id="live-player-spec"
@@ -669,10 +673,10 @@
       <!-- Right: Developed by JAFAR Creation | Phone -->
       <div class="flex items-center flex-wrap justify-center sm:justify-end gap-2 text-slate-300">
         <span>Developed by</span>
-        <button type="button"
-          class="jafar-anim-trigger footer-dev-badge font-bold text-[#DFC897] hover:text-[#FFF2A3] transition-all inline-flex items-center gap-1 cursor-pointer"
+        <button type="button" id="footer-jafar-btn"
+          class="jafar-anim-trigger footer-dev-badge login-glow-pulse font-bold text-[#DFC897] hover:text-[#FFF2A3] transition-all inline-flex items-center gap-1.5 cursor-pointer shadow-lg"
           title="Click to view JAFAR Creation animation">
-          <span class="text-[#C8A96A]">✨</span>
+          <span class="text-[#C8A96A] animate-pulse">✨</span>
           <span>JAFAR Creation</span>
         </button>
         <span class="text-[#C8A96A]/40 hidden sm:inline">|</span>
@@ -920,66 +924,66 @@
 
     </div>
 
-    <!-- ============================================================== -->
-    <!-- CINEMATIC ANIMATION BURST (EXCLUSIVELY FEATURING JAFAR CREATION)-->
-    <!-- ============================================================== -->
-    <div class="auth-burst-layer" id="auth-burst-effect" aria-hidden="true">
-      <div class="burst-rays-bg"></div>
-      <div class="burst-ripple-ring ring-1"></div>
-      <div class="burst-ripple-ring ring-2"></div>
-      <div class="burst-ripple-ring ring-3"></div>
+  </div>
 
-      <div class="burst-content-box">
-        <!-- Luxury Glowing Crest -->
-        <div class="burst-emblem-wrap">
-          <div class="burst-emblem-glow"></div>
-          <div class="burst-emblem-core">
-            <svg viewBox="0 0 100 100" class="w-16 h-16" fill="none">
-              <defs>
-                <linearGradient id="jcGoldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stop-color="#FFF2A3" />
-                  <stop offset="50%" stop-color="#C8A96A" />
-                  <stop offset="100%" stop-color="#8E6A28" />
-                </linearGradient>
-              </defs>
-              <polygon points="50,6 88,24 88,68 50,94 12,68 12,24" stroke="url(#jcGoldGradient)" stroke-width="3.5"
-                fill="#0A2C25" fill-opacity="0.95" />
-              <polygon points="50,14 80,29 80,64 50,86 20,64 20,29" stroke="#C8A96A" stroke-width="1.5"
-                stroke-dasharray="4 2" fill="none" />
-              <text x="50" y="58" text-anchor="middle" font-family="'Outfit', sans-serif" font-weight="900"
-                font-size="30" fill="url(#jcGoldGradient)" letter-spacing="1">JC</text>
-              <circle cx="50" cy="22" r="3.5" fill="#DFC897" />
-            </svg>
-          </div>
+  <!-- ============================================================== -->
+  <!-- CINEMATIC ANIMATION BURST (EXCLUSIVELY FEATURING JAFAR CREATION)-->
+  <!-- ============================================================== -->
+  <div class="auth-burst-layer" id="auth-burst-effect" aria-hidden="true">
+    <div class="burst-rays-bg"></div>
+    <div class="burst-ripple-ring ring-1"></div>
+    <div class="burst-ripple-ring ring-2"></div>
+    <div class="burst-ripple-ring ring-3"></div>
+
+    <div class="burst-content-box">
+      <!-- Luxury Glowing Crest -->
+      <div class="burst-emblem-wrap">
+        <div class="burst-emblem-glow"></div>
+        <div class="burst-emblem-core">
+          <svg viewBox="0 0 100 100" class="w-16 h-16" fill="none">
+            <defs>
+              <linearGradient id="jcGoldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#FFF2A3" />
+                <stop offset="50%" stop-color="#C8A96A" />
+                <stop offset="100%" stop-color="#8E6A28" />
+              </linearGradient>
+            </defs>
+            <polygon points="50,6 88,24 88,68 50,94 12,68 12,24" stroke="url(#jcGoldGradient)" stroke-width="3.5"
+              fill="#0A2C25" fill-opacity="0.95" />
+            <polygon points="50,14 80,29 80,64 50,86 20,64 20,29" stroke="#C8A96A" stroke-width="1.5"
+              stroke-dasharray="4 2" fill="none" />
+            <text x="50" y="58" text-anchor="middle" font-family="'Outfit', sans-serif" font-weight="900"
+              font-size="30" fill="url(#jcGoldGradient)" letter-spacing="1">JC</text>
+            <circle cx="50" cy="22" r="3.5" fill="#DFC897" />
+          </svg>
+        </div>
+      </div>
+
+      <!-- Company Name Animation -->
+      <div class="burst-brand-details">
+        <div class="burst-label-sup">DEVELOPED &amp; ENGINEERED BY</div>
+        <h1 class="burst-company-title">
+          JAFAR Creation
+        </h1>
+        <div class="burst-tagline-pill">
+          <span>✨</span> System Architecture &bull; Official Auction Platform 2026
+        </div>
+        <div class="burst-status-role" id="burst-target-role">
+          ⚡ Entering Tournament Terminal...
         </div>
 
-        <!-- Company Name Animation -->
-        <div class="burst-brand-details">
-          <div class="burst-label-sup">DEVELOPED &amp; ENGINEERED BY</div>
-          <h1 class="burst-company-title">
-            JAFAR Creation
-          </h1>
-          <div class="burst-tagline-pill">
-            <span>✨</span> System Architecture &bull; Official Auction Platform 2026
-          </div>
-          <div class="burst-status-role" id="burst-target-role">
-            ⚡ Entering Tournament Terminal...
-          </div>
-
-          <!-- 5-Second Progress Bar & Skip Control -->
-          <div class="burst-progress-wrap">
-            <div class="burst-progress-bar" id="burst-progress-fill"></div>
-          </div>
-          <div class="burst-actions-row">
-            <button type="button" id="burst-skip-btn" class="burst-skip-btn" title="Skip to dashboard immediately">
-              <span>Skip Intro</span>
-              <span>⏭️</span>
-            </button>
-          </div>
+        <!-- 5-Second Progress Bar & Skip Control -->
+        <div class="burst-progress-wrap">
+          <div class="burst-progress-bar" id="burst-progress-fill"></div>
+        </div>
+        <div class="burst-actions-row">
+          <button type="button" id="burst-skip-btn" class="burst-skip-btn" title="Skip to dashboard immediately">
+            <span>Skip Intro</span>
+            <span>⏭️</span>
+          </button>
         </div>
       </div>
     </div>
-
   </div>
 
   <!-- Session Eviction Modal (Single-Active-Session Conflict Resolution) -->
@@ -1001,11 +1005,11 @@
   <div id="toast-container"></div>
 
   <!-- Scripts -->
-  <script src="./js/data.js?v=2026.30"></script>
-  <script src="./js/storage.js?v=2026.30"></script>
-  <script src="./js/sound.js?v=2026.30"></script>
-  <script src="./js/auction-engine.js?v=2026.30"></script>
-  <script src="./js/app.js?v=2026.30"></script>
+  <script src="./js/data.js?v=2026.31"></script>
+  <script src="./js/storage.js?v=2026.31"></script>
+  <script src="./js/sound.js?v=2026.31"></script>
+  <script src="./js/auction-engine.js?v=2026.31"></script>
+  <script src="./js/app.js?v=2026.31"></script>
 </body>
 
 </html>

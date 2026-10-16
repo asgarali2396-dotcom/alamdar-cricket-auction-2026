@@ -100,7 +100,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const skipBtn = document.getElementById('burst-skip-btn');
 
     if (targetRoleEl) {
-      targetRoleEl.innerText = `⚡ Authenticating & Entering ${roleName}...`;
+      if (roleName.includes('JAFAR')) {
+        targetRoleEl.innerText = '⚡ JAFAR Creation • Official Platform Architect';
+      } else {
+        targetRoleEl.innerText = `⚡ Authenticating & Entering ${roleName}...`;
+      }
     }
 
     // Play opening fanfare / chime
@@ -140,10 +144,13 @@ document.addEventListener('DOMContentLoaded', () => {
         burstFinishTimeout = null;
       }
 
-      if (callback) callback();
+      if (callback) {
+        callback();
+        closeLoginModal();
+      }
+
       setTimeout(() => {
         burstLayer.classList.remove('active');
-        closeLoginModal();
       }, 350);
     }
 
@@ -154,6 +161,14 @@ document.addEventListener('DOMContentLoaded', () => {
         finishBurst();
       };
     }
+
+    // Click anywhere on overlay background to close
+    burstLayer.onclick = (e) => {
+      if (e.target.closest('#burst-skip-btn')) return;
+      if (e.target === burstLayer || e.target.classList.contains('burst-rays-bg')) {
+        finishBurst();
+      }
+    };
 
     // Conclude after exactly 5 seconds (5,000ms)
     burstFinishTimeout = setTimeout(() => {
@@ -346,11 +361,12 @@ document.addEventListener('DOMContentLoaded', () => {
       mobileTabOwner.addEventListener('click', () => setAuthSliderMode('owner'));
     }
 
-    // JAFAR Creation animation preview triggers
-    document.querySelectorAll('.jafar-anim-trigger').forEach((el) => {
+    // JAFAR Creation animation triggers (Footer and Modal badges)
+    document.querySelectorAll('.jafar-anim-trigger, #footer-jafar-btn').forEach((el) => {
       el.addEventListener('click', (e) => {
+        e.preventDefault();
         e.stopPropagation();
-        triggerCinematicLoginBurst('JAFAR Creation Showcase', null);
+        triggerCinematicLoginBurst('JAFAR Creation', null);
       });
     });
 
