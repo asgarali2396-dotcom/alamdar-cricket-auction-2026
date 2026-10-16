@@ -542,6 +542,88 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
+    // Fullscreen Mode Controller (Button + Keyboard Shortcut 'F' / 'F11')
+    const fullscreenBtn = document.getElementById('fullscreen-toggle-btn');
+    const fullscreenIcon = document.getElementById('fullscreen-icon');
+    const fullscreenText = document.getElementById('fullscreen-text');
+
+    function isFullscreenActive() {
+      return Boolean(
+        document.fullscreenElement ||
+        document.webkitFullscreenElement ||
+        document.mozFullScreenElement ||
+        document.msFullscreenElement
+      );
+    }
+
+    function updateFullscreenUI() {
+      const isFS = isFullscreenActive();
+      if (fullscreenIcon) fullscreenIcon.innerText = isFS ? '🗗' : '⛶';
+      if (fullscreenText) fullscreenText.innerText = isFS ? 'Exit Fullscreen' : 'Fullscreen';
+      if (fullscreenBtn) {
+        if (isFS) {
+          fullscreenBtn.classList.add('bg-[#C8A96A]/25', 'text-white', 'border-[#DFC897]');
+          fullscreenBtn.title = 'Exit Fullscreen (Shortcut: Press Esc or F)';
+        } else {
+          fullscreenBtn.classList.remove('bg-[#C8A96A]/25', 'text-white', 'border-[#DFC897]');
+          fullscreenBtn.title = 'Toggle Fullscreen Mode (Keyboard shortcut: "F" or "F11")';
+        }
+      }
+    }
+
+    async function toggleFullscreen() {
+      try {
+        if (!isFullscreenActive()) {
+          const docEl = document.documentElement;
+          if (docEl.requestFullscreen) {
+            await docEl.requestFullscreen();
+          } else if (docEl.webkitRequestFullscreen) {
+            await docEl.webkitRequestFullscreen();
+          } else if (docEl.msRequestFullscreen) {
+            await docEl.msRequestFullscreen();
+          }
+          showToast('🖥️ Fullscreen Mode Active (Press F or Esc to exit)', 'gold');
+        } else {
+          if (document.exitFullscreen) {
+            await document.exitFullscreen();
+          } else if (document.webkitExitFullscreen) {
+            await document.webkitExitFullscreen();
+          } else if (document.msExitFullscreen) {
+            await document.msExitFullscreen();
+          }
+          showToast('Exited Fullscreen Mode', 'info');
+        }
+      } catch (err) {
+        console.warn('Fullscreen toggle error:', err);
+      }
+      updateFullscreenUI();
+    }
+
+    if (fullscreenBtn) {
+      fullscreenBtn.addEventListener('click', toggleFullscreen);
+    }
+
+    // Keyboard shortcut listener: Press 'F' or 'F11'
+    window.addEventListener('keydown', (e) => {
+      // Don't trigger if user is typing in an input, textarea, or select field
+      const activeTag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
+      if (activeTag === 'input' || activeTag === 'textarea' || activeTag === 'select') {
+        return;
+      }
+
+      if (e.key === 'f' || e.key === 'F') {
+        e.preventDefault();
+        toggleFullscreen();
+      } else if (e.key === 'F11') {
+        e.preventDefault();
+        toggleFullscreen();
+      }
+    });
+
+    ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange'].forEach((evt) => {
+      document.addEventListener(evt, updateFullscreenUI);
+    });
+
     // 12-Franchise Demo Simulator Toggle Button
     const demoBotBtn = document.getElementById('admin-demo-bot-btn');
     if (demoBotBtn) {
