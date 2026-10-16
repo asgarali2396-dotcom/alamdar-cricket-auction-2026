@@ -43,7 +43,7 @@
   </script>
 
   <!-- Custom Stylesheet (with cache-bust) -->
-  <link rel="stylesheet" href="./css/style.css?v=2026.21">
+  <link rel="stylesheet" href="./css/style.css?v=2026.28">
 </head>
 
 <body class="bg-[#0F3D34] text-[#F7F6F1] min-h-screen flex flex-col">
@@ -314,10 +314,10 @@
     </div>
 
     <!-- MAIN GRID: 2. ACTUAL BIDDING BOX & 3. TEAM PURSE & ROSTER -->
-    <div id="owner-bidding-main-row" class="grid grid-cols-12 gap-5">
+    <div id="owner-bidding-main-row" class="owner-bidding-main-layout">
 
-      <!-- 2. ACTUAL BIDDING BOX (SECOND CONTAINER) -->
-      <div class="col-span-12 lg:col-span-8 space-y-4">
+      <!-- 2. ACTUAL BIDDING BOX (70% WIDTH) -->
+      <div id="owner-spotlight-col" class="owner-spotlight-col">
 
         <!-- Live Player Spotlight Box -->
         <div class="live-spotlight-box p-6 md:p-8 flex flex-col justify-between space-y-6">
@@ -338,13 +338,18 @@
             <!-- Player Name & Attributes -->
             <h2 id="owner-current-player-name"
               class="text-3xl md:text-5xl font-black text-[#F7F6F1] uppercase tracking-tight mt-4">
-              FAROOQ BAGASRAWALA
+              WAITING FOR PLAYER ON STAGE...
             </h2>
             <p id="owner-current-player-stats" class="text-xs sm:text-sm text-[#E6F0E9] mt-2 font-medium">
-              Age: 36 • Bat: Right-Hand • Bowl: Right-Arm Fast • All-Rounder
+              Auctioneer has not placed a player on the block yet
             </p>
             <!-- Active 2-Franchise Bidding Battle Ring -->
-            <div id="owner-active-bidders-ring" class="mt-4"></div>
+            <div id="owner-active-bidders-ring" class="mt-4">
+              <div class="p-3.5 rounded-2xl bg-[#092520]/80 border border-[#C8A96A]/20 text-center text-xs text-[#E6F0E9]/60 font-semibold flex items-center justify-center gap-2">
+                <span class="text-base">⚔️</span>
+                <span>Bidding Battle Ring on Standby — Awaiting Live Player on Stage</span>
+              </div>
+            </div>
           </div>
 
           <!-- Middle 2 Large Cards: Current Bid & Base/Next Min -->
@@ -355,12 +360,12 @@
               <p class="text-xs uppercase font-black tracking-wider text-[#0F3D34]/80">CURRENT HIGHEST BID</p>
               <p id="owner-current-bid-display"
                 class="text-4xl md:text-5xl font-black font-mono-num my-2 text-[#0F3D34]">
-                ₹1,000
+                ₹0
               </p>
               <div class="inline-block">
                 <span id="owner-leading-badge"
                   class="bg-[#0F3D34] text-[#F7F6F1] text-xs font-bold px-3 py-1 rounded-full">
-                  Leading: Husaini Hawks
+                  Awaiting Opening Bid
                 </span>
               </div>
             </div>
@@ -370,7 +375,7 @@
               class="spotlight-bid-card bg-[#134E43] text-[#F7F6F1] border-2 border-[#C8A96A]/50 p-5 rounded-2xl flex flex-col justify-between shadow-xl">
               <p class="text-xs uppercase font-black tracking-wider text-[#C8A96A]">BASE PRICE / NEXT MIN</p>
               <p id="owner-next-bid-step" class="text-3xl md:text-4xl font-black font-mono-num my-2 text-[#F7F6F1]">
-                ₹1,000 / ₹2,000
+                ₹1,000 / ₹1,000
               </p>
               <div class="text-xs text-[#E6F0E9] font-bold">Tiered Increments</div>
             </div>
@@ -380,18 +385,18 @@
         </div>
 
         <!-- Bottom Action Buttons: Giant Bidding Button + Withdraw Button -->
-        <div id="owner-bidding-actions-row" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div id="owner-bidding-actions-row" class="owner-bidding-actions-grid">
 
-          <!-- Bidding / Status Button (Spans 2 columns) -->
-          <div class="sm:col-span-2">
+          <!-- Bidding / Status Button -->
+          <div class="owner-action-btn-main-wrap">
             <button id="owner-raise-bid-btn"
-              class="w-full py-4 px-6 rounded-2xl font-black text-sm sm:text-base uppercase tracking-wider bg-[#134E43] text-[#F7F6F1] border border-[#C8A96A]/40 shadow-xl transition-all">
-              YOU HOLD THE HIGHEST BID (₹1,000)
+              class="w-full py-4 px-6 rounded-2xl font-black text-sm sm:text-base uppercase tracking-wider bg-[#C8A96A] hover:bg-[#DFC897] text-[#0F3D34] shadow-xl transition-all">
+              ⚔️ JOIN BIDDING BATTLE
             </button>
           </div>
 
           <!-- Withdraw Button -->
-          <div>
+          <div class="owner-action-btn-sub-wrap">
             <button id="owner-withdraw-btn"
               class="w-full py-4 px-6 rounded-2xl font-bold text-sm text-[#E6F0E9] bg-[#0a2c25] hover:bg-[#134E43] border border-[#C8A96A]/20 shadow-xl transition-all">
               Withdraw From Battle
@@ -402,8 +407,8 @@
 
       </div>
 
-      <!-- 3. PHOTO OF PLAYER & ATTRIBUTES (RIGHT CONTAINER - AS IN PHOTO) -->
-      <div class="col-span-12 lg:col-span-4 space-y-4">
+      <!-- 3. PHOTO OF PLAYER & ATTRIBUTES (30% WIDTH) -->
+      <div id="owner-photo-col" class="owner-photo-col">
         <div class="owner-player-spotlight-card">
           <!-- Title -->
           <h3 class="text-base sm:text-lg font-black uppercase tracking-wider text-[#C8A96A] text-center">
@@ -990,7 +995,7 @@
   <script src="./js/storage.js?v=2026.21"></script>
   <script src="./js/sound.js?v=2026.21"></script>
   <script src="./js/auction-engine.js?v=2026.21"></script>
-  <script src="./js/app.js?v=2026.21"></script>
+  <script src="./js/app.js?v=2026.27"></script>
 </body>
 
 </html>

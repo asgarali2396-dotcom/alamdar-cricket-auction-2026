@@ -1190,6 +1190,15 @@ document.addEventListener('DOMContentLoaded', () => {
         withdrawBtn.className = 'w-full py-4 px-6 rounded-2xl font-bold text-sm text-[#E6F0E9] bg-[#0a2c25] hover:bg-[#134E43] border border-[#C8A96A]/20 shadow-xl cursor-pointer';
       }
     }
+
+    // Match player photo container height to count going container
+    requestAnimationFrame(() => {
+      const spotlightBox = document.querySelector('#view-owner .live-spotlight-box');
+      const photoCard = document.querySelector('#view-owner .owner-player-spotlight-card');
+      if (spotlightBox && photoCard && spotlightBox.offsetHeight > 0) {
+        photoCard.style.height = `${spotlightBox.offsetHeight}px`;
+      }
+    });
   }
 
   // -------------------------------------------------------------
@@ -1838,6 +1847,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     renderApp();
   };
+
+  // Sync owner card heights on resize or fullscreen toggle
+  const syncOwnerCardHeights = () => {
+    requestAnimationFrame(() => {
+      const spotlightBox = document.querySelector('#view-owner .live-spotlight-box');
+      const photoCard = document.querySelector('#view-owner .owner-player-spotlight-card');
+      if (spotlightBox && photoCard && spotlightBox.offsetHeight > 0) {
+        photoCard.style.height = `${spotlightBox.offsetHeight}px`;
+      }
+    });
+  };
+  window.addEventListener('resize', syncOwnerCardHeights);
+  document.addEventListener('fullscreenchange', () => {
+    setTimeout(syncOwnerCardHeights, 80);
+  });
 
   window.renderApp = renderApp;
 });

@@ -49,14 +49,17 @@
 
 body {
   font-family: var(--font-main);
-  background-color: var(--bg-primary);
+  background-color: #0B2B24;
   color: var(--text-primary);
   min-height: 100vh;
   overflow-x: hidden;
   line-height: 1.5;
   background-image: 
-    radial-gradient(ellipse 80% 50% at 20% 0%, rgba(200, 169, 106, 0.10), transparent 70%),
-    radial-gradient(circle at 85% 90%, rgba(19, 78, 67, 0.50), transparent 60%);
+    linear-gradient(rgba(200, 169, 106, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(200, 169, 106, 0.08) 1px, transparent 1px),
+    radial-gradient(ellipse 80% 50% at 20% 0%, rgba(200, 169, 106, 0.12), transparent 70%),
+    radial-gradient(circle at 85% 90%, rgba(19, 78, 67, 0.55), transparent 60%);
+  background-size: 48px 48px, 48px 48px, auto, auto;
   background-attachment: fixed;
 }
 
@@ -218,19 +221,20 @@ body {
 /* Semicircular Gauge for Auction Slots */
 .gauge-container {
   position: relative;
-  width: 140px;
-  height: 75px;
-  margin: 0.5rem auto 0;
+  width: 124px;
+  height: 62px;
+  margin: 0.25rem auto 0;
   overflow: hidden;
 }
 .gauge-arc {
-  width: 140px;
-  height: 140px;
+  width: 124px;
+  height: 124px;
   border-radius: 50%;
-  border: 12px solid #0F3D34;
+  border: 9px solid rgba(15, 61, 52, 0.6);
   border-top-color: var(--gold-primary);
+  border-left-color: var(--gold-primary);
   border-right-color: var(--gold-primary);
-  transform: rotate(-45deg);
+  transform: rotate(0deg);
   position: absolute;
   top: 0;
   left: 0;
@@ -238,7 +242,7 @@ body {
 }
 .gauge-text {
   position: absolute;
-  bottom: 0;
+  bottom: 2px;
   left: 0;
   right: 0;
   text-align: center;
@@ -1280,6 +1284,94 @@ select:focus, input:focus {
 }
 
 /* =========================================================
+   Owner Dashboard Main Layout (Strict 70% / 30% Side-by-Side)
+   ========================================================= */
+#view-owner {
+  gap: 2.25rem !important;
+}
+
+#owner-purse-header {
+  margin-bottom: 2rem !important;
+}
+
+.owner-bidding-main-layout,
+#owner-bidding-main-row {
+  display: grid !important;
+  grid-template-columns: 7fr 3fr !important;
+  gap: 2.25rem !important;
+  align-items: stretch !important;
+  width: 100% !important;
+  margin-top: 0 !important;
+  margin-bottom: 2.5rem !important;
+}
+
+.owner-spotlight-col,
+#owner-spotlight-col {
+  grid-column: 1 / 2 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  gap: 0.25rem !important;
+  min-width: 0 !important;
+  width: 100% !important;
+}
+
+#view-owner .live-spotlight-box {
+  min-height: 520px !important;
+  padding: 2rem 2.25rem !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  gap: 1.75rem !important;
+  margin-bottom: 0 !important;
+}
+
+.owner-photo-col,
+#owner-photo-col {
+  grid-column: 2 / 3 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  align-self: flex-start !important;
+  min-width: 0 !important;
+  width: 100% !important;
+}
+
+.owner-bidding-actions-grid,
+#owner-bidding-actions-row {
+  display: grid !important;
+  grid-template-columns: 1.7fr 1fr !important;
+  gap: 1.25rem !important;
+  width: 100% !important;
+  margin-top: 0.25rem !important;
+  margin-bottom: 0.85rem !important;
+}
+
+.owner-action-btn-main-wrap {
+  grid-column: 1 / 2 !important;
+  width: 100% !important;
+}
+
+.owner-action-btn-sub-wrap {
+  grid-column: 2 / 3 !important;
+  width: 100% !important;
+}
+
+#owner-raise-bid-btn {
+  height: 58px !important;
+  font-size: 1.05rem !important;
+  font-weight: 900 !important;
+  border-radius: 1rem !important;
+}
+
+#owner-withdraw-btn {
+  height: 58px !important;
+  font-size: 0.95rem !important;
+  font-weight: 700 !important;
+  border-radius: 1rem !important;
+}
+
+/* =========================================================
    Owner Dashboard Player Spotlight Card (Right Container)
    ========================================================= */
 .owner-player-spotlight-card {
@@ -1289,40 +1381,45 @@ select:focus, input:focus {
   border: 2px solid var(--border-glass);
   border-radius: 1.25rem;
   box-shadow: 0 15px 35px -10px rgba(10, 35, 30, 0.65);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1.5rem;
-  gap: 1.25rem;
-  min-height: 100%;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 1.4rem 1.25rem !important;
+  gap: 1rem !important;
+  min-height: 520px !important;
+  height: 520px;
+  box-sizing: border-box !important;
 }
 
 .owner-photo-frame {
   width: 100%;
-  max-width: 250px;
+  max-width: 195px;
+  min-height: 145px;
+  max-height: 185px;
   aspect-ratio: 4 / 3;
-  border-radius: 1.1rem;
-  border: 2px solid rgba(200, 169, 106, 0.55);
+  border-radius: 1rem;
+  border: 2px solid rgba(200, 169, 106, 0.65);
   overflow: hidden;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(200, 169, 106, 0.15);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(200, 169, 106, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
   background: #1e293b;
   position: relative;
+  margin: 0.2rem auto;
 }
 
 .owner-attr-pill {
   width: 100%;
   background: rgba(10, 46, 38, 0.85);
   border: 1.5px solid rgba(200, 169, 106, 0.35);
-  border-radius: 1rem;
-  padding: 0.75rem 1.25rem;
+  border-radius: 0.7rem;
+  padding: 0.4rem 0.85rem;
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 0.6rem;
+  gap: 0.45rem;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
   transition: all 0.2s ease;
 }
@@ -1335,7 +1432,7 @@ select:focus, input:focus {
 
 .owner-attr-label {
   font-family: var(--font-main);
-  font-size: 1.1rem;
+  font-size: 0.88rem;
   font-weight: 800;
   color: var(--gold-light);
   letter-spacing: 0.04em;
@@ -1344,7 +1441,7 @@ select:focus, input:focus {
 
 .owner-attr-value {
   font-family: var(--font-main);
-  font-size: 1.05rem;
+  font-size: 0.88rem;
   font-weight: 700;
   color: var(--text-primary);
   overflow: hidden;
@@ -1552,309 +1649,404 @@ body.is-fullscreen #view-admin.hidden,
 
 body.is-fullscreen #view-owner:not(.hidden):not([style*="display: none"]),
 :fullscreen #view-owner:not(.hidden):not([style*="display: none"]) {
-  padding-top: 0.25rem !important;
-  padding-bottom: 1.5rem !important;
+  width: 96vw !important;
+  max-width: 1700px !important;
+  margin: 0 auto !important;
+  padding: 1.25rem 1.5rem 4rem !important;
+  min-height: calc(100vh - 65px) !important;
+  height: auto !important;
+  max-height: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  gap: 2.25rem !important;
+  box-sizing: border-box !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
 }
 
-/* Suppress large Tailwind space-y-6 gaps on direct children in fullscreen */
+/* Reset Tailwind vertical space utility on #view-owner direct children */
 body.is-fullscreen #view-owner > :not([hidden]) ~ :not([hidden]),
 :fullscreen #view-owner > :not([hidden]) ~ :not([hidden]) {
-  margin-top: 0.35rem !important;
+  margin-top: 0 !important;
   margin-bottom: 0 !important;
 }
 
-/* 1. Remaining Budget & Slots Header (Compact Sleek Fit) */
+/* 1. Remaining Budget & Slots Header (Top Container) */
 body.is-fullscreen #owner-purse-header,
 :fullscreen #owner-purse-header {
-  padding: 0.35rem 1rem !important;
-  margin-bottom: 0 !important;
-  border-radius: 0.85rem !important;
-  border: 1.5px solid rgba(200, 169, 106, 0.35) !important;
+  flex-shrink: 0 !important;
+  padding: 1.15rem 2rem !important;
+  margin-top: 0 !important;
+  margin-bottom: 2.25rem !important;
+  border-radius: 1.25rem !important;
+  border: 2px solid rgba(200, 169, 106, 0.45) !important;
+  background: rgba(19, 78, 67, 0.92) !important;
+  backdrop-filter: blur(16px) !important;
   display: grid !important;
-  grid-template-columns: 1fr 1fr !important;
+  grid-template-columns: 1.3fr 0.7fr !important;
   align-items: center !important;
-  gap: 1rem !important;
+  gap: 2rem !important;
 }
 
 body.is-fullscreen #owner-purse-header > div:first-child p.font-mono-num,
 :fullscreen #owner-purse-header > div:first-child p.font-mono-num {
-  font-size: 1.25rem !important;
-  line-height: 1.1 !important;
-  margin-top: 0.1rem !important;
+  font-size: clamp(1.5rem, 2vw, 1.9rem) !important;
+  line-height: 1.15 !important;
+  margin-top: 0.15rem !important;
 }
 
 body.is-fullscreen #owner-purse-header .w-full.bg-\[\#0F3D34\],
 :fullscreen #owner-purse-header .w-full.bg-\[\#0F3D34\] {
-  margin-top: 0.2rem !important;
-  height: 4px !important;
+  margin-top: 0.45rem !important;
+  height: 6px !important;
 }
 
 body.is-fullscreen #owner-purse-header #owner-budget-bar,
 :fullscreen #owner-purse-header #owner-budget-bar {
-  height: 4px !important;
+  height: 6px !important;
 }
 
 body.is-fullscreen #owner-purse-header .gauge-container,
 :fullscreen #owner-purse-header .gauge-container {
-  width: 90px !important;
-  height: 46px !important;
-  margin: 0.1rem auto 0 !important;
+  width: 120px !important;
+  height: 60px !important;
+  margin: 0.15rem auto 0 !important;
 }
 
 body.is-fullscreen #owner-purse-header .gauge-arc,
 :fullscreen #owner-purse-header .gauge-arc {
-  width: 90px !important;
-  height: 90px !important;
-  border-width: 8px !important;
+  width: 120px !important;
+  height: 120px !important;
+  border-width: 9px !important;
 }
 
 body.is-fullscreen #owner-purse-header #owner-slots-count,
 :fullscreen #owner-purse-header #owner-slots-count {
-  font-size: 1rem !important;
+  font-size: 1.2rem !important;
 }
 
-/* 2. Main Bidding Row (Constrained to Fit Screen with Buttons Intact) */
+/* 2. Main Bidding Row: STRICT 70% Count Going / 30% Player Photo */
 body.is-fullscreen #owner-bidding-main-row,
-:fullscreen #owner-bidding-main-row {
+body.is-fullscreen .owner-bidding-main-layout,
+:fullscreen #owner-bidding-main-row,
+:fullscreen .owner-bidding-main-layout {
+  min-height: 580px !important;
+  height: auto !important;
   display: grid !important;
-  height: calc(100vh - 135px) !important;
-  min-height: 0 !important;
-  max-height: calc(100vh - 135px) !important;
-  gap: 0.75rem !important;
-  margin-bottom: 0 !important;
+  grid-template-columns: 7fr 3fr !important;
+  gap: 2.25rem !important;
+  margin-top: 0 !important;
+  margin-bottom: 2.5rem !important;
+  width: 100% !important;
 }
 
-/* Left Column: Spotlight Box + Action Buttons */
-body.is-fullscreen #owner-bidding-main-row > div:first-child,
-:fullscreen #owner-bidding-main-row > div:first-child {
+/* Left Column (70%): Count Going + Spotlight Box + Action Buttons */
+body.is-fullscreen #owner-spotlight-col,
+body.is-fullscreen .owner-spotlight-col,
+:fullscreen #owner-spotlight-col,
+:fullscreen .owner-spotlight-col {
+  grid-column: 1 / 2 !important;
   display: flex !important;
   flex-direction: column !important;
-  justify-content: space-between !important;
-  height: 100% !important;
-  max-height: 100% !important;
-  min-height: 0 !important;
-  gap: 0.35rem !important;
-}
-
-body.is-fullscreen #owner-bidding-main-row > div:first-child > :not([hidden]) ~ :not([hidden]),
-:fullscreen #owner-bidding-main-row > div:first-child > :not([hidden]) ~ :not([hidden]) {
-  margin-top: 0.35rem !important;
-  margin-bottom: 0 !important;
-}
-
-body.is-fullscreen #view-owner .live-spotlight-box,
-:fullscreen #view-owner .live-spotlight-box {
-  flex: 1 1 0% !important;
+  justify-content: flex-start !important;
   height: auto !important;
   min-height: 0 !important;
-  padding: 0.65rem 1.25rem !important;
-  border-width: 2px !important;
+  gap: 0.25rem !important;
+  width: 100% !important;
+}
+
+body.is-fullscreen #owner-spotlight-col > :not([hidden]) ~ :not([hidden]),
+:fullscreen #owner-spotlight-col > :not([hidden]) ~ :not([hidden]) {
+  margin-top: 0.25rem !important;
+  margin-bottom: 0 !important;
+}
+
+/* Live Player Spotlight Box (Count Going Box) */
+body.is-fullscreen #view-owner .live-spotlight-box,
+:fullscreen #view-owner .live-spotlight-box {
+  flex: 1 1 auto !important;
+  height: auto !important;
+  min-height: clamp(500px, 58vh, 640px) !important;
+  padding: 2rem 2.25rem !important;
+  border-radius: 1.35rem !important;
+  border-width: 2.5px !important;
   border-color: var(--gold-primary) !important;
-  box-shadow: 0 0 25px rgba(200, 169, 106, 0.2), inset 0 0 15px rgba(200, 169, 106, 0.06) !important;
+  box-shadow: 0 0 45px rgba(200, 169, 106, 0.3), inset 0 0 25px rgba(200, 169, 106, 0.1) !important;
   display: flex !important;
   flex-direction: column !important;
   justify-content: space-between !important;
+  gap: 1.75rem !important;
   margin-bottom: 0 !important;
-  overflow: hidden !important;
+  overflow: visible !important;
 }
 
 body.is-fullscreen #view-owner .live-spotlight-box > :not([hidden]) ~ :not([hidden]),
 :fullscreen #view-owner .live-spotlight-box > :not([hidden]) ~ :not([hidden]) {
-  margin-top: 0.25rem !important;
+  margin-top: 0 !important;
   margin-bottom: 0 !important;
 }
 
 body.is-fullscreen #owner-countdown-banner,
 :fullscreen #owner-countdown-banner {
-  font-size: 0.75rem !important;
-  padding: 0.2rem 0.75rem !important;
+  font-size: 0.88rem !important;
+  padding: 0.35rem 0.95rem !important;
+  font-weight: 900 !important;
 }
 
 body.is-fullscreen #view-owner .spotlight-live-badge,
 :fullscreen #view-owner .spotlight-live-badge {
-  font-size: 0.75rem !important;
-  padding: 0.2rem 0.75rem !important;
+  font-size: 0.88rem !important;
+  padding: 0.35rem 0.95rem !important;
+  font-weight: 900 !important;
 }
 
 body.is-fullscreen #owner-current-player-name,
 :fullscreen #owner-current-player-name {
-  font-size: clamp(1.6rem, 2.3vw, 2.4rem) !important;
-  line-height: 1.1 !important;
+  font-size: clamp(1.8rem, 2.6vw, 2.8rem) !important;
+  line-height: 1.12 !important;
   letter-spacing: -0.02em !important;
-  margin-top: 0.2rem !important;
+  margin-top: 0.5rem !important;
+  font-weight: 900 !important;
 }
 
 body.is-fullscreen #owner-current-player-stats,
 :fullscreen #owner-current-player-stats {
-  font-size: 0.8rem !important;
-  margin-top: 0.15rem !important;
+  font-size: 0.95rem !important;
+  margin-top: 0.35rem !important;
 }
 
 body.is-fullscreen #owner-active-bidders-ring,
 :fullscreen #owner-active-bidders-ring {
-  margin-top: 0.25rem !important;
+  margin-top: 0.75rem !important;
 }
 
 body.is-fullscreen #owner-active-bidders-ring > div,
 :fullscreen #owner-active-bidders-ring > div {
-  padding: 0.35rem 0.75rem !important;
-  min-height: 48px !important;
+  padding: 0.5rem 1rem !important;
+  border-radius: 0.85rem !important;
 }
 
 /* Owner Bid Cards */
 body.is-fullscreen #view-owner .spotlight-bid-cards-grid,
 :fullscreen #view-owner .spotlight-bid-cards-grid {
-  gap: 0.6rem !important;
-  margin-top: 0.25rem !important;
+  gap: 1.25rem !important;
+  margin-top: auto !important;
+  padding-top: 1rem !important;
 }
 
 body.is-fullscreen #view-owner .spotlight-bid-card,
 :fullscreen #view-owner .spotlight-bid-card {
-  padding: 0.5rem 0.9rem !important;
-  min-height: 65px !important;
-  border-radius: 0.85rem !important;
+  padding: 1.15rem 1.4rem !important;
+  min-height: 100px !important;
+  border-radius: 1.15rem !important;
 }
 
 body.is-fullscreen #view-owner .spotlight-bid-card p.tracking-wider,
 :fullscreen #view-owner .spotlight-bid-card p.tracking-wider {
-  font-size: 0.7rem !important;
-  letter-spacing: 0.05em !important;
+  font-size: 0.75rem !important;
+  letter-spacing: 0.06em !important;
+  font-weight: 900 !important;
 }
 
 body.is-fullscreen #owner-current-bid-display,
 :fullscreen #owner-current-bid-display {
-  font-size: clamp(1.7rem, 2.3vw, 2.4rem) !important;
-  line-height: 1.05 !important;
-  margin: 0.1rem 0 !important;
+  font-size: clamp(2.2rem, 3vw, 3.2rem) !important;
+  line-height: 1 !important;
+  margin: 0.2rem 0 !important;
+  font-weight: 900 !important;
 }
 
 body.is-fullscreen #owner-next-bid-step,
 :fullscreen #owner-next-bid-step {
-  font-size: clamp(1.5rem, 2vw, 2.1rem) !important;
-  line-height: 1.05 !important;
-  margin: 0.1rem 0 !important;
+  font-size: clamp(1.8rem, 2.4vw, 2.6rem) !important;
+  line-height: 1 !important;
+  margin: 0.2rem 0 !important;
+  font-weight: 900 !important;
 }
 
 body.is-fullscreen #owner-leading-badge,
 :fullscreen #owner-leading-badge {
-  font-size: 0.7rem !important;
-  padding: 0.15rem 0.55rem !important;
+  font-size: 0.8rem !important;
+  padding: 0.25rem 0.75rem !important;
+  font-weight: 800 !important;
 }
 
-/* Owner Bidding Action Buttons: GUARANTEED ZERO CUTTING OFF */
+/* Action Buttons */
 body.is-fullscreen #owner-bidding-actions-row,
-:fullscreen #owner-bidding-actions-row {
-  margin-top: 0.35rem !important;
+body.is-fullscreen .owner-bidding-actions-grid,
+:fullscreen #owner-bidding-actions-row,
+:fullscreen .owner-bidding-actions-grid {
+  margin-top: 0.25rem !important;
+  margin-bottom: 0.85rem !important;
   flex-shrink: 0 !important;
-  gap: 0.5rem !important;
+  display: grid !important;
+  grid-template-columns: 1.7fr 1fr !important;
+  gap: 1.25rem !important;
+}
+
+body.is-fullscreen .owner-action-btn-main-wrap,
+:fullscreen .owner-action-btn-main-wrap {
+  grid-column: 1 / 2 !important;
+  width: 100% !important;
+}
+
+body.is-fullscreen .owner-action-btn-sub-wrap,
+:fullscreen .owner-action-btn-sub-wrap {
+  grid-column: 2 / 3 !important;
+  width: 100% !important;
 }
 
 body.is-fullscreen #owner-raise-bid-btn,
 :fullscreen #owner-raise-bid-btn {
-  padding-top: 0.65rem !important;
-  padding-bottom: 0.65rem !important;
-  padding-left: 1rem !important;
-  padding-right: 1rem !important;
-  font-size: 0.95rem !important;
-  border-radius: 0.75rem !important;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.45) !important;
+  height: 56px !important;
+  padding: 0 1.5rem !important;
+  font-size: 1.05rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.04em !important;
+  border-radius: 1rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45) !important;
 }
 
 body.is-fullscreen #owner-withdraw-btn,
 :fullscreen #owner-withdraw-btn {
-  padding-top: 0.65rem !important;
-  padding-bottom: 0.65rem !important;
-  padding-left: 0.85rem !important;
-  padding-right: 0.85rem !important;
-  font-size: 0.85rem !important;
-  border-radius: 0.75rem !important;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.45) !important;
+  height: 56px !important;
+  padding: 0 1.25rem !important;
+  font-size: 0.95rem !important;
+  font-weight: 800 !important;
+  border-radius: 1rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45) !important;
 }
 
-/* Owner Right Column: Player Photo Card (Matched Height & Proportions) */
-body.is-fullscreen #owner-bidding-main-row > div:nth-child(2),
-:fullscreen #owner-bidding-main-row > div:nth-child(2) {
-  height: 100% !important;
-  max-height: 100% !important;
+/* Right Column (30%): Player Photo & Attributes */
+body.is-fullscreen #owner-photo-col,
+body.is-fullscreen .owner-photo-col,
+:fullscreen #owner-photo-col,
+:fullscreen .owner-photo-col {
+  grid-column: 2 / 3 !important;
+  height: auto !important;
   min-height: 0 !important;
+  align-self: flex-start !important;
+  justify-content: flex-start !important;
   display: flex !important;
   flex-direction: column !important;
+  width: 100% !important;
 }
 
 body.is-fullscreen #view-owner .owner-player-spotlight-card,
 :fullscreen #view-owner .owner-player-spotlight-card {
   height: 100% !important;
-  max-height: 100% !important;
-  min-height: 0 !important;
-  padding: 0.65rem 1rem !important;
+  min-height: clamp(500px, 58vh, 640px) !important;
+  padding: 1.5rem 1.35rem !important;
+  border-radius: 1.25rem !important;
   border-width: 2px !important;
   border-color: rgba(200, 169, 106, 0.55) !important;
-  box-shadow: 0 10px 25px -8px rgba(10, 35, 30, 0.8) !important;
+  box-shadow: 0 15px 35px -10px rgba(10, 35, 30, 0.65), 0 0 20px rgba(200, 169, 106, 0.1) !important;
   display: flex !important;
   flex-direction: column !important;
   justify-content: space-between !important;
-  gap: 0.35rem !important;
+  gap: 1rem !important;
+  position: relative !important;
   overflow: hidden !important;
+  box-sizing: border-box !important;
 }
 
 body.is-fullscreen #view-owner .owner-player-spotlight-card h3,
 :fullscreen #view-owner .owner-player-spotlight-card h3 {
   font-size: 0.95rem !important;
-  letter-spacing: 0.1em !important;
-  margin-bottom: 0.15rem !important;
+  letter-spacing: 0.08em !important;
+  margin-bottom: 0 !important;
   flex-shrink: 0 !important;
+  font-weight: 900 !important;
 }
 
 body.is-fullscreen #view-owner .owner-photo-frame,
 :fullscreen #view-owner .owner-photo-frame {
-  width: auto !important;
-  max-width: 220px !important;
+  flex: 0 0 auto !important;
+  min-height: 145px !important;
+  max-height: 185px !important;
+  width: 100% !important;
+  max-width: 195px !important;
   aspect-ratio: 4 / 3 !important;
   height: auto !important;
-  max-height: clamp(100px, 16vh, 150px) !important;
-  min-height: 85px !important;
   margin-left: auto !important;
   margin-right: auto !important;
+  margin-top: 0.2rem !important;
+  margin-bottom: 0.2rem !important;
   border-radius: 1rem !important;
   border: 2px solid rgba(200, 169, 106, 0.65) !important;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5), inset 0 0 12px rgba(200, 169, 106, 0.2) !important;
-  flex-shrink: 1 !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(200, 169, 106, 0.2) !important;
 }
 
 body.is-fullscreen #view-owner .owner-player-spotlight-card .w-full.space-y-3,
 :fullscreen #view-owner .owner-player-spotlight-card .w-full.space-y-3 {
-  gap: 0.3rem !important;
+  gap: 0.45rem !important;
   display: flex !important;
   flex-direction: column !important;
   flex-shrink: 0 !important;
   padding-top: 0 !important;
+  margin-top: 0 !important;
 }
 
 body.is-fullscreen #view-owner .owner-player-spotlight-card .w-full.space-y-3 > :not([hidden]) ~ :not([hidden]),
 :fullscreen #view-owner .owner-player-spotlight-card .w-full.space-y-3 > :not([hidden]) ~ :not([hidden]) {
-  margin-top: 0.3rem !important;
+  margin-top: 0 !important;
   margin-bottom: 0 !important;
 }
 
 body.is-fullscreen #view-owner .owner-attr-pill,
 :fullscreen #view-owner .owner-attr-pill {
-  padding: 0.38rem 0.75rem !important;
-  border-radius: 0.65rem !important;
-  gap: 0.5rem !important;
+  padding: 0.4rem 0.85rem !important;
+  border-radius: 0.7rem !important;
+  gap: 0.45rem !important;
   border-width: 1.5px !important;
-  border-color: rgba(200, 169, 106, 0.4) !important;
-  background: rgba(10, 46, 38, 0.9) !important;
+  border-color: rgba(200, 169, 106, 0.35) !important;
+  background: rgba(10, 46, 38, 0.85) !important;
 }
 
 body.is-fullscreen #view-owner .owner-attr-label,
 :fullscreen #view-owner .owner-attr-label {
-  font-size: 0.9rem !important;
+  font-size: 0.88rem !important;
   letter-spacing: 0.04em !important;
+  font-weight: 800 !important;
 }
 
 body.is-fullscreen #view-owner .owner-attr-value,
 :fullscreen #view-owner .owner-attr-value {
-  font-size: 0.9rem !important;
+  font-size: 0.84rem !important;
+  font-weight: 700 !important;
 }
+
+/* =========================================================
+   3B. Gap Between Bidding Area and Squad Roster Section
+   ========================================================= */
+#owner-bidding-main-row {
+  margin-bottom: 2.75rem !important;
+}
+
+#owner-team-squad-section {
+  margin-top: 2.75rem !important;
+}
+
+body.is-fullscreen #view-owner > #owner-bidding-main-row,
+:fullscreen #view-owner > #owner-bidding-main-row,
+body.is-fullscreen #owner-bidding-main-row,
+:fullscreen #owner-bidding-main-row {
+  margin-bottom: 2.75rem !important;
+}
+
+body.is-fullscreen #view-owner > #owner-team-squad-section,
+:fullscreen #view-owner > #owner-team-squad-section,
+body.is-fullscreen #owner-team-squad-section,
+:fullscreen #owner-team-squad-section {
+  margin-top: 2.75rem !important;
+}
+
 
 
