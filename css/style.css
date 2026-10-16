@@ -1228,3 +1228,54 @@ select:focus, input:focus {
   }
 }
 
+/* =========================================================
+   Official Tournament Footer (Alamdar Sports Club & JAFAR Creation)
+   ========================================================= */
+.site-footer {
+  background: linear-gradient(180deg, rgba(10, 38, 33, 0.95) 0%, rgba(7, 26, 23, 0.98) 100%);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.35);
+  position: relative;
+}
+
+.site-footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(200, 169, 106, 0.5) 25%, rgba(223, 200, 151, 0.8) 50%, rgba(200, 169, 106, 0.5) 75%, transparent 100%);
+}
+
+.footer-dev-badge {
+  background: rgba(200, 169, 106, 0.12);
+  border: 1px solid rgba(200, 169, 106, 0.30);
+  padding: 3px 10px;
+  border-radius: 9999px;
+  transition: all 0.25s ease;
+  outline: none;
+}
+
+.footer-dev-badge:hover {
+  background: rgba(200, 169, 106, 0.25);
+  border-color: rgba(223, 200, 151, 0.70);
+  box-shadow: 0 0 12px rgba(200, 169, 106, 0.35);
+  transform: translateY(-1px);
+}
+
+.footer-phone-link {
+  background: rgba(19, 78, 67, 0.45);
+  border: 1px solid rgba(200, 169, 106, 0.25);
+  padding: 3px 10px;
+  border-radius: 9999px;
+  transition: all 0.25s ease;
+  text-decoration: none;
+}
+
+.footer-phone-link:hover {
+  background: rgba(19, 78, 67, 0.75);
+  border-color: rgba(223, 200, 151, 0.60);
+  box-shadow: 0 0 10px rgba(200, 169, 106, 0.30);
+  transform: translateY(-1px);
+}
+

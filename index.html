@@ -42,9 +42,9 @@
   </script>
 
   <!-- Custom Stylesheet (with cache-bust) -->
-  <link rel="stylesheet" href="./css/style.css?v=2026.13">
+  <link rel="stylesheet" href="./css/style.css?v=2026.14">
 </head>
-<body class="bg-[#0F3D34] text-[#F7F6F1] min-h-screen">
+<body class="bg-[#0F3D34] text-[#F7F6F1] min-h-screen flex flex-col">
 
   <!-- ============================================================== -->
   <!-- TOP NAVIGATION BAR (WITH ROLE BADGE & AUTHENTICATION CONTROLS) -->
@@ -110,7 +110,7 @@
   <!-- ============================================================== -->
   <!-- 1. AUDIENCE SCREEN VIEW (EXACTLY AS SCREENSHOT 3) -->
   <!-- ============================================================== -->
-  <main id="view-live" class="p-4 md:p-6 max-w-[1600px] mx-auto space-y-6">
+  <main id="view-live" class="flex-1 w-full p-4 md:p-6 max-w-[1600px] mx-auto space-y-6">
     
     <!-- Top Row: Left Sidebar (Budget + Slots + Mini List) & Right Spotlight Card -->
     <div class="grid grid-cols-12 gap-5">
@@ -235,7 +235,7 @@
   <!-- ============================================================== -->
   <!-- 2. OWNER DASHBOARD VIEW (EXACTLY AS SCREENSHOT 1) -->
   <!-- ============================================================== -->
-  <main id="view-owner" class="p-4 md:p-6 max-w-[1600px] mx-auto space-y-6" style="display:none;">
+  <main id="view-owner" class="flex-1 w-full p-4 md:p-6 max-w-[1600px] mx-auto space-y-6" style="display:none;">
     
     <!-- 1. REMAINING BUDGET & AUCTION SLOTS (FIRST CONTAINER) -->
     <div class="glass-panel p-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -436,7 +436,7 @@
   <!-- ============================================================== -->
   <!-- 3. ADMIN CONTROL VIEW (EXACTLY AS SCREENSHOT 2) -->
   <!-- ============================================================== -->
-  <main id="view-admin" class="p-4 md:p-6 max-w-[1600px] mx-auto space-y-5" style="display:none;">
+  <main id="view-admin" class="flex-1 w-full p-4 md:p-6 max-w-[1600px] mx-auto space-y-5" style="display:none;">
     
     <!-- Top Card: Master Auction Controller & Set Selector -->
     <div class="glass-panel p-5 space-y-3">
@@ -506,6 +506,35 @@
     </div>
 
   </main>
+
+  <!-- ============================================================== -->
+  <!-- 4. OFFICIAL TOURNAMENT FOOTER (ALAMDAR SPORTS CLUB & JAFAR CREATION) -->
+  <!-- ============================================================== -->
+  <footer class="site-footer border-t border-[#C8A96A]/20 bg-[#0A2621]/95 backdrop-blur-md text-[#E6F0E9] py-3 px-4 md:px-8 mt-auto z-30">
+    <div class="max-w-[1600px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs sm:text-sm">
+      <!-- Left / Center: Copyright -->
+      <div class="flex items-center gap-2 text-center sm:text-left">
+        <span class="text-[#C8A96A] font-semibold">&copy;</span>
+        <span class="text-slate-200">
+          Copyright to <strong class="text-[#DFC897] font-bold">Alamdar Sports Club</strong>
+        </span>
+      </div>
+
+      <!-- Right: Developed by JAFAR Creation | Phone -->
+      <div class="flex items-center flex-wrap justify-center sm:justify-end gap-2 text-slate-300">
+        <span>Developed by</span>
+        <button type="button" class="jafar-anim-trigger footer-dev-badge font-bold text-[#DFC897] hover:text-[#FFF2A3] transition-all inline-flex items-center gap-1 cursor-pointer" title="Click to view JAFAR Creation animation">
+          <span class="text-[#C8A96A]">✨</span>
+          <span>JAFAR Creation</span>
+        </button>
+        <span class="text-[#C8A96A]/40 hidden sm:inline">|</span>
+        <a href="tel:9325704560" class="footer-phone-link inline-flex items-center gap-1.5 text-[#DFC897] hover:text-[#FFF2A3] font-semibold transition-all" title="Call Developer: 9325704560">
+          <span class="text-xs">📞</span>
+          <span class="font-mono tracking-wide">9325704560</span>
+        </a>
+      </div>
+    </div>
+  </footer>
 
   <!-- ============================================================== -->
   <!-- 4. DUAL-PANEL SLIDING SIGN IN PAGE (ADMIN & OWNER SLIDING PORTAL) -->
@@ -800,10 +829,10 @@
   <div id="toast-container"></div>
 
   <!-- Scripts -->
-  <script src="./js/data.js?v=2026.13"></script>
-  <script src="./js/storage.js?v=2026.13"></script>
-  <script src="./js/sound.js?v=2026.13"></script>
-  <script src="./js/auction-engine.js?v=2026.13"></script>
-  <script src="./js/app.js?v=2026.13"></script>
+  <script src="./js/data.js?v=2026.14"></script>
+  <script src="./js/storage.js?v=2026.14"></script>
+  <script src="./js/sound.js?v=2026.14"></script>
+  <script src="./js/auction-engine.js?v=2026.14"></script>
+  <script src="./js/app.js?v=2026.14"></script>
 </body>
 </html>
