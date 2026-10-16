@@ -1352,3 +1352,216 @@ select:focus, input:focus {
   white-space: nowrap;
 }
 
+/* =========================================================
+   Fullscreen Mode Grand Stadium Layout
+   Enlarges ((•)) COUNT GOING, GOING... & Player Photo Containers
+   ========================================================= */
+
+/* Expand main view containers to widescreen width */
+body.is-fullscreen #view-live,
+body.is-fullscreen #view-owner,
+:fullscreen #view-live,
+:fullscreen #view-owner {
+  max-width: 95vw !important;
+  width: 95vw !important;
+  padding-left: 1.5rem !important;
+  padding-right: 1.5rem !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* 1. LEFT CONTAINER: ((•)) COUNT GOING, GOING... Live Spotlight Box */
+body.is-fullscreen .live-spotlight-box,
+:fullscreen .live-spotlight-box {
+  padding: 2.25rem 2.75rem !important;
+  min-height: clamp(480px, 53vh, 600px) !important;
+  border-width: 2.5px !important;
+  border-color: var(--gold-primary) !important;
+  box-shadow: 0 0 45px rgba(200, 169, 106, 0.35), inset 0 0 30px rgba(200, 169, 106, 0.10) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+}
+
+/* Countdown Going Going and Live Badges */
+body.is-fullscreen #live-countdown-banner,
+body.is-fullscreen #owner-countdown-banner,
+body.is-fullscreen .spotlight-countdown-badge,
+:fullscreen #live-countdown-banner,
+:fullscreen #owner-countdown-banner,
+:fullscreen .spotlight-countdown-badge {
+  font-size: 0.95rem !important;
+  padding: 0.5rem 1.25rem !important;
+  letter-spacing: 0.08em !important;
+}
+
+body.is-fullscreen .spotlight-live-badge,
+:fullscreen .spotlight-live-badge {
+  font-size: 0.95rem !important;
+  padding: 0.5rem 1.25rem !important;
+  letter-spacing: 0.08em !important;
+}
+
+body.is-fullscreen .live-spotlight-box .animate-pulse,
+body.is-fullscreen .live-spotlight-box .animate-ping,
+:fullscreen .live-spotlight-box .animate-pulse,
+:fullscreen .live-spotlight-box .animate-ping {
+  font-size: 1.15rem !important;
+}
+
+/* Giant Player Name */
+body.is-fullscreen #live-player-name,
+body.is-fullscreen #owner-current-player-name,
+:fullscreen #live-player-name,
+:fullscreen #owner-current-player-name {
+  font-size: clamp(2.8rem, 3.8vw, 4.4rem) !important;
+  line-height: 1.08 !important;
+  letter-spacing: -0.02em !important;
+  margin-top: 0.75rem !important;
+}
+
+/* Category & Role Badges */
+body.is-fullscreen #live-player-spec,
+:fullscreen #live-player-spec {
+  font-size: 0.85rem !important;
+  padding: 0.4rem 1rem !important;
+}
+
+/* Player Subtext / Stats */
+body.is-fullscreen #live-player-details,
+body.is-fullscreen #owner-current-player-stats,
+:fullscreen #live-player-details,
+:fullscreen #owner-current-player-stats {
+  font-size: 1.1rem !important;
+  margin-top: 0.65rem !important;
+}
+
+/* Active Bidders Ring */
+body.is-fullscreen #live-active-bidders-ring,
+body.is-fullscreen #owner-active-bidders-ring,
+:fullscreen #live-active-bidders-ring,
+:fullscreen #owner-active-bidders-ring {
+  margin-top: 1rem !important;
+}
+
+/* Huge Bidding Cards (Current Highest Bid & Base Price / Next Min) */
+body.is-fullscreen .spotlight-bid-cards-grid,
+:fullscreen .spotlight-bid-cards-grid {
+  gap: 1.25rem !important;
+  margin-top: 1.25rem !important;
+}
+
+body.is-fullscreen .spotlight-bid-card,
+:fullscreen .spotlight-bid-card {
+  padding: 1.75rem 2rem !important;
+  min-height: 180px !important;
+  border-radius: 1.25rem !important;
+}
+
+body.is-fullscreen .spotlight-bid-card p.tracking-wider,
+:fullscreen .spotlight-bid-card p.tracking-wider {
+  font-size: 0.95rem !important;
+  letter-spacing: 0.08em !important;
+}
+
+body.is-fullscreen #live-bid-display,
+body.is-fullscreen #owner-current-bid-display,
+:fullscreen #live-bid-display,
+:fullscreen #owner-current-bid-display {
+  font-size: clamp(3.2rem, 4.4vw, 4.8rem) !important;
+  line-height: 1.05 !important;
+  margin: 0.65rem 0 !important;
+}
+
+body.is-fullscreen #live-player-base-price,
+body.is-fullscreen #owner-next-bid-step,
+:fullscreen #live-player-base-price,
+:fullscreen #owner-next-bid-step {
+  font-size: clamp(3rem, 4.2vw, 4.5rem) !important;
+  line-height: 1.05 !important;
+  margin: 0.65rem 0 !important;
+}
+
+body.is-fullscreen #live-highest-bidder-name,
+body.is-fullscreen #owner-leading-badge,
+:fullscreen #live-highest-bidder-name,
+:fullscreen #owner-leading-badge {
+  font-size: 0.95rem !important;
+  padding: 0.4rem 1.1rem !important;
+}
+
+/* Owner Bidding Action Buttons in Fullscreen */
+body.is-fullscreen #owner-raise-bid-btn,
+:fullscreen #owner-raise-bid-btn {
+  padding-top: 1.2rem !important;
+  padding-bottom: 1.2rem !important;
+  font-size: 1.1rem !important;
+}
+
+body.is-fullscreen #owner-withdraw-btn,
+:fullscreen #owner-withdraw-btn {
+  padding-top: 1.2rem !important;
+  padding-bottom: 1.2rem !important;
+  font-size: 1.05rem !important;
+}
+
+/* 2. RIGHT CONTAINER: PHOTO OF PLAYER & ATTRIBUTES Card */
+body.is-fullscreen .owner-player-spotlight-card,
+:fullscreen .owner-player-spotlight-card {
+  padding: 2.25rem 2rem !important;
+  min-height: clamp(480px, 53vh, 600px) !important;
+  border-width: 2.5px !important;
+  border-color: rgba(200, 169, 106, 0.6) !important;
+  box-shadow: 0 20px 45px -10px rgba(10, 35, 30, 0.85), 0 0 30px rgba(200, 169, 106, 0.15) !important;
+  justify-content: space-between !important;
+  gap: 1.25rem !important;
+}
+
+body.is-fullscreen .owner-player-spotlight-card h3,
+:fullscreen .owner-player-spotlight-card h3 {
+  font-size: 1.35rem !important;
+  letter-spacing: 0.14em !important;
+  margin-bottom: 0.25rem !important;
+}
+
+body.is-fullscreen .owner-photo-frame,
+:fullscreen .owner-photo-frame {
+  width: 90% !important;
+  max-width: 350px !important;
+  aspect-ratio: 4 / 3 !important;
+  height: auto !important;
+  min-height: 230px !important;
+  border-radius: 1.35rem !important;
+  border: 3px solid rgba(200, 169, 106, 0.70) !important;
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.65), inset 0 0 25px rgba(200, 169, 106, 0.25) !important;
+}
+
+body.is-fullscreen .owner-player-spotlight-card .w-full.space-y-3,
+:fullscreen .owner-player-spotlight-card .w-full.space-y-3 {
+  gap: 0.85rem !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+body.is-fullscreen .owner-attr-pill,
+:fullscreen .owner-attr-pill {
+  padding: 1rem 1.4rem !important;
+  border-radius: 1.15rem !important;
+  gap: 0.8rem !important;
+  border-width: 2px !important;
+  border-color: rgba(200, 169, 106, 0.45) !important;
+  background: rgba(10, 46, 38, 0.92) !important;
+}
+
+body.is-fullscreen .owner-attr-label,
+:fullscreen .owner-attr-label {
+  font-size: 1.25rem !important;
+  letter-spacing: 0.05em !important;
+}
+
+body.is-fullscreen .owner-attr-value,
+:fullscreen .owner-attr-value {
+  font-size: 1.25rem !important;
+}
+
+

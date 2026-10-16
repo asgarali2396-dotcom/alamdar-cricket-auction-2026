@@ -43,7 +43,7 @@
   </script>
 
   <!-- Custom Stylesheet (with cache-bust) -->
-  <link rel="stylesheet" href="./css/style.css?v=2026.17">
+  <link rel="stylesheet" href="./css/style.css?v=2026.18">
 </head>
 
 <body class="bg-[#0F3D34] text-[#F7F6F1] min-h-screen flex flex-col">
@@ -143,11 +143,11 @@
           <div>
             <div class="flex justify-between items-center">
               <span id="live-countdown-banner"
-                class="px-3.5 py-1 rounded-full text-xs font-black tracking-wider text-cyan-300 border border-cyan-500/50 bg-cyan-950/40 flex items-center gap-1.5">
+                class="spotlight-countdown-badge px-3.5 py-1 rounded-full text-xs font-black tracking-wider text-cyan-300 border border-cyan-500/50 bg-cyan-950/40 flex items-center gap-1.5">
                 <span class="animate-pulse">((•))</span> COUNT GOING, GOING...
               </span>
               <span
-                class="px-3.5 py-1 rounded-full text-xs font-black tracking-wider text-rose-300 border border-rose-500/50 bg-rose-950/40 flex items-center gap-1.5">
+                class="spotlight-live-badge px-3.5 py-1 rounded-full text-xs font-black tracking-wider text-rose-300 border border-rose-500/50 bg-rose-950/40 flex items-center gap-1.5">
                 <span class="animate-ping">((•))</span> LIVE
               </span>
             </div>
@@ -172,10 +172,10 @@
           </div>
 
           <!-- Middle: 2 Huge Colorful Bidding Cards -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="spotlight-bid-cards-grid grid grid-cols-1 sm:grid-cols-2 gap-4">
 
             <!-- Gold Card: Current Highest Bid -->
-            <div class="bg-[#C8A96A] text-[#0F3D34] p-5 rounded-2xl flex flex-col justify-between shadow-xl">
+            <div class="spotlight-bid-card bg-[#C8A96A] text-[#0F3D34] p-5 rounded-2xl flex flex-col justify-between shadow-xl">
               <p class="text-xs uppercase font-black tracking-wider text-[#0F3D34]/80">CURRENT HIGHEST BID</p>
               <p id="live-bid-display" class="text-4xl md:text-5xl font-black font-mono-num my-2 text-[#0F3D34]">
                 ₹0
@@ -190,7 +190,7 @@
 
             <!-- Emerald Jewel Card: Base Price -->
             <div
-              class="bg-[#134E43] text-[#F7F6F1] border-2 border-[#C8A96A]/50 p-5 rounded-2xl flex flex-col justify-between shadow-xl">
+              class="spotlight-bid-card bg-[#134E43] text-[#F7F6F1] border-2 border-[#C8A96A]/50 p-5 rounded-2xl flex flex-col justify-between shadow-xl">
               <p class="text-xs uppercase font-black tracking-wider text-[#C8A96A]">BASE PRICE</p>
               <p id="live-player-base-price" class="text-4xl md:text-5xl font-black font-mono-num my-2 text-[#F7F6F1]">
                 ₹1,000
@@ -325,12 +325,12 @@
           <!-- Top Tag Row -->
           <div>
             <div class="flex justify-between items-center">
-              <span
-                class="px-3.5 py-1 rounded-full text-xs font-black tracking-wider text-[#C8A96A] border border-[#C8A96A]/50 bg-[#0F3D34]/80 flex items-center gap-1.5">
+              <span id="owner-countdown-banner"
+                class="spotlight-countdown-badge px-3.5 py-1 rounded-full text-xs font-black tracking-wider text-[#C8A96A] border border-[#C8A96A]/50 bg-[#0F3D34]/80 flex items-center gap-1.5">
                 <span class="animate-pulse">((•))</span> COUNT GOING, GOING...
               </span>
               <span
-                class="px-3.5 py-1 rounded-full text-xs font-black tracking-wider text-[#F7F6F1] border border-[#9e2a2b]/60 bg-[#9e2a2b]/50 flex items-center gap-1.5">
+                class="spotlight-live-badge px-3.5 py-1 rounded-full text-xs font-black tracking-wider text-[#F7F6F1] border border-[#9e2a2b]/60 bg-[#9e2a2b]/50 flex items-center gap-1.5">
                 <span class="animate-ping">((•))</span> LIVE
               </span>
             </div>
@@ -348,10 +348,10 @@
           </div>
 
           <!-- Middle 2 Large Cards: Current Bid & Base/Next Min -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="spotlight-bid-cards-grid grid grid-cols-1 sm:grid-cols-2 gap-4">
 
             <!-- Gold Card: Current Highest Bid -->
-            <div class="bg-[#C8A96A] text-[#0F3D34] p-5 rounded-2xl flex flex-col justify-between shadow-xl">
+            <div class="spotlight-bid-card bg-[#C8A96A] text-[#0F3D34] p-5 rounded-2xl flex flex-col justify-between shadow-xl">
               <p class="text-xs uppercase font-black tracking-wider text-[#0F3D34]/80">CURRENT HIGHEST BID</p>
               <p id="owner-current-bid-display"
                 class="text-4xl md:text-5xl font-black font-mono-num my-2 text-[#0F3D34]">
@@ -367,7 +367,7 @@
 
             <!-- Emerald Jewel Card: Base Price / Next Min -->
             <div
-              class="bg-[#134E43] text-[#F7F6F1] border-2 border-[#C8A96A]/50 p-5 rounded-2xl flex flex-col justify-between shadow-xl">
+              class="spotlight-bid-card bg-[#134E43] text-[#F7F6F1] border-2 border-[#C8A96A]/50 p-5 rounded-2xl flex flex-col justify-between shadow-xl">
               <p class="text-xs uppercase font-black tracking-wider text-[#C8A96A]">BASE PRICE / NEXT MIN</p>
               <p id="owner-next-bid-step" class="text-3xl md:text-4xl font-black font-mono-num my-2 text-[#F7F6F1]">
                 ₹1,000 / ₹2,000
@@ -987,10 +987,10 @@
 
   <!-- Scripts -->
   <script src="./js/data.js?v=2026.17"></script>
-  <script src="./js/storage.js?v=2026.17"></script>
-  <script src="./js/sound.js?v=2026.17"></script>
-  <script src="./js/auction-engine.js?v=2026.17"></script>
-  <script src="./js/app.js?v=2026.17"></script>
+  <script src="./js/storage.js?v=2026.18"></script>
+  <script src="./js/sound.js?v=2026.18"></script>
+  <script src="./js/auction-engine.js?v=2026.18"></script>
+  <script src="./js/app.js?v=2026.18"></script>
 </body>
 
 </html>

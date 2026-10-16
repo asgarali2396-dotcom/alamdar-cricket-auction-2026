@@ -558,6 +558,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateFullscreenUI() {
       const isFS = isFullscreenActive();
+      document.body.classList.toggle('is-fullscreen', isFS);
+      document.documentElement.classList.toggle('is-fullscreen', isFS);
       if (fullscreenIcon) fullscreenIcon.innerText = isFS ? '🗗' : '⛶';
       if (fullscreenText) fullscreenText.innerText = isFS ? 'Exit Fullscreen' : 'Fullscreen';
       if (fullscreenBtn) {
@@ -623,6 +625,8 @@ document.addEventListener('DOMContentLoaded', () => {
     ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange'].forEach((evt) => {
       document.addEventListener(evt, updateFullscreenUI);
     });
+    window.addEventListener('resize', updateFullscreenUI);
+    updateFullscreenUI();
 
     // 12-Franchise Demo Simulator Toggle Button
     const demoBotBtn = document.getElementById('admin-demo-bot-btn');
