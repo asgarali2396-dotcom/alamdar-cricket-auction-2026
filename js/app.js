@@ -982,6 +982,28 @@ document.addEventListener('DOMContentLoaded', () => {
         : 'Awaiting Opening Bid';
     }
 
+    // Update Right Column Player Spotlight Photo & Attributes Card (As in Reference Photo)
+    const cardAge = document.getElementById('owner-card-player-age');
+    const cardBat = document.getElementById('owner-card-player-bat');
+    const cardBowl = document.getElementById('owner-card-player-bowl');
+    const cardImg = document.getElementById('owner-card-player-img');
+    const cardSvg = document.getElementById('owner-card-player-svg');
+
+    if (cardAge) cardAge.innerText = hasPlayer ? ` ${p.age}` : '';
+    if (cardBat) cardBat.innerText = hasPlayer ? ` ${p.batsmanType}` : '';
+    if (cardBowl) cardBowl.innerText = hasPlayer ? ` ${p.bowlerType}` : '';
+
+    if (cardImg && cardSvg) {
+      if (hasPlayer && p.photo) {
+        cardImg.src = p.photo;
+        cardImg.style.display = 'block';
+        cardSvg.style.display = 'none';
+      } else {
+        cardImg.style.display = 'none';
+        cardSvg.style.display = 'block';
+      }
+    }
+
     // Evaluate Bidding Actions & Rules
     const hasBoughtFromSet = team.ownedSetIds && team.ownedSetIds.includes(currentAuctionState.currentSetId);
     const isRosterFull = team.acquiredCount >= team.maxAuctionSlots;

@@ -42,7 +42,7 @@
   </script>
 
   <!-- Custom Stylesheet (with cache-bust) -->
-  <link rel="stylesheet" href="./css/style.css?v=2026.14">
+  <link rel="stylesheet" href="./css/style.css?v=2026.15">
 </head>
 <body class="bg-[#0F3D34] text-[#F7F6F1] min-h-screen flex flex-col">
 
@@ -345,17 +345,61 @@
 
       </div>
 
-      <!-- 3. TEAM PURSE & ROSTER (THIRD CONTAINER - SIDEBAR LIST) -->
+      <!-- 3. PHOTO OF PLAYER & ATTRIBUTES (RIGHT CONTAINER - AS IN PHOTO) -->
       <div class="col-span-12 lg:col-span-4 space-y-4">
-        
-        <!-- Team Purse & Roster (Left List) -->
-        <div class="glass-panel p-4 space-y-2.5">
-          <h3 class="text-xs font-bold uppercase tracking-wider text-[#F7F6F1]">Team Purse & Roster</h3>
-          <div id="owner-sidebar-teams-list" class="space-y-2 max-h-[360px] overflow-y-auto pr-1">
-            <!-- Dynamically populated -->
+        <div class="owner-player-spotlight-card">
+          <!-- Title -->
+          <h3 class="text-base sm:text-lg font-black uppercase tracking-wider text-[#C8A96A] text-center">
+            PHOTO OF PLAYER
+          </h3>
+
+          <!-- Photo Frame with Dynamic Photo or Silhouette -->
+          <div class="owner-photo-frame">
+            <img id="owner-card-player-img" src="" alt="Player Photo" class="w-full h-full object-cover" style="display:none;">
+            <svg id="owner-card-player-svg" viewBox="0 0 200 200" class="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <radialGradient id="ownerPlayerBgGrad" cx="50%" cy="38%" r="65%">
+                  <stop offset="0%" stop-color="#E2E8F0" stop-opacity="0.95"/>
+                  <stop offset="45%" stop-color="#94A3B8" stop-opacity="0.75"/>
+                  <stop offset="100%" stop-color="#475569" stop-opacity="0.95"/>
+                </radialGradient>
+                <linearGradient id="ownerSilhouetteGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#334155"/>
+                  <stop offset="50%" stop-color="#1E293B"/>
+                  <stop offset="100%" stop-color="#0F172A"/>
+                </linearGradient>
+                <linearGradient id="ownerCollarGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#CBD5E1"/>
+                  <stop offset="100%" stop-color="#64748B"/>
+                </linearGradient>
+              </defs>
+              <rect width="200" height="200" fill="url(#ownerPlayerBgGrad)"/>
+              <circle cx="100" cy="70" r="30" fill="url(#ownerSilhouetteGrad)"/>
+              <rect x="88" y="94" width="24" height="24" rx="5" fill="url(#ownerSilhouetteGrad)"/>
+              <path d="M36 186 C36 138 66 120 84 116 L94 130 L106 130 L116 116 C134 120 164 138 164 186 Z" fill="url(#ownerSilhouetteGrad)"/>
+              <path d="M84 116 L100 138 L116 116" stroke="url(#ownerCollarGrad)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              <line x1="100" y1="138" x2="100" y2="158" stroke="url(#ownerCollarGrad)" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+
+          <!-- Attributes Pills (Age, BAT, BOWL) -->
+          <div class="w-full space-y-3 pt-1">
+            <div class="owner-attr-pill">
+              <span class="owner-attr-label">Age :-</span>
+              <span id="owner-card-player-age" class="owner-attr-value"></span>
+            </div>
+
+            <div class="owner-attr-pill">
+              <span class="owner-attr-label">BAT :-</span>
+              <span id="owner-card-player-bat" class="owner-attr-value"></span>
+            </div>
+
+            <div class="owner-attr-pill">
+              <span class="owner-attr-label">BOWL :-</span>
+              <span id="owner-card-player-bowl" class="owner-attr-value"></span>
+            </div>
           </div>
         </div>
-
       </div>
 
     </div>
@@ -829,10 +873,10 @@
   <div id="toast-container"></div>
 
   <!-- Scripts -->
-  <script src="./js/data.js?v=2026.14"></script>
-  <script src="./js/storage.js?v=2026.14"></script>
-  <script src="./js/sound.js?v=2026.14"></script>
-  <script src="./js/auction-engine.js?v=2026.14"></script>
-  <script src="./js/app.js?v=2026.14"></script>
+  <script src="./js/data.js?v=2026.15"></script>
+  <script src="./js/storage.js?v=2026.15"></script>
+  <script src="./js/sound.js?v=2026.15"></script>
+  <script src="./js/auction-engine.js?v=2026.15"></script>
+  <script src="./js/app.js?v=2026.15"></script>
 </body>
 </html>

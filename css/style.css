@@ -1279,3 +1279,76 @@ select:focus, input:focus {
   transform: translateY(-1px);
 }
 
+/* =========================================================
+   Owner Dashboard Player Spotlight Card (Right Container)
+   ========================================================= */
+.owner-player-spotlight-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 2px solid var(--border-glass);
+  border-radius: 1.25rem;
+  box-shadow: 0 15px 35px -10px rgba(10, 35, 30, 0.65);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem;
+  gap: 1.25rem;
+  min-height: 100%;
+}
+
+.owner-photo-frame {
+  width: 100%;
+  max-width: 250px;
+  aspect-ratio: 4 / 3;
+  border-radius: 1.1rem;
+  border: 2px solid rgba(200, 169, 106, 0.55);
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(200, 169, 106, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1e293b;
+  position: relative;
+}
+
+.owner-attr-pill {
+  width: 100%;
+  background: rgba(10, 46, 38, 0.85);
+  border: 1.5px solid rgba(200, 169, 106, 0.35);
+  border-radius: 1rem;
+  padding: 0.75rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.6rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+  transition: all 0.2s ease;
+}
+
+.owner-attr-pill:hover {
+  border-color: rgba(200, 169, 106, 0.65);
+  background: rgba(15, 61, 52, 0.95);
+  box-shadow: 0 4px 18px rgba(200, 169, 106, 0.20);
+}
+
+.owner-attr-label {
+  font-family: var(--font-main);
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--gold-light);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.owner-attr-value {
+  font-family: var(--font-main);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
