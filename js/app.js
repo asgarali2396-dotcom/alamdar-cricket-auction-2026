@@ -950,6 +950,28 @@ document.addEventListener('DOMContentLoaded', () => {
         ? `Leading: ${currentAuctionState.highestBidderTeamName}`
         : 'Awaiting Opening Bid';
     }
+
+    // Update Right Column Player Spotlight Photo & Attributes Card (Audience Screen)
+    const cardAge = document.getElementById('live-card-player-age');
+    const cardBat = document.getElementById('live-card-player-bat');
+    const cardBowl = document.getElementById('live-card-player-bowl');
+    const cardImg = document.getElementById('live-card-player-img');
+    const cardSvg = document.getElementById('live-card-player-svg');
+
+    if (cardAge) cardAge.innerText = hasPlayer ? ` ${p.age}` : '';
+    if (cardBat) cardBat.innerText = hasPlayer ? ` ${p.batsmanType}` : '';
+    if (cardBowl) cardBowl.innerText = hasPlayer ? ` ${p.bowlerType}` : '';
+
+    if (cardImg && cardSvg) {
+      if (hasPlayer && p.photo) {
+        cardImg.src = p.photo;
+        cardImg.style.display = 'block';
+        cardSvg.style.display = 'none';
+      } else {
+        cardImg.style.display = 'none';
+        cardSvg.style.display = 'block';
+      }
+    }
   }
 
   // -------------------------------------------------------------

@@ -42,7 +42,7 @@
   </script>
 
   <!-- Custom Stylesheet (with cache-bust) -->
-  <link rel="stylesheet" href="./css/style.css?v=2026.15">
+  <link rel="stylesheet" href="./css/style.css?v=2026.16">
 </head>
 <body class="bg-[#0F3D34] text-[#F7F6F1] min-h-screen flex flex-col">
 
@@ -112,50 +112,10 @@
   <!-- ============================================================== -->
   <main id="view-live" class="flex-1 w-full p-4 md:p-6 max-w-[1600px] mx-auto space-y-6">
     
-    <!-- Top Row: Left Sidebar (Budget + Slots + Mini List) & Right Spotlight Card -->
+    <!-- Top Row: Left Spotlight Card & Right Photo Container (Matching Live Screen Layout) -->
     <div class="grid grid-cols-12 gap-5">
       
-      <!-- Left Column (Budget & Teams Summary) -->
-      <div class="col-span-12 lg:col-span-4 space-y-4">
-        
-        <!-- Top Stats Box: Remaining Budget & Auction Slots -->
-        <div class="glass-panel p-4 grid grid-cols-2 gap-3">
-          <!-- Remaining Budget -->
-          <div>
-            <p class="text-[11px] font-bold text-slate-400">Remaining Budget</p>
-            <p class="text-xl sm:text-2xl font-black text-white font-mono-num mt-0.5">
-              <span id="live-sidebar-budget">₹100,000</span> <span class="text-[11px] font-medium text-slate-400 font-sans">/ ₹1,00,000 Purse Cap</span>
-            </p>
-            <div class="w-full bg-slate-900 rounded-full h-1.5 mt-2.5 overflow-hidden">
-              <div id="live-sidebar-budget-bar" class="bg-emerald-400 h-1.5 rounded-full" style="width: 100%;"></div>
-            </div>
-            <p class="text-[10px] text-slate-400 mt-1">Progress/ Purse Cap</p>
-          </div>
-
-          <!-- Auction Slots Semicircular Meter -->
-          <div class="border-l border-white/10 pl-3 flex flex-col justify-between">
-            <p class="text-[11px] font-bold text-slate-400">Auction Slots</p>
-            <div class="gauge-container">
-              <div class="gauge-arc"></div>
-              <div class="gauge-text">
-                <span id="live-sidebar-slots" class="text-lg font-black text-white font-mono-num">0 / 8</span>
-                <p class="text-[10px] text-slate-400 -mt-0.5">Players</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Team Purse & Roster (Left List) -->
-        <div class="glass-panel p-4 space-y-2.5">
-          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">Team Purse & Roster</h3>
-          <div id="live-sidebar-teams-list" class="space-y-2 max-h-[360px] overflow-y-auto pr-1">
-            <!-- Dynamically populated -->
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Right Column: Player Spotlight Card (Blue Glowing Box) -->
+      <!-- Left Column: Player Spotlight Card (col-span-12 lg:col-span-8) -->
       <div class="col-span-12 lg:col-span-8">
         <div class="live-spotlight-box p-6 md:p-8 flex flex-col justify-between h-full space-y-6">
           
@@ -173,16 +133,16 @@
             <!-- Giant Player Name & Role Pill -->
             <div class="flex flex-wrap items-center gap-3 mt-4">
               <h2 id="live-player-name" class="text-3xl md:text-5xl font-black text-white uppercase tracking-tight">
-                FAROOQ BAGASRAWALA
+                WAITING FOR PLAYER ON STAGE...
               </h2>
               <span id="live-player-spec" class="px-3 py-1 rounded-full text-xs font-extrabold uppercase bg-cyan-950/80 border border-cyan-400 text-cyan-300">
-                BOWLING ALL-ROUNDER
+                BOX CRICKET 2026
               </span>
             </div>
 
             <!-- Player Attributes Subtext -->
             <p id="live-player-details" class="text-xs sm:text-sm text-slate-300 mt-2 font-medium">
-              Age: 36 • Bat: Right-Hand Anchor • Bowl: Right-Arm Fast Yorker Specialist
+              Select stone set and push player to stage in Admin Control
             </p>
             <!-- Active 2-Franchise Bidding Battle Ring -->
             <div id="live-active-bidders-ring" class="mt-4"></div>
@@ -195,11 +155,11 @@
             <div class="bg-[#C8A96A] text-[#0F3D34] p-5 rounded-2xl flex flex-col justify-between shadow-xl">
               <p class="text-xs uppercase font-black tracking-wider text-[#0F3D34]/80">CURRENT HIGHEST BID</p>
               <p id="live-bid-display" class="text-4xl md:text-5xl font-black font-mono-num my-2 text-[#0F3D34]">
-                ₹1,000
+                ₹0
               </p>
               <div class="inline-block">
                 <span id="live-highest-bidder-name" class="bg-[#0F3D34] text-[#F7F6F1] text-xs font-bold px-3 py-1 rounded-full">
-                  Leading: Husaini Hawks
+                  Awaiting Opening Bid
                 </span>
               </div>
             </div>
@@ -215,6 +175,63 @@
 
           </div>
 
+        </div>
+      </div>
+
+      <!-- Right Column: PHOTO OF PLAYER & ATTRIBUTES (col-span-12 lg:col-span-4) -->
+      <div class="col-span-12 lg:col-span-4 space-y-4">
+        <div class="owner-player-spotlight-card">
+          <!-- Title -->
+          <h3 class="text-base sm:text-lg font-black uppercase tracking-wider text-[#C8A96A] text-center">
+            PHOTO OF PLAYER
+          </h3>
+
+          <!-- Photo Frame with Dynamic Photo or Silhouette -->
+          <div class="owner-photo-frame">
+            <img id="live-card-player-img" src="" alt="Player Photo" class="w-full h-full object-cover" style="display:none;">
+            <svg id="live-card-player-svg" viewBox="0 0 200 200" class="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <radialGradient id="liveAudiencePlayerBgGrad" cx="50%" cy="38%" r="65%">
+                  <stop offset="0%" stop-color="#E2E8F0" stop-opacity="0.95"/>
+                  <stop offset="45%" stop-color="#94A3B8" stop-opacity="0.75"/>
+                  <stop offset="100%" stop-color="#475569" stop-opacity="0.95"/>
+                </radialGradient>
+                <linearGradient id="liveAudienceSilhouetteGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#334155"/>
+                  <stop offset="50%" stop-color="#1E293B"/>
+                  <stop offset="100%" stop-color="#0F172A"/>
+                </linearGradient>
+                <linearGradient id="liveAudienceCollarGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#CBD5E1"/>
+                  <stop offset="100%" stop-color="#64748B"/>
+                </linearGradient>
+              </defs>
+              <rect width="200" height="200" fill="url(#liveAudiencePlayerBgGrad)"/>
+              <circle cx="100" cy="70" r="30" fill="url(#liveAudienceSilhouetteGrad)"/>
+              <rect x="88" y="94" width="24" height="24" rx="5" fill="url(#liveAudienceSilhouetteGrad)"/>
+              <path d="M36 186 C36 138 66 120 84 116 L94 130 L106 130 L116 116 C134 120 164 138 164 186 Z" fill="url(#liveAudienceSilhouetteGrad)"/>
+              <path d="M84 116 L100 138 L116 116" stroke="url(#liveAudienceCollarGrad)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              <line x1="100" y1="138" x2="100" y2="158" stroke="url(#liveAudienceCollarGrad)" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+
+          <!-- Attributes Pills (Age, BAT, BOWL) -->
+          <div class="w-full space-y-3 pt-1">
+            <div class="owner-attr-pill">
+              <span class="owner-attr-label">Age :-</span>
+              <span id="live-card-player-age" class="owner-attr-value"></span>
+            </div>
+
+            <div class="owner-attr-pill">
+              <span class="owner-attr-label">BAT :-</span>
+              <span id="live-card-player-bat" class="owner-attr-value"></span>
+            </div>
+
+            <div class="owner-attr-pill">
+              <span class="owner-attr-label">BOWL :-</span>
+              <span id="live-card-player-bowl" class="owner-attr-value"></span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -873,10 +890,10 @@
   <div id="toast-container"></div>
 
   <!-- Scripts -->
-  <script src="./js/data.js?v=2026.15"></script>
-  <script src="./js/storage.js?v=2026.15"></script>
-  <script src="./js/sound.js?v=2026.15"></script>
-  <script src="./js/auction-engine.js?v=2026.15"></script>
-  <script src="./js/app.js?v=2026.15"></script>
+  <script src="./js/data.js?v=2026.16"></script>
+  <script src="./js/storage.js?v=2026.16"></script>
+  <script src="./js/sound.js?v=2026.16"></script>
+  <script src="./js/auction-engine.js?v=2026.16"></script>
+  <script src="./js/app.js?v=2026.16"></script>
 </body>
 </html>
