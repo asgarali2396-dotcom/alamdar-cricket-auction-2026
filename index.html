@@ -43,7 +43,7 @@
   </script>
 
   <!-- Custom Stylesheet (with cache-bust) -->
-  <link rel="stylesheet" href="./css/style.css?v=2026.18">
+  <link rel="stylesheet" href="./css/style.css?v=2026.19">
 </head>
 
 <body class="bg-[#0F3D34] text-[#F7F6F1] min-h-screen flex flex-col">
@@ -133,7 +133,7 @@
   <main id="view-live" class="flex-1 w-full p-4 md:p-6 max-w-[1600px] mx-auto space-y-6">
 
     <!-- Top Row: Left Spotlight Card & Right Photo Container (Matching Live Screen Layout) -->
-    <div class="grid grid-cols-12 gap-5">
+    <div id="live-spotlight-row" class="grid grid-cols-12 gap-5">
 
       <!-- Left Column: Player Spotlight Card (col-span-12 lg:col-span-8) -->
       <div class="col-span-12 lg:col-span-8">
@@ -285,7 +285,7 @@
   <main id="view-owner" class="flex-1 w-full p-4 md:p-6 max-w-[1600px] mx-auto space-y-6" style="display:none;">
 
     <!-- 1. REMAINING BUDGET & AUCTION SLOTS (FIRST CONTAINER) -->
-    <div class="glass-panel p-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div id="owner-purse-header" class="glass-panel p-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
       <!-- Remaining Budget -->
       <div>
         <p class="text-[11px] font-bold text-[#E6F0E9]">Remaining Budget</p>
@@ -314,7 +314,7 @@
     </div>
 
     <!-- MAIN GRID: 2. ACTUAL BIDDING BOX & 3. TEAM PURSE & ROSTER -->
-    <div class="grid grid-cols-12 gap-5">
+    <div id="owner-bidding-main-row" class="grid grid-cols-12 gap-5">
 
       <!-- 2. ACTUAL BIDDING BOX (SECOND CONTAINER) -->
       <div class="col-span-12 lg:col-span-8 space-y-4">
@@ -380,7 +380,7 @@
         </div>
 
         <!-- Bottom Action Buttons: Giant Bidding Button + Withdraw Button -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div id="owner-bidding-actions-row" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
 
           <!-- Bidding / Status Button (Spans 2 columns) -->
           <div class="sm:col-span-2">
@@ -986,11 +986,11 @@
   <div id="toast-container"></div>
 
   <!-- Scripts -->
-  <script src="./js/data.js?v=2026.17"></script>
-  <script src="./js/storage.js?v=2026.18"></script>
-  <script src="./js/sound.js?v=2026.18"></script>
-  <script src="./js/auction-engine.js?v=2026.18"></script>
-  <script src="./js/app.js?v=2026.18"></script>
+  <script src="./js/data.js?v=2026.19"></script>
+  <script src="./js/storage.js?v=2026.19"></script>
+  <script src="./js/sound.js?v=2026.19"></script>
+  <script src="./js/auction-engine.js?v=2026.19"></script>
+  <script src="./js/app.js?v=2026.19"></script>
 </body>
 
 </html>

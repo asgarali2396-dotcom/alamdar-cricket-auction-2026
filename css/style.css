@@ -1354,27 +1354,44 @@ select:focus, input:focus {
 
 /* =========================================================
    Fullscreen Mode Grand Stadium Layout
-   Enlarges ((•)) COUNT GOING, GOING... & Player Photo Containers
+   1. Audience View: Fullscreen Spotlight & Photo on screen 1 (scroll for 12 teams)
+   2. Owner View: Fullscreen Purse Header + Spotlight + Bidding Buttons + Photo (NO cutting off)
    ========================================================= */
 
-/* Expand main view containers to widescreen width */
+/* Widescreen Main Containers */
 body.is-fullscreen #view-live,
 body.is-fullscreen #view-owner,
 :fullscreen #view-live,
 :fullscreen #view-owner {
-  max-width: 95vw !important;
-  width: 95vw !important;
-  padding-left: 1.5rem !important;
-  padding-right: 1.5rem !important;
+  max-width: 96vw !important;
+  width: 96vw !important;
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
   margin-left: auto !important;
   margin-right: auto !important;
 }
 
-/* 1. LEFT CONTAINER: ((•)) COUNT GOING, GOING... Live Spotlight Box */
-body.is-fullscreen .live-spotlight-box,
-:fullscreen .live-spotlight-box {
-  padding: 2.25rem 2.75rem !important;
-  min-height: clamp(480px, 53vh, 600px) !important;
+/* ---------------------------------------------------------
+   A. AUDIENCE SCREEN VIEW (#view-live) IN FULLSCREEN
+   Takes full screen 1 height; 12 teams are below the fold (scroll for more)
+   --------------------------------------------------------- */
+body.is-fullscreen #view-live,
+:fullscreen #view-live {
+  padding-top: 0.75rem !important;
+  padding-bottom: 2rem !important;
+}
+
+body.is-fullscreen #live-spotlight-row,
+:fullscreen #live-spotlight-row {
+  min-height: calc(100vh - 5.5rem) !important;
+  margin-bottom: 2.5rem !important;
+}
+
+body.is-fullscreen #view-live .live-spotlight-box,
+:fullscreen #view-live .live-spotlight-box {
+  height: 100% !important;
+  min-height: calc(100vh - 6.5rem) !important;
+  padding: 2rem 2.5rem !important;
   border-width: 2.5px !important;
   border-color: var(--gold-primary) !important;
   box-shadow: 0 0 45px rgba(200, 169, 106, 0.35), inset 0 0 30px rgba(200, 169, 106, 0.10) !important;
@@ -1383,169 +1400,109 @@ body.is-fullscreen .live-spotlight-box,
   justify-content: space-between !important;
 }
 
-/* Countdown Going Going and Live Badges */
-body.is-fullscreen #live-countdown-banner,
-body.is-fullscreen #owner-countdown-banner,
-body.is-fullscreen .spotlight-countdown-badge,
-:fullscreen #live-countdown-banner,
-:fullscreen #owner-countdown-banner,
-:fullscreen .spotlight-countdown-badge {
+body.is-fullscreen #view-live #live-countdown-banner,
+:fullscreen #view-live #live-countdown-banner {
   font-size: 0.95rem !important;
-  padding: 0.5rem 1.25rem !important;
+  padding: 0.45rem 1.15rem !important;
   letter-spacing: 0.08em !important;
 }
 
-body.is-fullscreen .spotlight-live-badge,
-:fullscreen .spotlight-live-badge {
+body.is-fullscreen #view-live .spotlight-live-badge,
+:fullscreen #view-live .spotlight-live-badge {
   font-size: 0.95rem !important;
-  padding: 0.5rem 1.25rem !important;
+  padding: 0.45rem 1.15rem !important;
   letter-spacing: 0.08em !important;
 }
 
-body.is-fullscreen .live-spotlight-box .animate-pulse,
-body.is-fullscreen .live-spotlight-box .animate-ping,
-:fullscreen .live-spotlight-box .animate-pulse,
-:fullscreen .live-spotlight-box .animate-ping {
-  font-size: 1.15rem !important;
-}
-
-/* Giant Player Name */
-body.is-fullscreen #live-player-name,
-body.is-fullscreen #owner-current-player-name,
-:fullscreen #live-player-name,
-:fullscreen #owner-current-player-name {
-  font-size: clamp(2.8rem, 3.8vw, 4.4rem) !important;
+body.is-fullscreen #view-live #live-player-name,
+:fullscreen #view-live #live-player-name {
+  font-size: clamp(2.6rem, 3.8vw, 4.2rem) !important;
   line-height: 1.08 !important;
   letter-spacing: -0.02em !important;
-  margin-top: 0.75rem !important;
+  margin-top: 0.65rem !important;
 }
 
-/* Category & Role Badges */
-body.is-fullscreen #live-player-spec,
-:fullscreen #live-player-spec {
+body.is-fullscreen #view-live #live-player-spec,
+:fullscreen #view-live #live-player-spec {
   font-size: 0.85rem !important;
   padding: 0.4rem 1rem !important;
 }
 
-/* Player Subtext / Stats */
-body.is-fullscreen #live-player-details,
-body.is-fullscreen #owner-current-player-stats,
-:fullscreen #live-player-details,
-:fullscreen #owner-current-player-stats {
+body.is-fullscreen #view-live #live-player-details,
+:fullscreen #view-live #live-player-details {
   font-size: 1.1rem !important;
-  margin-top: 0.65rem !important;
+  margin-top: 0.5rem !important;
 }
 
-/* Active Bidders Ring */
-body.is-fullscreen #live-active-bidders-ring,
-body.is-fullscreen #owner-active-bidders-ring,
-:fullscreen #live-active-bidders-ring,
-:fullscreen #owner-active-bidders-ring {
-  margin-top: 1rem !important;
+body.is-fullscreen #view-live #live-active-bidders-ring,
+:fullscreen #view-live #live-active-bidders-ring {
+  margin-top: 0.85rem !important;
 }
 
-/* Huge Bidding Cards (Current Highest Bid & Base Price / Next Min) */
-body.is-fullscreen .spotlight-bid-cards-grid,
-:fullscreen .spotlight-bid-cards-grid {
+body.is-fullscreen #view-live .spotlight-bid-cards-grid,
+:fullscreen #view-live .spotlight-bid-cards-grid {
   gap: 1.25rem !important;
   margin-top: 1.25rem !important;
 }
 
-body.is-fullscreen .spotlight-bid-card,
-:fullscreen .spotlight-bid-card {
-  padding: 1.75rem 2rem !important;
-  min-height: 180px !important;
+body.is-fullscreen #view-live .spotlight-bid-card,
+:fullscreen #view-live .spotlight-bid-card {
+  padding: 1.5rem 1.85rem !important;
+  min-height: 160px !important;
   border-radius: 1.25rem !important;
 }
 
-body.is-fullscreen .spotlight-bid-card p.tracking-wider,
-:fullscreen .spotlight-bid-card p.tracking-wider {
-  font-size: 0.95rem !important;
-  letter-spacing: 0.08em !important;
-}
-
-body.is-fullscreen #live-bid-display,
-body.is-fullscreen #owner-current-bid-display,
-:fullscreen #live-bid-display,
-:fullscreen #owner-current-bid-display {
-  font-size: clamp(3.2rem, 4.4vw, 4.8rem) !important;
-  line-height: 1.05 !important;
-  margin: 0.65rem 0 !important;
-}
-
-body.is-fullscreen #live-player-base-price,
-body.is-fullscreen #owner-next-bid-step,
-:fullscreen #live-player-base-price,
-:fullscreen #owner-next-bid-step {
+body.is-fullscreen #view-live #live-bid-display,
+:fullscreen #view-live #live-bid-display {
   font-size: clamp(3rem, 4.2vw, 4.5rem) !important;
   line-height: 1.05 !important;
-  margin: 0.65rem 0 !important;
+  margin: 0.5rem 0 !important;
 }
 
-body.is-fullscreen #live-highest-bidder-name,
-body.is-fullscreen #owner-leading-badge,
-:fullscreen #live-highest-bidder-name,
-:fullscreen #owner-leading-badge {
-  font-size: 0.95rem !important;
-  padding: 0.4rem 1.1rem !important;
+body.is-fullscreen #view-live #live-player-base-price,
+:fullscreen #view-live #live-player-base-price {
+  font-size: clamp(2.8rem, 4vw, 4.2rem) !important;
+  line-height: 1.05 !important;
+  margin: 0.5rem 0 !important;
 }
 
-/* Owner Bidding Action Buttons in Fullscreen */
-body.is-fullscreen #owner-raise-bid-btn,
-:fullscreen #owner-raise-bid-btn {
-  padding-top: 1.2rem !important;
-  padding-bottom: 1.2rem !important;
-  font-size: 1.1rem !important;
-}
-
-body.is-fullscreen #owner-withdraw-btn,
-:fullscreen #owner-withdraw-btn {
-  padding-top: 1.2rem !important;
-  padding-bottom: 1.2rem !important;
-  font-size: 1.05rem !important;
-}
-
-/* 2. RIGHT CONTAINER: PHOTO OF PLAYER & ATTRIBUTES Card */
-body.is-fullscreen .owner-player-spotlight-card,
-:fullscreen .owner-player-spotlight-card {
-  padding: 2.25rem 2rem !important;
-  min-height: clamp(480px, 53vh, 600px) !important;
+/* Audience Screen Right Column: Player Photo Card */
+body.is-fullscreen #view-live .owner-player-spotlight-card,
+:fullscreen #view-live .owner-player-spotlight-card {
+  height: 100% !important;
+  min-height: calc(100vh - 6.5rem) !important;
+  padding: 2rem 1.75rem !important;
   border-width: 2.5px !important;
   border-color: rgba(200, 169, 106, 0.6) !important;
   box-shadow: 0 20px 45px -10px rgba(10, 35, 30, 0.85), 0 0 30px rgba(200, 169, 106, 0.15) !important;
+  display: flex !important;
+  flex-direction: column !important;
   justify-content: space-between !important;
-  gap: 1.25rem !important;
 }
 
-body.is-fullscreen .owner-player-spotlight-card h3,
-:fullscreen .owner-player-spotlight-card h3 {
+body.is-fullscreen #view-live .owner-player-spotlight-card h3,
+:fullscreen #view-live .owner-player-spotlight-card h3 {
   font-size: 1.35rem !important;
   letter-spacing: 0.14em !important;
   margin-bottom: 0.25rem !important;
 }
 
-body.is-fullscreen .owner-photo-frame,
-:fullscreen .owner-photo-frame {
-  width: 90% !important;
-  max-width: 350px !important;
+body.is-fullscreen #view-live .owner-photo-frame,
+:fullscreen #view-live .owner-photo-frame {
+  width: 85% !important;
+  max-width: 330px !important;
   aspect-ratio: 4 / 3 !important;
   height: auto !important;
-  min-height: 230px !important;
+  max-height: clamp(200px, 26vh, 280px) !important;
+  min-height: 200px !important;
   border-radius: 1.35rem !important;
   border: 3px solid rgba(200, 169, 106, 0.70) !important;
   box-shadow: 0 14px 35px rgba(0, 0, 0, 0.65), inset 0 0 25px rgba(200, 169, 106, 0.25) !important;
 }
 
-body.is-fullscreen .owner-player-spotlight-card .w-full.space-y-3,
-:fullscreen .owner-player-spotlight-card .w-full.space-y-3 {
-  gap: 0.85rem !important;
-  display: flex !important;
-  flex-direction: column !important;
-}
-
-body.is-fullscreen .owner-attr-pill,
-:fullscreen .owner-attr-pill {
-  padding: 1rem 1.4rem !important;
+body.is-fullscreen #view-live .owner-attr-pill,
+:fullscreen #view-live .owner-attr-pill {
+  padding: 0.9rem 1.35rem !important;
   border-radius: 1.15rem !important;
   gap: 0.8rem !important;
   border-width: 2px !important;
@@ -1553,15 +1510,244 @@ body.is-fullscreen .owner-attr-pill,
   background: rgba(10, 46, 38, 0.92) !important;
 }
 
-body.is-fullscreen .owner-attr-label,
-:fullscreen .owner-attr-label {
+body.is-fullscreen #view-live .owner-attr-label,
+:fullscreen #view-live .owner-attr-label {
   font-size: 1.25rem !important;
   letter-spacing: 0.05em !important;
 }
 
-body.is-fullscreen .owner-attr-value,
-:fullscreen .owner-attr-value {
+body.is-fullscreen #view-live .owner-attr-value,
+:fullscreen #view-live .owner-attr-value {
   font-size: 1.25rem !important;
+}
+
+/* ---------------------------------------------------------
+   B. OWNER DASHBOARD VIEW (#view-owner) IN FULLSCREEN
+   Fits Purse Header + Spotlight + Bidding Buttons + Photo Card
+   Completely into 100vh without ANY buttons or options cutting off!
+   (Squad roster table is below the fold, scroll for more)
+   --------------------------------------------------------- */
+body.is-fullscreen #view-owner,
+:fullscreen #view-owner {
+  padding-top: 0.5rem !important;
+  padding-bottom: 2rem !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.5rem !important;
+}
+
+/* 1. Remaining Budget & Slots Header (Compact Sleek Fit) */
+body.is-fullscreen #owner-purse-header,
+:fullscreen #owner-purse-header {
+  padding: 0.55rem 1.25rem !important;
+  margin-bottom: 0 !important;
+  border-radius: 1rem !important;
+  border: 1.5px solid rgba(200, 169, 106, 0.35) !important;
+}
+
+/* 2. Main Bidding Row (Constrained to Fit Screen with Buttons Intact) */
+body.is-fullscreen #owner-bidding-main-row,
+:fullscreen #owner-bidding-main-row {
+  display: grid !important;
+  height: calc(100vh - 160px) !important;
+  min-height: 480px !important;
+  max-height: calc(100vh - 160px) !important;
+  gap: 1rem !important;
+  margin-bottom: 2rem !important;
+}
+
+/* Left Column: Spotlight Box + Action Buttons */
+body.is-fullscreen #owner-bidding-main-row > div:first-child,
+:fullscreen #owner-bidding-main-row > div:first-child {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  height: 100% !important;
+  gap: 0.5rem !important;
+}
+
+body.is-fullscreen #view-owner .live-spotlight-box,
+:fullscreen #view-owner .live-spotlight-box {
+  flex: 1 1 auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+  padding: 1rem 1.5rem !important;
+  border-width: 2px !important;
+  border-color: var(--gold-primary) !important;
+  box-shadow: 0 0 35px rgba(200, 169, 106, 0.25), inset 0 0 20px rgba(200, 169, 106, 0.08) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  margin-bottom: 0 !important;
+}
+
+body.is-fullscreen #owner-countdown-banner,
+:fullscreen #owner-countdown-banner {
+  font-size: 0.85rem !important;
+  padding: 0.3rem 0.9rem !important;
+}
+
+body.is-fullscreen #view-owner .spotlight-live-badge,
+:fullscreen #view-owner .spotlight-live-badge {
+  font-size: 0.85rem !important;
+  padding: 0.3rem 0.9rem !important;
+}
+
+body.is-fullscreen #owner-current-player-name,
+:fullscreen #owner-current-player-name {
+  font-size: clamp(1.8rem, 2.6vw, 2.8rem) !important;
+  line-height: 1.1 !important;
+  letter-spacing: -0.02em !important;
+  margin-top: 0.35rem !important;
+}
+
+body.is-fullscreen #owner-current-player-stats,
+:fullscreen #owner-current-player-stats {
+  font-size: 0.85rem !important;
+  margin-top: 0.2rem !important;
+}
+
+body.is-fullscreen #owner-active-bidders-ring,
+:fullscreen #owner-active-bidders-ring {
+  margin-top: 0.4rem !important;
+}
+
+body.is-fullscreen #owner-active-bidders-ring > div,
+:fullscreen #owner-active-bidders-ring > div {
+  padding: 0.45rem 0.85rem !important;
+}
+
+/* Owner Bid Cards */
+body.is-fullscreen #view-owner .spotlight-bid-cards-grid,
+:fullscreen #view-owner .spotlight-bid-cards-grid {
+  gap: 0.75rem !important;
+  margin-top: 0.4rem !important;
+}
+
+body.is-fullscreen #view-owner .spotlight-bid-card,
+:fullscreen #view-owner .spotlight-bid-card {
+  padding: 0.75rem 1.15rem !important;
+  min-height: 90px !important;
+  border-radius: 1rem !important;
+}
+
+body.is-fullscreen #view-owner .spotlight-bid-card p.tracking-wider,
+:fullscreen #view-owner .spotlight-bid-card p.tracking-wider {
+  font-size: 0.75rem !important;
+  letter-spacing: 0.05em !important;
+}
+
+body.is-fullscreen #owner-current-bid-display,
+:fullscreen #owner-current-bid-display {
+  font-size: clamp(2rem, 2.8vw, 3rem) !important;
+  line-height: 1.05 !important;
+  margin: 0.2rem 0 !important;
+}
+
+body.is-fullscreen #owner-next-bid-step,
+:fullscreen #owner-next-bid-step {
+  font-size: clamp(1.8rem, 2.5vw, 2.6rem) !important;
+  line-height: 1.05 !important;
+  margin: 0.2rem 0 !important;
+}
+
+body.is-fullscreen #owner-leading-badge,
+:fullscreen #owner-leading-badge {
+  font-size: 0.75rem !important;
+  padding: 0.2rem 0.65rem !important;
+}
+
+/* Owner Bidding Action Buttons: GUARANTEED ZERO CUTTING OFF */
+body.is-fullscreen #owner-bidding-actions-row,
+:fullscreen #owner-bidding-actions-row {
+  margin-top: 0.4rem !important;
+  flex-shrink: 0 !important;
+  gap: 0.65rem !important;
+}
+
+body.is-fullscreen #owner-raise-bid-btn,
+:fullscreen #owner-raise-bid-btn {
+  padding-top: 0.75rem !important;
+  padding-bottom: 0.75rem !important;
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+  font-size: 0.95rem !important;
+  border-radius: 0.85rem !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45) !important;
+}
+
+body.is-fullscreen #owner-withdraw-btn,
+:fullscreen #owner-withdraw-btn {
+  padding-top: 0.75rem !important;
+  padding-bottom: 0.75rem !important;
+  padding-left: 0.85rem !important;
+  padding-right: 0.85rem !important;
+  font-size: 0.85rem !important;
+  border-radius: 0.85rem !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45) !important;
+}
+
+/* Owner Right Column: Player Photo Card (Matched Height & Proportions) */
+body.is-fullscreen #view-owner .owner-player-spotlight-card,
+:fullscreen #view-owner .owner-player-spotlight-card {
+  height: 100% !important;
+  min-height: 0 !important;
+  padding: 1rem 1.25rem !important;
+  border-width: 2px !important;
+  border-color: rgba(200, 169, 106, 0.55) !important;
+  box-shadow: 0 15px 35px -10px rgba(10, 35, 30, 0.8) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  gap: 0.5rem !important;
+}
+
+body.is-fullscreen #view-owner .owner-player-spotlight-card h3,
+:fullscreen #view-owner .owner-player-spotlight-card h3 {
+  font-size: 1.1rem !important;
+  letter-spacing: 0.1em !important;
+  margin-bottom: 0.2rem !important;
+}
+
+body.is-fullscreen #view-owner .owner-photo-frame,
+:fullscreen #view-owner .owner-photo-frame {
+  width: 75% !important;
+  max-width: 250px !important;
+  aspect-ratio: 4 / 3 !important;
+  height: auto !important;
+  max-height: clamp(140px, 18vh, 190px) !important;
+  min-height: 130px !important;
+  border-radius: 1.15rem !important;
+  border: 2.5px solid rgba(200, 169, 106, 0.65) !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.55), inset 0 0 15px rgba(200, 169, 106, 0.2) !important;
+}
+
+body.is-fullscreen #view-owner .owner-player-spotlight-card .w-full.space-y-3,
+:fullscreen #view-owner .owner-player-spotlight-card .w-full.space-y-3 {
+  gap: 0.4rem !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+body.is-fullscreen #view-owner .owner-attr-pill,
+:fullscreen #view-owner .owner-attr-pill {
+  padding: 0.55rem 0.9rem !important;
+  border-radius: 0.85rem !important;
+  gap: 0.6rem !important;
+  border-width: 1.5px !important;
+  border-color: rgba(200, 169, 106, 0.4) !important;
+  background: rgba(10, 46, 38, 0.9) !important;
+}
+
+body.is-fullscreen #view-owner .owner-attr-label,
+:fullscreen #view-owner .owner-attr-label {
+  font-size: 1rem !important;
+  letter-spacing: 0.04em !important;
+}
+
+body.is-fullscreen #view-owner .owner-attr-value,
+:fullscreen #view-owner .owner-attr-value {
+  font-size: 1rem !important;
 }
 
 
