@@ -279,10 +279,31 @@ const StorageManager = {
     return this.initializeDefaults();
   },
 
-  // Multi-Device Real-Time Wi-Fi Sync
+  // Multi-Device Real-Time Wi-Fi & Cloud Sync (Render / Local)
   _serverVersion: 0,
   _syncDisabled: false,
   _pollIntervalId: null,
+  _connected: false,
+
+  _setConnectionStatus(connected) {
+    if (this._connected === connected) return;
+    this._connected = connected;
+    const el = document.getElementById('sync-status-indicator');
+    if (el) {
+      if (connected) {
+        el.className = 'sync-status-pill connected';
+        el.title = 'Real-time multi-device sync active (Connected to Render Server)';
+        const textEl = el.querySelector('.sync-text');
+        if (textEl) textEl.innerText = 'Live Sync';
+      } else {
+        el.className = 'sync-status-pill disconnected';
+        el.title = 'Connecting to auction sync server...';
+        const textEl = el.querySelector('.sync-text');
+        if (textEl) textEl.innerText = 'Connecting';
+      }
+    }
+    bus.emit('SYNC_STATUS', { connected });
+  },
 
   syncToServer(key, value) {
     if (this._syncDisabled || typeof fetch === 'undefined') return;
@@ -302,12 +323,15 @@ const StorageManager = {
     })
       .then((res) => {
         if (!res.ok) {
-          if (res.status === 404) {
+          // Only permanently disable sync when run purely locally via file:// protocol
+          if (res.status === 404 && (window.location.protocol === 'file:' || !window.location.origin)) {
             this._syncDisabled = true;
             if (this._pollIntervalId) clearInterval(this._pollIntervalId);
           }
+          this._setConnectionStatus(false);
           return null;
         }
+        this._setConnectionStatus(true);
         return res.json();
       })
       .then((data) => {
@@ -316,7 +340,8 @@ const StorageManager = {
         }
       })
       .catch((err) => {
-        // DO NOT disable sync on temporary network hiccup! Phones recover automatically.
+        this._setConnectionStatus(false);
+        // Do not disable sync on temporary network hiccup! Automatically recovers.
         console.warn('Sync POST error (will retry on next poll):', err);
       });
   },
@@ -329,17 +354,23 @@ const StorageManager = {
       try {
         const res = await fetch('/api/sync?t=' + Date.now(), { cache: 'no-store' });
         if (!res.ok) {
-          if (res.status === 404) {
+          if (res.status === 404 && (window.location.protocol === 'file:' || !window.location.origin)) {
             this._syncDisabled = true;
             if (this._pollIntervalId) {
               clearInterval(this._pollIntervalId);
               this._pollIntervalId = null;
             }
           }
+          this._setConnectionStatus(false);
           return;
         }
         const data = await res.json();
-        if (!data) return;
+        if (!data) {
+          this._setConnectionStatus(false);
+          return;
+        }
+
+        this._setConnectionStatus(true);
 
         // Synchronize whenever server has a newer version OR on initial connection
         const isNewVersion = data.version && data.version > this._serverVersion;
@@ -368,6 +399,7 @@ const StorageManager = {
           bus.emit('DATA_CHANGED', { key: STORAGE_KEYS.STATE, value: data.state });
         }
       } catch (e) {
+        this._setConnectionStatus(false);
         // Wi-Fi packet drop or momentary sleep on mobile device:
         // DO NOT disable polling! Next tick in 400ms will seamlessly reconnect.
       }

@@ -9,8 +9,20 @@ import os
 import sys
 import json
 import time
+import socket
 import threading
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
+
+# Ensure correct MIME types on all OS environments (Render Linux / Windows)
+SimpleHTTPRequestHandler.extensions_map.update({
+    '.js': 'application/javascript',
+    '.mjs': 'application/javascript',
+    '.json': 'application/json',
+    '.css': 'text/css',
+    '.svg': 'image/svg+xml',
+    '.ico': 'image/x-icon',
+    '.webmanifest': 'application/manifest+json'
+})
 
 PORT = int(os.environ.get('PORT', 3000))
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -297,11 +309,10 @@ class AuctionSyncHandler(SimpleHTTPRequestHandler):
         super().log_message(format, *args)
 
 
-import socket
-
 def get_local_ip():
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.settimeout(0.5)
         s.connect(('8.8.8.8', 80))
         ip = s.getsockname()[0]
         s.close()

@@ -166,6 +166,13 @@ class SoundEffectsManager {
       console.warn('Audio error:', e);
     }
   }
+
+  // Gavel Strike countdown chime (alias to playHammerStrike)
+  playGavelStrike() {
+    this.playHammerStrike();
+  }
 }
 
 window.soundManager = new SoundEffectsManager();
+window.soundEffects = window.soundManager;
+

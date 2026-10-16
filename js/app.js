@@ -46,9 +46,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Periodic heartbeat single-session monitor (every 2.5 seconds)
   setInterval(checkSingleSessionHealth, 2500);
 
-  // Modal Helpers (Dual-Slider Campus Fix Model - Default Admin)
+  // Modal Helpers (Dual-Slider Modal - Default Admin)
   function openLoginModal(mode = 'admin') {
-    const modal = document.getElementById('auth-page-modal') || document.getElementById('login-modal');
+    const modal = document.getElementById('auth-page-modal');
     const errOwner = document.getElementById('login-owner-error-msg');
     const errAdmin = document.getElementById('login-admin-error-msg');
     if (errOwner) errOwner.style.display = 'none';
@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function closeLoginModal() {
-    const modal = document.getElementById('auth-page-modal') || document.getElementById('login-modal');
+    const modal = document.getElementById('auth-page-modal');
     if (modal) {
       modal.classList.remove('open');
       modal.setAttribute('aria-hidden', 'true');
@@ -104,8 +104,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Play opening fanfare / chime
-    if (window.soundEffects && typeof window.soundEffects.playBattleJoin === 'function') {
-      window.soundEffects.playBattleJoin();
+    if (window.soundManager && typeof window.soundManager.playBattleJoin === 'function') {
+      window.soundManager.playBattleJoin();
     }
 
     if (!burstLayer) {
@@ -1191,12 +1191,16 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    // Match player photo container height to count going container
+    // Match player photo container height on desktop (>= 900px); allow auto height on mobile
     requestAnimationFrame(() => {
       const spotlightBox = document.querySelector('#view-owner .live-spotlight-box');
       const photoCard = document.querySelector('#view-owner .owner-player-spotlight-card');
-      if (spotlightBox && photoCard && spotlightBox.offsetHeight > 0) {
-        photoCard.style.height = `${spotlightBox.offsetHeight}px`;
+      if (spotlightBox && photoCard) {
+        if (window.innerWidth >= 900 && !document.body.classList.contains('is-fullscreen') && spotlightBox.offsetHeight > 0) {
+          photoCard.style.height = `${spotlightBox.offsetHeight}px`;
+        } else {
+          photoCard.style.height = 'auto';
+        }
       }
     });
   }
@@ -1848,13 +1852,17 @@ document.addEventListener('DOMContentLoaded', () => {
     renderApp();
   };
 
-  // Sync owner card heights on resize or fullscreen toggle
+  // Sync owner card heights on resize or fullscreen toggle (desktop only)
   const syncOwnerCardHeights = () => {
     requestAnimationFrame(() => {
       const spotlightBox = document.querySelector('#view-owner .live-spotlight-box');
       const photoCard = document.querySelector('#view-owner .owner-player-spotlight-card');
-      if (spotlightBox && photoCard && spotlightBox.offsetHeight > 0) {
-        photoCard.style.height = `${spotlightBox.offsetHeight}px`;
+      if (spotlightBox && photoCard) {
+        if (window.innerWidth >= 900 && !document.body.classList.contains('is-fullscreen') && spotlightBox.offsetHeight > 0) {
+          photoCard.style.height = `${spotlightBox.offsetHeight}px`;
+        } else {
+          photoCard.style.height = 'auto';
+        }
       }
     });
   };

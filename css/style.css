@@ -121,6 +121,51 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
+/* Real-Time Sync Status Pill */
+.sync-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+  user-select: none;
+}
+.sync-status-pill.connected {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.45);
+  color: #34d399;
+}
+.sync-status-pill.disconnected {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  color: #fbbf24;
+}
+.sync-status-pill .sync-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.sync-status-pill.connected .sync-dot {
+  background: #34d399;
+  box-shadow: 0 0 8px #34d399;
+  animation: syncDotPulse 2s infinite ease-in-out;
+}
+.sync-status-pill.disconnected .sync-dot {
+  background: #fbbf24;
+  box-shadow: 0 0 8px #fbbf24;
+  animation: syncDotPulse 1s infinite ease-in-out;
+}
+@keyframes syncDotPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
 /* Navigation Tab Pills */
 .nav-pill {
   padding: 0.55rem 1.25rem;
@@ -1371,6 +1416,75 @@ select:focus, input:focus {
   border-radius: 1rem !important;
 }
 
+/* Responsive Owner Dashboard Media Queries for Mobile & Tablets (< 900px & < 640px) */
+@media (max-width: 899px) {
+  .owner-bidding-main-layout,
+  #owner-bidding-main-row {
+    grid-template-columns: 1fr !important;
+    gap: 1.5rem !important;
+    margin-bottom: 2rem !important;
+  }
+
+  .owner-spotlight-col,
+  #owner-spotlight-col,
+  .owner-photo-col,
+  #owner-photo-col {
+    grid-column: 1 / -1 !important;
+    width: 100% !important;
+  }
+
+  #view-owner .live-spotlight-box {
+    min-height: auto !important;
+    padding: 1.5rem 1.25rem !important;
+    gap: 1.25rem !important;
+  }
+
+  .owner-player-spotlight-card {
+    min-height: auto !important;
+    height: auto !important;
+    padding: 1.5rem 1.25rem !important;
+    width: 100% !important;
+  }
+
+  .owner-photo-frame {
+    max-width: 220px !important;
+    max-height: 190px !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .nav-pill {
+    padding: 0.4rem 0.65rem !important;
+    font-size: 0.75rem !important;
+  }
+
+  #owner-purse-header {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+    padding: 1rem !important;
+    margin-bottom: 1.25rem !important;
+  }
+
+  .owner-bidding-actions-grid,
+  #owner-bidding-actions-row {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+  }
+
+  .owner-action-btn-main-wrap,
+  .owner-action-btn-sub-wrap {
+    grid-column: 1 / -1 !important;
+    width: 100% !important;
+  }
+
+  #owner-raise-bid-btn,
+  #owner-withdraw-btn {
+    height: 52px !important;
+    font-size: 0.95rem !important;
+    padding: 0 1rem !important;
+  }
+}
+
 /* =========================================================
    Owner Dashboard Player Spotlight Card (Right Container)
    ========================================================= */
@@ -2034,19 +2148,12 @@ body.is-fullscreen #view-owner .owner-attr-value,
   margin-top: 2.75rem !important;
 }
 
-body.is-fullscreen #view-owner > #owner-bidding-main-row,
-:fullscreen #view-owner > #owner-bidding-main-row,
 body.is-fullscreen #owner-bidding-main-row,
 :fullscreen #owner-bidding-main-row {
   margin-bottom: 2.75rem !important;
 }
 
-body.is-fullscreen #view-owner > #owner-team-squad-section,
-:fullscreen #view-owner > #owner-team-squad-section,
 body.is-fullscreen #owner-team-squad-section,
 :fullscreen #owner-team-squad-section {
   margin-top: 2.75rem !important;
 }
-
-
-

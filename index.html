@@ -43,7 +43,7 @@
   </script>
 
   <!-- Custom Stylesheet (with cache-bust) -->
-  <link rel="stylesheet" href="./css/style.css?v=2026.28">
+  <link rel="stylesheet" href="./css/style.css?v=2026.30">
 </head>
 
 <body class="bg-[#0F3D34] text-[#F7F6F1] min-h-screen flex flex-col">
@@ -52,42 +52,48 @@
   <!-- TOP NAVIGATION BAR (WITH ROLE BADGE & AUTHENTICATION CONTROLS) -->
   <!-- ============================================================== -->
   <nav
-    class="sticky top-0 z-50 bg-[#0F3D34]/95 backdrop-blur-xl border-b border-[#C8A96A]/20 px-4 md:px-6 py-2.5 flex flex-wrap justify-between items-center gap-3">
+    class="sticky top-0 z-50 bg-[#0F3D34]/95 backdrop-blur-xl border-b border-[#C8A96A]/20 px-3 sm:px-4 md:px-6 py-2.5 flex flex-wrap justify-between items-center gap-2 sm:gap-3">
 
     <!-- Left: Tournament Brand with Official Crest -->
-    <div class="flex items-center gap-3">
+    <div class="flex items-center gap-2.5 sm:gap-3">
       <div class="relative shrink-0">
         <img src="./icons/logo.png" alt="Alamdar Sports Club Amravati"
-          class="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover shadow-lg border-2 border-[#C8A96A]/60 ring-2 ring-[#C8A96A]/20 transition-transform hover:scale-105">
+          class="w-9 h-9 sm:w-11 sm:h-11 rounded-full object-cover shadow-lg border-2 border-[#C8A96A]/60 ring-2 ring-[#C8A96A]/20 transition-transform hover:scale-105">
       </div>
       <div>
-        <h1 class="text-sm sm:text-base font-extrabold text-[#F7F6F1] leading-tight flex items-center gap-1.5">
+        <h1 class="text-xs sm:text-base font-extrabold text-[#F7F6F1] leading-tight flex items-center gap-1.5">
           Alamdar Sports Club
           <span
-            class="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-[#C8A96A]/20 text-[#DFC897] border border-[#C8A96A]/30">Amravati</span>
+            class="text-[9px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-[#C8A96A]/20 text-[#DFC897] border border-[#C8A96A]/30">Amravati</span>
         </h1>
-        <p class="text-[11px] text-[#C8A96A] font-semibold tracking-wide">Box Cricket Auction 2026</p>
+        <p class="text-[10px] sm:text-[11px] text-[#C8A96A] font-semibold tracking-wide">Box Cricket Auction 2026</p>
       </div>
     </div>
 
     <!-- Center: View Switcher Pills -->
-    <div class="flex items-center gap-1.5 bg-[#134E43]/70 p-1 rounded-full border border-[#C8A96A]/20">
+    <div class="flex items-center gap-1 sm:gap-1.5 bg-[#134E43]/70 p-1 rounded-full border border-[#C8A96A]/20 max-w-full overflow-x-auto">
       <button data-view-tab="live" class="nav-pill active">Audience Screen</button>
       <button data-view-tab="owner" class="nav-pill" id="nav-owner-tab">Owner Dashboard</button>
       <button data-view-tab="admin" class="nav-pill" id="nav-admin-tab">Admin Control</button>
     </div>
 
-    <!-- Right: Authentication State & Audio Toggle -->
-    <div class="flex items-center gap-2.5">
+    <!-- Right: Authentication State, Sync Status & Audio Toggle -->
+    <div class="flex items-center gap-2 sm:gap-2.5">
+
+      <!-- Live Multi-Device Sync Indicator -->
+      <div id="sync-status-indicator" class="sync-status-pill connected" title="Real-time multi-device sync active (Render Server)">
+        <span class="sync-dot"></span>
+        <span class="sync-text hidden sm:inline">Live Sync</span>
+      </div>
 
       <!-- State 1: Public Viewer (Not Logged In) -->
       <div id="auth-guest-controls" class="auth-login-trigger-wrap flex items-center gap-2">
-        <span class="text-xs text-[#E6F0E9] font-semibold hidden sm:inline flex items-center gap-1.5">
+        <span class="text-xs text-[#E6F0E9] font-semibold hidden lg:inline flex items-center gap-1.5">
           <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
           Audience Mode
         </span>
         <button id="open-login-btn"
-          class="btn-primary login-glow-pulse text-xs py-1.5 px-3.5 rounded-xl font-black shadow-lg flex items-center gap-1.5 border border-[#DFC897]/50 transition-transform hover:scale-105"
+          class="btn-primary login-glow-pulse text-xs py-1.5 px-3 sm:px-3.5 rounded-xl font-black shadow-lg flex items-center gap-1.5 border border-[#DFC897]/50 transition-transform hover:scale-105"
           title="Sign In as Master Admin or Franchise Owner">
           <span>🔐</span>
           <span>Sign In</span>
@@ -99,28 +105,29 @@
       <!-- State 2: Authenticated (Team Owner or Admin Locked Session) -->
       <div id="auth-user-controls" class="auth-login-trigger-wrap items-center gap-2" style="display:none;">
         <button id="auth-user-badge"
-          class="stone-badge text-[#C8A96A] border-[#C8A96A]/60 bg-[#134E43]/80 text-xs py-1 px-3 font-bold cursor-pointer hover:bg-[#134E43] hover:border-[#C8A96A] transition-all"
+          class="stone-badge text-[#C8A96A] border-[#C8A96A]/60 bg-[#134E43]/80 text-xs py-1 px-2.5 sm:px-3 font-bold cursor-pointer hover:bg-[#134E43] hover:border-[#C8A96A] transition-all max-w-[140px] sm:max-w-none truncate"
           title="Click to open portal / switch login">
           Husaini Hawks
         </button>
         <button id="logout-btn"
-          class="btn-outline text-xs py-1.5 px-3 text-rose-300 border-rose-800 hover:bg-rose-950/60 font-bold rounded-xl"
+          class="btn-outline text-xs py-1.5 px-2.5 sm:px-3 text-rose-300 border-rose-800 hover:bg-rose-950/60 font-bold rounded-xl"
           title="Click to logout and switch account">
-          🚪 Log Out
+          🚪 <span class="hidden sm:inline">Log Out</span>
         </button>
       </div>
 
       <!-- Fullscreen Toggle Button (Click or Press 'F' / 'F11') -->
       <button id="fullscreen-toggle-btn"
-        class="btn-outline text-xs py-1.5 px-3 font-semibold rounded-xl text-[#DFC897] border-[#C8A96A]/40 hover:bg-[#C8A96A]/20 hover:text-white flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
+        class="btn-outline text-xs py-1.5 px-2.5 sm:px-3 font-semibold rounded-xl text-[#DFC897] border-[#C8A96A]/40 hover:bg-[#C8A96A]/20 hover:text-white flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
         title="Toggle Fullscreen Mode (Keyboard shortcut: 'F' or 'F11')">
         <span id="fullscreen-icon">⛶</span>
-        <span id="fullscreen-text" class="hidden sm:inline">Fullscreen</span>
+        <span id="fullscreen-text" class="hidden md:inline">Fullscreen</span>
       </button>
 
       <!-- Audio Toggle -->
-      <button id="sound-toggle-btn" class="btn-outline text-xs py-1.5 px-3 font-semibold rounded-xl text-[#F7F6F1]">
-        🔊 Audio ON
+      <button id="sound-toggle-btn" class="btn-outline text-xs py-1.5 px-2.5 sm:px-3 font-semibold rounded-xl text-[#F7F6F1]"
+        title="Toggle Sound Effects">
+        🔊 <span class="hidden sm:inline">Audio</span>
       </button>
 
     </div>
@@ -153,8 +160,8 @@
             </div>
 
             <!-- Giant Player Name & Role Pill -->
-            <div class="flex flex-wrap items-center gap-3 mt-4">
-              <h2 id="live-player-name" class="text-3xl md:text-5xl font-black text-white uppercase tracking-tight">
+            <div class="flex flex-wrap items-center gap-2.5 sm:gap-3 mt-3 sm:mt-4">
+              <h2 id="live-player-name" class="text-2xl sm:text-3xl md:text-5xl font-black text-white uppercase tracking-tight break-words">
                 WAITING FOR PLAYER ON STAGE...
               </h2>
               <span id="live-player-spec"
@@ -175,7 +182,8 @@
           <div class="spotlight-bid-cards-grid grid grid-cols-1 sm:grid-cols-2 gap-4">
 
             <!-- Gold Card: Current Highest Bid -->
-            <div class="spotlight-bid-card bg-[#C8A96A] text-[#0F3D34] p-5 rounded-2xl flex flex-col justify-between shadow-xl">
+            <div
+              class="spotlight-bid-card bg-[#C8A96A] text-[#0F3D34] p-5 rounded-2xl flex flex-col justify-between shadow-xl">
               <p class="text-xs uppercase font-black tracking-wider text-[#0F3D34]/80">CURRENT HIGHEST BID</p>
               <p id="live-bid-display" class="text-4xl md:text-5xl font-black font-mono-num my-2 text-[#0F3D34]">
                 ₹0
@@ -337,7 +345,7 @@
 
             <!-- Player Name & Attributes -->
             <h2 id="owner-current-player-name"
-              class="text-3xl md:text-5xl font-black text-[#F7F6F1] uppercase tracking-tight mt-4">
+              class="text-2xl sm:text-3xl md:text-5xl font-black text-[#F7F6F1] uppercase tracking-tight mt-3 sm:mt-4 break-words">
               WAITING FOR PLAYER ON STAGE...
             </h2>
             <p id="owner-current-player-stats" class="text-xs sm:text-sm text-[#E6F0E9] mt-2 font-medium">
@@ -345,7 +353,8 @@
             </p>
             <!-- Active 2-Franchise Bidding Battle Ring -->
             <div id="owner-active-bidders-ring" class="mt-4">
-              <div class="p-3.5 rounded-2xl bg-[#092520]/80 border border-[#C8A96A]/20 text-center text-xs text-[#E6F0E9]/60 font-semibold flex items-center justify-center gap-2">
+              <div
+                class="p-3.5 rounded-2xl bg-[#092520]/80 border border-[#C8A96A]/20 text-center text-xs text-[#E6F0E9]/60 font-semibold flex items-center justify-center gap-2">
                 <span class="text-base">⚔️</span>
                 <span>Bidding Battle Ring on Standby — Awaiting Live Player on Stage</span>
               </div>
@@ -356,7 +365,8 @@
           <div class="spotlight-bid-cards-grid grid grid-cols-1 sm:grid-cols-2 gap-4">
 
             <!-- Gold Card: Current Highest Bid -->
-            <div class="spotlight-bid-card bg-[#C8A96A] text-[#0F3D34] p-5 rounded-2xl flex flex-col justify-between shadow-xl">
+            <div
+              class="spotlight-bid-card bg-[#C8A96A] text-[#0F3D34] p-5 rounded-2xl flex flex-col justify-between shadow-xl">
               <p class="text-xs uppercase font-black tracking-wider text-[#0F3D34]/80">CURRENT HIGHEST BID</p>
               <p id="owner-current-bid-display"
                 class="text-4xl md:text-5xl font-black font-mono-num my-2 text-[#0F3D34]">
@@ -666,9 +676,9 @@
           <span>JAFAR Creation</span>
         </button>
         <span class="text-[#C8A96A]/40 hidden sm:inline">|</span>
-        <a href="tel:9325704560"
+        <a href="tel:+91 9325704560"
           class="footer-phone-link inline-flex items-center gap-1.5 text-[#DFC897] hover:text-[#FFF2A3] font-semibold transition-all"
-          title="Call Developer: 9325704560">
+          title="Call Developer: +91 9325704560">
           <span class="text-xs">📞</span>
           <span class="font-mono tracking-wide">+91 9325704560</span>
         </a>
@@ -991,11 +1001,11 @@
   <div id="toast-container"></div>
 
   <!-- Scripts -->
-  <script src="./js/data.js?v=2026.21"></script>
-  <script src="./js/storage.js?v=2026.21"></script>
-  <script src="./js/sound.js?v=2026.21"></script>
-  <script src="./js/auction-engine.js?v=2026.21"></script>
-  <script src="./js/app.js?v=2026.27"></script>
+  <script src="./js/data.js?v=2026.30"></script>
+  <script src="./js/storage.js?v=2026.30"></script>
+  <script src="./js/sound.js?v=2026.30"></script>
+  <script src="./js/auction-engine.js?v=2026.30"></script>
+  <script src="./js/app.js?v=2026.30"></script>
 </body>
 
 </html>
