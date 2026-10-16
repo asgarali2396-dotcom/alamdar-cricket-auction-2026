@@ -43,7 +43,7 @@
   </script>
 
   <!-- Custom Stylesheet (with cache-bust) -->
-  <link rel="stylesheet" href="./css/style.css?v=2026.21">
+  <link rel="stylesheet" href="./css/style.css?v=2026.22">
 </head>
 
 <body class="bg-[#0F3D34] text-[#F7F6F1] min-h-screen flex flex-col">
@@ -284,77 +284,127 @@
   <!-- ============================================================== -->
   <main id="view-owner" class="flex-1 w-full p-4 md:p-6 max-w-[1600px] mx-auto space-y-6" style="display:none;">
 
-    <!-- 1. REMAINING BUDGET & AUCTION SLOTS (FIRST CONTAINER) -->
-    <div id="owner-purse-header" class="glass-panel p-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-      <!-- Remaining Budget -->
-      <div>
-        <p class="text-[11px] font-bold text-[#E6F0E9]">Remaining Budget</p>
-        <p class="text-xl sm:text-2xl font-black text-[#F7F6F1] font-mono-num mt-0.5">
-          <span id="owner-remaining-budget">₹100,000</span> <span
-            class="text-[11px] font-medium text-[#E6F0E9] font-sans">/ ₹1,00,000 Purse Cap</span>
-        </p>
-        <div class="w-full bg-[#0F3D34] rounded-full h-1.5 mt-2.5 overflow-hidden">
-          <div id="owner-budget-bar" class="bg-[#C8A96A] h-1.5 rounded-full" style="width: 100%;"></div>
+    <!-- 1. REMAINING BUDGET & AUCTION SLOTS (EXECUTIVE FRANCHISE HUD) -->
+    <div id="owner-purse-header" class="owner-purse-hud-panel glass-panel">
+      <!-- Franchise Identity -->
+      <div class="owner-hud-col-brand">
+        <div class="flex items-center gap-3">
+          <div id="owner-header-team-avatar" class="owner-hud-team-avatar">
+            <span id="owner-header-team-icon" class="text-2xl sm:text-3xl">🦅</span>
+          </div>
+          <div class="truncate">
+            <div class="flex items-center gap-2">
+              <h2 id="owner-header-team-name" class="text-base sm:text-lg font-black text-[#F7F6F1] tracking-tight truncate">
+                Husaini Hawks
+              </h2>
+              <span class="owner-hud-role-pill">OFFICIAL FRANCHISE</span>
+            </div>
+            <p id="owner-header-caption" class="text-[11px] text-[#C8A96A] font-semibold truncate mt-0.5">
+              Franchise Owner: Shabbir Bhai • Playing Capt: Shabbir (C)
+            </p>
+          </div>
         </div>
-        <p class="text-[10px] text-[#E6F0E9] mt-1">Progress/ Purse Cap</p>
       </div>
 
-      <!-- Auction Slots Semicircular Meter -->
-      <div
-        class="border-t sm:border-t-0 sm:border-l border-[#C8A96A]/20 pt-3 sm:pt-0 sm:pl-4 flex flex-col justify-between">
-        <p class="text-[11px] font-bold text-[#E6F0E9]">Auction Slots</p>
-        <div class="gauge-container">
-          <div class="gauge-arc"></div>
-          <div class="gauge-text">
-            <span id="owner-slots-count" class="text-lg font-black text-[#F7F6F1] font-mono-num">0 / 8</span>
-            <p class="text-[10px] text-[#E6F0E9] -mt-0.5">Players</p>
-          </div>
+      <!-- Hero Metric: Remaining Purse & Progress -->
+      <div class="owner-hud-col-purse">
+        <div class="flex justify-between items-baseline gap-2">
+          <span class="text-[10px] uppercase font-black tracking-wider text-[#C8A96A] flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> REMAINING PURSE
+          </span>
+          <span class="text-[11px] font-bold text-[#E6F0E9] truncate">
+            Cap: <strong class="text-[#F7F6F1]">₹1,00,000</strong> • Spent: <strong id="owner-header-spent" class="text-[#DFC897] font-mono-num">₹0</strong>
+          </span>
+        </div>
+        <div class="flex items-baseline gap-2 mt-1">
+          <span id="owner-remaining-budget" class="text-2xl sm:text-3xl font-black text-[#F7F6F1] font-mono-num drop-shadow tracking-tight">
+            ₹100,000
+          </span>
+          <span id="owner-budget-pct-label" class="text-xs font-black text-emerald-400 font-mono-num">
+            (100% Available)
+          </span>
+        </div>
+        <!-- High-End Luxury Animated Progress Bar -->
+        <div class="owner-hud-progress-track">
+          <div id="owner-budget-bar" class="owner-hud-progress-fill" style="width: 100%;"></div>
+        </div>
+      </div>
+
+      <!-- Slots Acquired & Max Bid Allowed -->
+      <div class="owner-hud-col-slots">
+        <div class="flex justify-between items-center text-[10px] font-black uppercase tracking-wider text-[#E6F0E9]">
+          <span>AUCTION SLOTS</span>
+          <span id="owner-slots-count" class="text-sm font-black text-[#DFC897] font-mono-num">0 / 8 Acquired</span>
+        </div>
+        <!-- 8 Interactive Slot Pip Indicators -->
+        <div id="owner-slots-pips" class="owner-slots-pips-grid mt-1.5">
+          <!-- Populated dynamically via renderSidebar -->
+        </div>
+        <div class="flex justify-between items-center text-[11px] text-[#E6F0E9] mt-2 pt-1 border-t border-[#C8A96A]/20">
+          <span class="text-[10px] uppercase font-bold text-[#C8A96A]">Max Safe Bid:</span>
+          <strong id="owner-max-bid-limit" class="text-[#F7F6F1] font-mono-num font-black text-xs">₹93,000</strong>
         </div>
       </div>
     </div>
 
     <!-- MAIN GRID: 2. ACTUAL BIDDING BOX & 3. TEAM PURSE & ROSTER -->
-    <div id="owner-bidding-main-row" class="grid grid-cols-12 gap-5">
+    <div id="owner-bidding-main-row" class="grid grid-cols-12 gap-4 lg:gap-5">
 
       <!-- 2. ACTUAL BIDDING BOX (SECOND CONTAINER) -->
-      <div class="col-span-12 lg:col-span-8 space-y-4">
+      <div class="col-span-12 lg:col-span-8 flex flex-col justify-between space-y-4">
 
         <!-- Live Player Spotlight Box -->
-        <div class="live-spotlight-box p-6 md:p-8 flex flex-col justify-between space-y-6">
+        <div class="live-spotlight-box p-5 md:p-7 flex flex-col justify-between space-y-4">
 
-          <!-- Top Tag Row -->
+          <!-- Top Tag Row: Dynamic Live Countdown Banner & Urgency Meter -->
           <div>
-            <div class="flex justify-between items-center">
-              <span id="owner-countdown-banner"
-                class="spotlight-countdown-badge px-3.5 py-1 rounded-full text-xs font-black tracking-wider text-[#C8A96A] border border-[#C8A96A]/50 bg-[#0F3D34]/80 flex items-center gap-1.5">
-                <span class="animate-pulse">((•))</span> COUNT GOING, GOING...
-              </span>
+            <div class="flex flex-wrap justify-between items-center gap-2">
+              <div id="owner-countdown-banner" class="spotlight-countdown-badge">
+                <span id="owner-countdown-icon" class="countdown-badge-icon animate-pulse">((•))</span>
+                <span id="owner-countdown-text" class="countdown-badge-text font-black">COUNT GOING: WAITING FOR STAGE...</span>
+              </div>
               <span
-                class="spotlight-live-badge px-3.5 py-1 rounded-full text-xs font-black tracking-wider text-[#F7F6F1] border border-[#9e2a2b]/60 bg-[#9e2a2b]/50 flex items-center gap-1.5">
+                class="spotlight-live-badge px-3.5 py-1 rounded-full text-xs font-black tracking-wider text-[#F7F6F1] border border-[#9e2a2b]/60 bg-[#9e2a2b]/60 flex items-center gap-1.5 shadow-md">
                 <span class="animate-ping">((•))</span> LIVE
               </span>
             </div>
 
+            <!-- Urgent Countdown 3-Stage Pip Meter (Only visible during COUNTDOWN) -->
+            <div id="owner-countdown-meter" class="owner-countdown-meter-bar" style="display:none;">
+              <div class="countdown-step" id="count-step-1">
+                <span class="step-num">1</span>
+                <span class="step-lbl">GOING ONCE</span>
+              </div>
+              <div class="countdown-step" id="count-step-2">
+                <span class="step-num">2</span>
+                <span class="step-lbl">GOING TWICE</span>
+              </div>
+              <div class="countdown-step" id="count-step-3">
+                <span class="step-num">3</span>
+                <span class="step-lbl">FINAL CALL</span>
+              </div>
+            </div>
+
             <!-- Player Name & Attributes -->
             <h2 id="owner-current-player-name"
-              class="text-3xl md:text-5xl font-black text-[#F7F6F1] uppercase tracking-tight mt-4">
+              class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-[#F7F6F1] uppercase tracking-tight mt-3">
               FAROOQ BAGASRAWALA
             </h2>
-            <p id="owner-current-player-stats" class="text-xs sm:text-sm text-[#E6F0E9] mt-2 font-medium">
+            <p id="owner-current-player-stats" class="text-xs sm:text-sm text-[#E6F0E9] mt-1 font-medium">
               Age: 36 • Bat: Right-Hand • Bowl: Right-Arm Fast • All-Rounder
             </p>
             <!-- Active 2-Franchise Bidding Battle Ring -->
-            <div id="owner-active-bidders-ring" class="mt-4"></div>
+            <div id="owner-active-bidders-ring" class="mt-3"></div>
           </div>
 
           <!-- Middle 2 Large Cards: Current Bid & Base/Next Min -->
-          <div class="spotlight-bid-cards-grid grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="spotlight-bid-cards-grid grid grid-cols-1 sm:grid-cols-2 gap-3.5">
 
             <!-- Gold Card: Current Highest Bid -->
-            <div class="spotlight-bid-card bg-[#C8A96A] text-[#0F3D34] p-5 rounded-2xl flex flex-col justify-between shadow-xl">
+            <div class="spotlight-bid-card bg-[#C8A96A] text-[#0F3D34] p-4 sm:p-5 rounded-2xl flex flex-col justify-between shadow-xl">
               <p class="text-xs uppercase font-black tracking-wider text-[#0F3D34]/80">CURRENT HIGHEST BID</p>
               <p id="owner-current-bid-display"
-                class="text-4xl md:text-5xl font-black font-mono-num my-2 text-[#0F3D34]">
+                class="text-3xl sm:text-4xl md:text-5xl font-black font-mono-num my-1.5 text-[#0F3D34]">
                 ₹1,000
               </p>
               <div class="inline-block">
@@ -367,9 +417,9 @@
 
             <!-- Emerald Jewel Card: Base Price / Next Min -->
             <div
-              class="spotlight-bid-card bg-[#134E43] text-[#F7F6F1] border-2 border-[#C8A96A]/50 p-5 rounded-2xl flex flex-col justify-between shadow-xl">
+              class="spotlight-bid-card bg-[#134E43] text-[#F7F6F1] border-2 border-[#C8A96A]/50 p-4 sm:p-5 rounded-2xl flex flex-col justify-between shadow-xl">
               <p class="text-xs uppercase font-black tracking-wider text-[#C8A96A]">BASE PRICE / NEXT MIN</p>
-              <p id="owner-next-bid-step" class="text-3xl md:text-4xl font-black font-mono-num my-2 text-[#F7F6F1]">
+              <p id="owner-next-bid-step" class="text-2xl sm:text-3xl md:text-4xl font-black font-mono-num my-1.5 text-[#F7F6F1]">
                 ₹1,000 / ₹2,000
               </p>
               <div class="text-xs text-[#E6F0E9] font-bold">Tiered Increments</div>
@@ -379,13 +429,13 @@
 
         </div>
 
-        <!-- Bottom Action Buttons: Giant Bidding Button + Withdraw Button -->
+        <!-- Bottom Action Buttons: Guaranteed 100% Visible & Tactile Action Center -->
         <div id="owner-bidding-actions-row" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
 
           <!-- Bidding / Status Button (Spans 2 columns) -->
           <div class="sm:col-span-2">
             <button id="owner-raise-bid-btn"
-              class="w-full py-4 px-6 rounded-2xl font-black text-sm sm:text-base uppercase tracking-wider bg-[#134E43] text-[#F7F6F1] border border-[#C8A96A]/40 shadow-xl transition-all">
+              class="w-full py-4 px-6 rounded-2xl font-black text-sm sm:text-base uppercase tracking-wider bg-[#134E43] text-[#F7F6F1] border border-[#C8A96A]/40 shadow-xl transition-all cursor-pointer">
               YOU HOLD THE HIGHEST BID (₹1,000)
             </button>
           </div>
@@ -393,7 +443,7 @@
           <!-- Withdraw Button -->
           <div>
             <button id="owner-withdraw-btn"
-              class="w-full py-4 px-6 rounded-2xl font-bold text-sm text-[#E6F0E9] bg-[#0a2c25] hover:bg-[#134E43] border border-[#C8A96A]/20 shadow-xl transition-all">
+              class="w-full py-4 px-6 rounded-2xl font-bold text-sm text-[#E6F0E9] bg-[#0a2c25] hover:bg-[#134E43] border border-[#C8A96A]/20 shadow-xl transition-all cursor-pointer">
               Withdraw From Battle
             </button>
           </div>
@@ -402,13 +452,19 @@
 
       </div>
 
-      <!-- 3. PHOTO OF PLAYER & ATTRIBUTES (RIGHT CONTAINER - AS IN PHOTO) -->
-      <div class="col-span-12 lg:col-span-4 space-y-4">
+      <!-- 3. PHOTO OF PLAYER & ATTRIBUTES (RIGHT CONTAINER - PROFESSIONAL SPORTS TRADING CARD) -->
+      <div class="col-span-12 lg:col-span-4">
         <div class="owner-player-spotlight-card">
-          <!-- Title -->
-          <h3 class="text-base sm:text-lg font-black uppercase tracking-wider text-[#C8A96A] text-center">
-            PHOTO OF PLAYER
-          </h3>
+          <!-- Card Header: Category & Stone Set -->
+          <div class="owner-card-header flex items-center justify-between w-full pb-2 border-b border-[#C8A96A]/25">
+            <span id="owner-card-player-set" class="text-[11px] font-black uppercase tracking-wider text-[#DFC897] bg-[#0a2c25] px-2.5 py-1 rounded-full border border-[#C8A96A]/30 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-[#C8A96A]"></span>
+              <span id="owner-card-player-set-name">AQEEQ SET</span>
+            </span>
+            <span class="text-[11px] font-black text-[#C8A96A] tracking-widest uppercase">
+              PLAYER CARD
+            </span>
+          </div>
 
           <!-- Photo Frame with Dynamic Photo or Silhouette -->
           <div class="owner-photo-frame">
@@ -418,47 +474,56 @@
               xmlns="http://www.w3.org/2000/svg">
               <defs>
                 <radialGradient id="ownerPlayerBgGrad" cx="50%" cy="38%" r="65%">
-                  <stop offset="0%" stop-color="#E2E8F0" stop-opacity="0.95" />
-                  <stop offset="45%" stop-color="#94A3B8" stop-opacity="0.75" />
-                  <stop offset="100%" stop-color="#475569" stop-opacity="0.95" />
+                  <stop offset="0%" stop-color="#1E3A34" stop-opacity="0.95" />
+                  <stop offset="55%" stop-color="#0F2D26" stop-opacity="0.85" />
+                  <stop offset="100%" stop-color="#071A16" stop-opacity="0.98" />
                 </radialGradient>
                 <linearGradient id="ownerSilhouetteGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stop-color="#334155" />
-                  <stop offset="50%" stop-color="#1E293B" />
-                  <stop offset="100%" stop-color="#0F172A" />
+                  <stop offset="0%" stop-color="#C8A96A" />
+                  <stop offset="50%" stop-color="#A98748" />
+                  <stop offset="100%" stop-color="#5A4722" />
                 </linearGradient>
                 <linearGradient id="ownerCollarGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stop-color="#CBD5E1" />
-                  <stop offset="100%" stop-color="#64748B" />
+                  <stop offset="0%" stop-color="#F7F6F1" />
+                  <stop offset="100%" stop-color="#DFC897" />
                 </linearGradient>
               </defs>
               <rect width="200" height="200" fill="url(#ownerPlayerBgGrad)" />
-              <circle cx="100" cy="70" r="30" fill="url(#ownerSilhouetteGrad)" />
-              <rect x="88" y="94" width="24" height="24" rx="5" fill="url(#ownerSilhouetteGrad)" />
-              <path d="M36 186 C36 138 66 120 84 116 L94 130 L106 130 L116 116 C134 120 164 138 164 186 Z"
+              <circle cx="100" cy="65" r="28" fill="url(#ownerSilhouetteGrad)" />
+              <rect x="89" y="88" width="22" height="22" rx="4" fill="url(#ownerSilhouetteGrad)" />
+              <path d="M38 186 C38 135 68 116 85 112 L94 126 L106 126 L115 112 C132 116 162 135 162 186 Z"
                 fill="url(#ownerSilhouetteGrad)" />
-              <path d="M84 116 L100 138 L116 116" stroke="url(#ownerCollarGrad)" stroke-width="3" stroke-linecap="round"
+              <path d="M85 112 L100 134 L115 112" stroke="url(#ownerCollarGrad)" stroke-width="3" stroke-linecap="round"
                 stroke-linejoin="round" />
-              <line x1="100" y1="138" x2="100" y2="158" stroke="url(#ownerCollarGrad)" stroke-width="2"
+              <line x1="100" y1="134" x2="100" y2="155" stroke="url(#ownerCollarGrad)" stroke-width="2.5"
                 stroke-linecap="round" />
             </svg>
+            <!-- Floating Role Ribbon Badge Across Photo Bottom -->
+            <div id="owner-card-player-role" class="owner-card-role-ribbon">
+              ALL-ROUNDER
+            </div>
           </div>
 
-          <!-- Attributes Pills (Age, BAT, BOWL) -->
-          <div class="w-full space-y-3 pt-1">
+          <!-- Attributes 2x2 Grid (Age, Base, BAT, BOWL) -->
+          <div class="owner-attr-grid w-full">
             <div class="owner-attr-pill">
               <span class="owner-attr-label">Age :-</span>
-              <span id="owner-card-player-age" class="owner-attr-value"></span>
+              <span id="owner-card-player-age" class="owner-attr-value">36</span>
+            </div>
+
+            <div class="owner-attr-pill">
+              <span class="owner-attr-label">Base :-</span>
+              <span id="owner-card-player-base" class="owner-attr-value">₹1,000</span>
             </div>
 
             <div class="owner-attr-pill">
               <span class="owner-attr-label">BAT :-</span>
-              <span id="owner-card-player-bat" class="owner-attr-value"></span>
+              <span id="owner-card-player-bat" class="owner-attr-value">Right-Hand</span>
             </div>
 
             <div class="owner-attr-pill">
               <span class="owner-attr-label">BOWL :-</span>
-              <span id="owner-card-player-bowl" class="owner-attr-value"></span>
+              <span id="owner-card-player-bowl" class="owner-attr-value">Right-Arm Fast</span>
             </div>
           </div>
         </div>
@@ -986,11 +1051,11 @@
   <div id="toast-container"></div>
 
   <!-- Scripts -->
-  <script src="./js/data.js?v=2026.21"></script>
-  <script src="./js/storage.js?v=2026.21"></script>
-  <script src="./js/sound.js?v=2026.21"></script>
-  <script src="./js/auction-engine.js?v=2026.21"></script>
-  <script src="./js/app.js?v=2026.21"></script>
+  <script src="./js/data.js?v=2026.22"></script>
+  <script src="./js/storage.js?v=2026.22"></script>
+  <script src="./js/sound.js?v=2026.22"></script>
+  <script src="./js/auction-engine.js?v=2026.22"></script>
+  <script src="./js/app.js?v=2026.22"></script>
 </body>
 
 </html>

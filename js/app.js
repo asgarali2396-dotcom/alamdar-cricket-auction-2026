@@ -682,7 +682,11 @@ document.addEventListener('DOMContentLoaded', () => {
             showToast(joinRes.error, 'error');
           }
         } else {
-          // Raise Bid
+          // Raise Bid (If countdown is running, abort countdown and continue bidding!)
+          if (window._activeCountdownTimer) {
+            clearInterval(window._activeCountdownTimer);
+            window._activeCountdownTimer = null;
+          }
           const res = AuctionEngine.placeBid(teamId);
           if (res.success) {
             showToast(`Bid raised to ₹${res.newBid.toLocaleString()}!`, 'gold');
@@ -947,7 +951,6 @@ document.addEventListener('DOMContentLoaded', () => {
           userBadge.innerText = team ? `${team.icon || '🏏'} ${team.name}` : '🏏 Team Owner';
           userBadge.className = 'stone-badge text-[#C8A96A] border-[#C8A96A]/60 bg-[#134E43]/80 text-xs py-1 px-3 font-bold';
         }
-        if (navOwnerTab) navOwnerTab.innerText = team ? `🏏 ${team.name}` : 'My Dashboard';
         if (navAdminTab) navAdminTab.innerText = 'Admin Control';
       }
     }
@@ -957,7 +960,11 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderSidebar(team) {
     const remBudget = team ? team.remainingBudget : 100000;
     const slots = team ? team.acquiredCount : 0;
-    const pct = Math.min(100, Math.round((remBudget / 100000) * 100));
+    const spent = Math.max(0, 100000 - remBudget);
+    const pct = Math.max(0, Math.min(100, Math.round((remBudget / 100000) * 100)));
+    const slotsLeft = Math.max(0, 8 - slots);
+    const slotsNeedingReserve = Math.max(0, slotsLeft - 1);
+    const maxSafeBid = Math.max(0, remBudget - slotsNeedingReserve * 1000);
 
     // Update Audience View Sidebar
     const liveBudget = document.getElementById('live-sidebar-budget');
@@ -967,13 +974,38 @@ document.addEventListener('DOMContentLoaded', () => {
     if (liveBar) liveBar.style.width = `${pct}%`;
     if (liveSlots) liveSlots.innerText = `${slots} / 8`;
 
-    // Update Owner View Sidebar
+    // Update Owner View Executive Purse HUD
     const ownerBudget = document.getElementById('owner-remaining-budget');
     const ownerBar = document.getElementById('owner-budget-bar');
     const ownerSlots = document.getElementById('owner-slots-count');
+    const ownerSpent = document.getElementById('owner-header-spent');
+    const ownerPctLabel = document.getElementById('owner-budget-pct-label');
+    const ownerTeamIcon = document.getElementById('owner-header-team-icon');
+    const ownerTeamName = document.getElementById('owner-header-team-name');
+    const ownerCaption = document.getElementById('owner-header-caption');
+    const ownerMaxBid = document.getElementById('owner-max-bid-limit');
+    const ownerPipsContainer = document.getElementById('owner-slots-pips');
+
     if (ownerBudget) ownerBudget.innerText = `₹${remBudget.toLocaleString()}`;
     if (ownerBar) ownerBar.style.width = `${pct}%`;
-    if (ownerSlots) ownerSlots.innerText = `${slots} / 8`;
+    if (ownerSlots) ownerSlots.innerText = `${slots} / 8 Acquired`;
+    if (ownerSpent) ownerSpent.innerText = `₹${spent.toLocaleString()}`;
+    if (ownerPctLabel) ownerPctLabel.innerText = `(${pct}% Available)`;
+    if (ownerTeamIcon) ownerTeamIcon.innerText = team ? (team.icon || '🏏') : '🦅';
+    if (ownerTeamName) ownerTeamName.innerText = team ? team.name : 'Husaini Hawks';
+    if (ownerCaption) {
+      ownerCaption.innerText = team
+        ? `Franchise Owner: ${team.ownerName || 'Team Owner'} • Playing Capt: ${team.playingOwner || 'Captain (C)'}`
+        : 'Franchise Owner Dashboard';
+    }
+    if (ownerMaxBid) ownerMaxBid.innerText = `₹${maxSafeBid.toLocaleString()}`;
+
+    if (ownerPipsContainer) {
+      ownerPipsContainer.innerHTML = Array.from({ length: 8 }, (_, i) => {
+        const isFilled = i < slots;
+        return `<div class="owner-slot-pip ${isFilled ? 'filled' : ''}" title="${isFilled ? 'Slot ' + (i + 1) + ' Acquired' : 'Slot ' + (i + 1) + ' Open'}"></div>`;
+      }).join('');
+    }
 
     // Render Sidebar Teams List
     ['live-sidebar-teams-list', 'owner-sidebar-teams-list'].forEach((containerId) => {
@@ -1061,6 +1093,26 @@ document.addEventListener('DOMContentLoaded', () => {
         : 'Awaiting Opening Bid';
     }
 
+    // Dynamic Live Countdown Banner for Audience Screen
+    const liveCountdownBanner = document.getElementById('live-countdown-banner');
+    if (liveCountdownBanner) {
+      if (currentAuctionState.status === 'COUNTDOWN' && currentAuctionState.hammerCountdown) {
+        const countVal = currentAuctionState.hammerCountdown;
+        liveCountdownBanner.className = 'spotlight-countdown-badge countdown-active ' + (countVal === 1 ? 'countdown-final-call' : '');
+        liveCountdownBanner.innerHTML = countVal === 1
+          ? '<span class="animate-ping">🚨</span> FINAL CALL! GOING, GOING... (1s)'
+          : `<span class="animate-bounce">🔨</span> GOING ${countVal === 3 ? 'ONCE' : 'TWICE'}... (${countVal}s)`;
+      } else if (hasPlayer) {
+        liveCountdownBanner.className = 'spotlight-countdown-badge';
+        liveCountdownBanner.innerHTML = currentAuctionState.highestBidderTeamName
+          ? `<span class="animate-pulse text-emerald-400">⚡</span> ${currentAuctionState.highestBidderTeamName} LEADING`
+          : '<span class="animate-pulse">((•))</span> LIVE AUCTION BIDDING';
+      } else {
+        liveCountdownBanner.className = 'spotlight-countdown-badge';
+        liveCountdownBanner.innerHTML = '<span class="animate-pulse">((•))</span> LIVE AUCTION';
+      }
+    }
+
     // Update Right Column Player Spotlight Photo & Attributes Card (Audience Screen)
     const cardAge = document.getElementById('live-card-player-age');
     const cardBat = document.getElementById('live-card-player-bat');
@@ -1085,7 +1137,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // -------------------------------------------------------------
-  // 2. RENDER OWNER DASHBOARD (EXACTLY AS SCREENSHOT 1)
+  // 2. RENDER OWNER DASHBOARD (EXECUTIVE FRANCHISE DASHBOARD)
   // -------------------------------------------------------------
   function renderOwnerDashboard(team) {
     const p = currentAuctionState.currentPlayer;
@@ -1114,16 +1166,78 @@ document.addEventListener('DOMContentLoaded', () => {
         : 'Awaiting Opening Bid';
     }
 
-    // Update Right Column Player Spotlight Photo & Attributes Card (As in Reference Photo)
+    // Dynamic Live Countdown Banner & 3-Step Urgency Meter
+    const countdownBanner = document.getElementById('owner-countdown-banner');
+    const countdownIcon = document.getElementById('owner-countdown-icon');
+    const countdownText = document.getElementById('owner-countdown-text');
+    const countdownMeter = document.getElementById('owner-countdown-meter');
+    const countStep1 = document.getElementById('count-step-1');
+    const countStep2 = document.getElementById('count-step-2');
+    const countStep3 = document.getElementById('count-step-3');
+
+    const isCountdown = currentAuctionState.status === 'COUNTDOWN';
+    const countVal = currentAuctionState.hammerCountdown;
+
+    if (countdownBanner && countdownText) {
+      if (isCountdown && countVal) {
+        countdownBanner.classList.add('countdown-active');
+        if (countVal === 1) {
+          countdownBanner.classList.add('countdown-final-call');
+          if (countdownIcon) countdownIcon.innerText = '🚨';
+          countdownText.innerText = 'FINAL CALL: GOING, GOING...! (1s)';
+        } else if (countVal === 2) {
+          countdownBanner.classList.remove('countdown-final-call');
+          if (countdownIcon) countdownIcon.innerText = '🔨';
+          countdownText.innerText = 'HAMMER COUNTDOWN: GOING TWICE! (2s)';
+        } else {
+          countdownBanner.classList.remove('countdown-final-call');
+          if (countdownIcon) countdownIcon.innerText = '🔨';
+          countdownText.innerText = 'HAMMER COUNTDOWN: GOING ONCE! (3s)';
+        }
+        if (countdownMeter) countdownMeter.style.display = 'grid';
+        if (countStep1) countStep1.className = `countdown-step ${countVal <= 3 ? 'active-step-1' : ''}`;
+        if (countStep2) countStep2.className = `countdown-step ${countVal <= 2 ? 'active-step-2' : ''}`;
+        if (countStep3) countStep3.className = `countdown-step ${countVal === 1 ? 'active-step-3' : ''}`;
+      } else {
+        countdownBanner.classList.remove('countdown-active', 'countdown-final-call');
+        if (countdownMeter) countdownMeter.style.display = 'none';
+
+        if (currentAuctionState.status === 'BIDDING' && hasPlayer) {
+          if (countdownIcon) countdownIcon.innerText = '⚡';
+          if (currentAuctionState.highestBidderTeamName) {
+            countdownText.innerText = `🔥 BATTLE ACTIVE: ${currentAuctionState.highestBidderTeamName.toUpperCase()} LEADING`;
+          } else {
+            countdownText.innerText = `COUNT GOING: OPENING BASE PRICE ₹${currentAuctionState.basePrice.toLocaleString()}`;
+          }
+        } else if (currentAuctionState.status === 'SOLD') {
+          if (countdownIcon) countdownIcon.innerText = '🏆';
+          countdownText.innerText = `SOLD TO ${currentAuctionState.highestBidderTeamName || 'WINNER'} (₹${currentAuctionState.currentBid.toLocaleString()})`;
+        } else if (currentAuctionState.status === 'UNSOLD') {
+          if (countdownIcon) countdownIcon.innerText = '❌';
+          countdownText.innerText = 'PLAYER UNSOLD / PASSED';
+        } else {
+          if (countdownIcon) countdownIcon.innerText = '((•))';
+          countdownText.innerText = 'COUNT GOING: WAITING FOR STAGE...';
+        }
+      }
+    }
+
+    // Update Player Trading Card
     const cardAge = document.getElementById('owner-card-player-age');
+    const cardBase = document.getElementById('owner-card-player-base');
     const cardBat = document.getElementById('owner-card-player-bat');
     const cardBowl = document.getElementById('owner-card-player-bowl');
+    const cardSet = document.getElementById('owner-card-player-set-name');
+    const cardRole = document.getElementById('owner-card-player-role');
     const cardImg = document.getElementById('owner-card-player-img');
     const cardSvg = document.getElementById('owner-card-player-svg');
 
-    if (cardAge) cardAge.innerText = hasPlayer ? ` ${p.age}` : '';
-    if (cardBat) cardBat.innerText = hasPlayer ? ` ${p.batsmanType}` : '';
-    if (cardBowl) cardBowl.innerText = hasPlayer ? ` ${p.bowlerType}` : '';
+    if (cardAge) cardAge.innerText = hasPlayer ? `${p.age} Yrs` : '-';
+    if (cardBase) cardBase.innerText = hasPlayer ? `₹${p.basePrice.toLocaleString()}` : '₹1,000';
+    if (cardBat) cardBat.innerText = hasPlayer ? p.batsmanType : '-';
+    if (cardBowl) cardBowl.innerText = hasPlayer ? p.bowlerType : '-';
+    if (cardSet) cardSet.innerText = hasPlayer ? `${p.setName.toUpperCase()} SET` : 'BOX CRICKET 2026';
+    if (cardRole) cardRole.innerText = hasPlayer ? p.specialization.toUpperCase() : 'AUCTION SPOTLIGHT';
 
     if (cardImg && cardSvg) {
       if (hasPlayer && p.photo) {

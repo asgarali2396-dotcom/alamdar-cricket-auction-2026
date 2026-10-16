@@ -1282,6 +1282,232 @@ select:focus, input:focus {
 /* =========================================================
    Owner Dashboard Player Spotlight Card (Right Container)
    ========================================================= */
+/* =========================================================
+   Executive Franchise Owner Purse HUD
+   ========================================================= */
+.owner-purse-hud-panel {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  padding: 1.15rem 1.4rem;
+  border-radius: 1.25rem;
+  border: 2px solid rgba(200, 169, 106, 0.45);
+  background: linear-gradient(135deg, rgba(19, 78, 67, 0.95) 0%, rgba(15, 61, 52, 0.98) 100%);
+  box-shadow: 0 15px 35px -10px rgba(10, 35, 30, 0.7);
+}
+
+@media (min-width: 860px) {
+  .owner-purse-hud-panel {
+    grid-template-columns: 1.15fr 1.5fr 1.15fr;
+    align-items: center;
+    gap: 1.25rem;
+  }
+}
+
+.owner-hud-col-brand {
+  border-bottom: 1px solid rgba(200, 169, 106, 0.2);
+  padding-bottom: 0.75rem;
+}
+@media (min-width: 860px) {
+  .owner-hud-col-brand {
+    border-bottom: none;
+    border-right: 1px solid rgba(200, 169, 106, 0.25);
+    padding-bottom: 0;
+    padding-right: 1.25rem;
+  }
+}
+
+.owner-hud-team-avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle, rgba(200, 169, 106, 0.35) 0%, rgba(10, 44, 37, 0.9) 100%);
+  border: 2px solid var(--gold-primary);
+  box-shadow: 0 0 15px rgba(200, 169, 106, 0.3);
+  flex-shrink: 0;
+}
+
+.owner-hud-role-pill {
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  padding: 0.2rem 0.55rem;
+  border-radius: 9999px;
+  background: rgba(10, 44, 37, 0.9);
+  color: var(--gold-light);
+  border: 1px solid rgba(200, 169, 106, 0.45);
+}
+
+.owner-hud-col-purse {
+  border-bottom: 1px solid rgba(200, 169, 106, 0.2);
+  padding-bottom: 0.75rem;
+}
+@media (min-width: 860px) {
+  .owner-hud-col-purse {
+    border-bottom: none;
+    border-right: 1px solid rgba(200, 169, 106, 0.25);
+    padding-bottom: 0;
+    padding-right: 1.25rem;
+  }
+}
+
+.owner-hud-progress-track {
+  width: 100%;
+  height: 8px;
+  border-radius: 9999px;
+  background: rgba(10, 44, 37, 0.95);
+  border: 1px solid rgba(200, 169, 106, 0.25);
+  overflow: hidden;
+  margin-top: 0.45rem;
+}
+
+.owner-hud-progress-fill {
+  height: 100%;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, #10b981 0%, #C8A96A 65%, #DFC897 100%);
+  box-shadow: 0 0 10px rgba(200, 169, 106, 0.6);
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.owner-hud-col-slots {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.owner-slots-pips-grid {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.owner-slot-pip {
+  flex: 1;
+  height: 13px;
+  border-radius: 3px;
+  border: 1.5px solid rgba(200, 169, 106, 0.35);
+  background: rgba(10, 44, 37, 0.7);
+  transition: all 0.3s ease;
+}
+
+.owner-slot-pip.filled {
+  background: linear-gradient(135deg, #C8A96A 0%, #DFC897 100%);
+  border-color: #F7F6F1;
+  box-shadow: 0 0 8px rgba(200, 169, 106, 0.75);
+}
+
+/* =========================================================
+   Live Countdown Banner & 3-Step Urgency Meter
+   ========================================================= */
+.spotlight-countdown-badge {
+  padding: 0.35rem 0.95rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  color: var(--gold-light);
+  border: 1.5px solid rgba(200, 169, 106, 0.5);
+  background: rgba(10, 44, 37, 0.9);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  transition: all 0.3s ease;
+}
+
+.spotlight-countdown-badge.countdown-active {
+  border-color: #f59e0b;
+  background: rgba(245, 158, 11, 0.2);
+  color: #fef3c7;
+  box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+  animation: countdownUrgentPulse 1s infinite alternate;
+}
+
+.spotlight-countdown-badge.countdown-final-call {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.3);
+  color: #ffffff;
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
+  animation: countdownUrgentFlash 0.5s infinite alternate;
+}
+
+@keyframes countdownUrgentPulse {
+  0% { transform: scale(1); filter: brightness(1); }
+  100% { transform: scale(1.02); filter: brightness(1.2); }
+}
+
+@keyframes countdownUrgentFlash {
+  0% { opacity: 0.85; transform: scale(1); }
+  100% { opacity: 1; transform: scale(1.04); }
+}
+
+.owner-countdown-meter-bar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+  padding: 0.35rem;
+  border-radius: 0.75rem;
+  background: rgba(10, 44, 37, 0.75);
+  border: 1.5px solid rgba(200, 169, 106, 0.35);
+}
+
+.countdown-step {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  background: rgba(15, 61, 52, 0.6);
+  border: 1px solid rgba(200, 169, 106, 0.2);
+  color: rgba(230, 240, 233, 0.6);
+  transition: all 0.3s ease;
+}
+
+.countdown-step .step-num {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 900;
+  background: rgba(10, 44, 37, 0.9);
+  border: 1px solid rgba(200, 169, 106, 0.4);
+}
+
+.countdown-step.active-step-1 {
+  background: rgba(245, 158, 11, 0.25);
+  border-color: #f59e0b;
+  color: #fef3c7;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
+}
+
+.countdown-step.active-step-2 {
+  background: rgba(249, 115, 22, 0.3);
+  border-color: #f97316;
+  color: #ffedd5;
+  box-shadow: 0 0 12px rgba(249, 115, 22, 0.5);
+}
+
+.countdown-step.active-step-3 {
+  background: rgba(239, 68, 68, 0.4);
+  border-color: #ef4444;
+  color: #ffffff;
+  box-shadow: 0 0 18px rgba(239, 68, 68, 0.7);
+  animation: countdownUrgentFlash 0.5s infinite alternate;
+}
+
+/* =========================================================
+   Owner Dashboard Player Spotlight Card (Right Container)
+   ========================================================= */
 .owner-player-spotlight-card {
   background: var(--bg-card);
   backdrop-filter: blur(16px);
@@ -1291,51 +1517,75 @@ select:focus, input:focus {
   box-shadow: 0 15px 35px -10px rgba(10, 35, 30, 0.65);
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: space-between;
-  padding: 1.5rem;
-  gap: 1.25rem;
-  min-height: 100%;
+  padding: 1.25rem;
+  gap: 0.75rem;
+  height: 100%;
 }
 
 .owner-photo-frame {
   width: 100%;
-  max-width: 250px;
-  aspect-ratio: 4 / 3;
+  max-width: 260px;
+  aspect-ratio: 3 / 4;
   border-radius: 1.1rem;
-  border: 2px solid rgba(200, 169, 106, 0.55);
+  border: 2.5px solid rgba(200, 169, 106, 0.65);
   overflow: hidden;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(200, 169, 106, 0.15);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(200, 169, 106, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #1e293b;
+  background: radial-gradient(circle at 50% 30%, #173f36 0%, #0a2520 85%, #051411 100%);
   position: relative;
+  margin: 0 auto;
+}
+
+.owner-card-role-ribbon {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(180deg, transparent 0%, rgba(7, 26, 22, 0.85) 30%, rgba(7, 26, 22, 0.98) 100%);
+  padding: 0.65rem 0.5rem 0.35rem;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  color: var(--gold-light);
+  text-transform: uppercase;
+  border-top: 1px solid rgba(200, 169, 106, 0.35);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.owner-attr-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.45rem;
+  width: 100%;
 }
 
 .owner-attr-pill {
   width: 100%;
   background: rgba(10, 46, 38, 0.85);
   border: 1.5px solid rgba(200, 169, 106, 0.35);
-  border-radius: 1rem;
-  padding: 0.75rem 1.25rem;
+  border-radius: 0.75rem;
+  padding: 0.45rem 0.75rem;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  gap: 0.6rem;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+  justify-content: space-between;
+  gap: 0.4rem;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
   transition: all 0.2s ease;
 }
 
 .owner-attr-pill:hover {
   border-color: rgba(200, 169, 106, 0.65);
   background: rgba(15, 61, 52, 0.95);
-  box-shadow: 0 4px 18px rgba(200, 169, 106, 0.20);
+  box-shadow: 0 3px 12px rgba(200, 169, 106, 0.25);
 }
 
 .owner-attr-label {
   font-family: var(--font-main);
-  font-size: 1.1rem;
+  font-size: 0.85rem;
   font-weight: 800;
   color: var(--gold-light);
   letter-spacing: 0.04em;
@@ -1344,8 +1594,8 @@ select:focus, input:focus {
 
 .owner-attr-value {
   font-family: var(--font-main);
-  font-size: 1.05rem;
-  font-weight: 700;
+  font-size: 0.85rem;
+  font-weight: 800;
   color: var(--text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1552,75 +1802,77 @@ body.is-fullscreen #view-admin.hidden,
 
 body.is-fullscreen #view-owner:not(.hidden):not([style*="display: none"]),
 :fullscreen #view-owner:not(.hidden):not([style*="display: none"]) {
-  padding-top: 0.25rem !important;
-  padding-bottom: 1.5rem !important;
+  display: flex !important;
+  flex-direction: column !important;
+  height: calc(100vh - 65px) !important;
+  max-height: calc(100vh - 65px) !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  padding: 0.4rem 1rem 0.5rem !important;
+  gap: 0.45rem !important;
 }
 
 /* Suppress large Tailwind space-y-6 gaps on direct children in fullscreen */
 body.is-fullscreen #view-owner > :not([hidden]) ~ :not([hidden]),
 :fullscreen #view-owner > :not([hidden]) ~ :not([hidden]) {
-  margin-top: 0.35rem !important;
+  margin-top: 0 !important;
   margin-bottom: 0 !important;
 }
 
-/* 1. Remaining Budget & Slots Header (Compact Sleek Fit) */
+/* 1. Remaining Budget & Slots Header (Compact Executive HUD) */
 body.is-fullscreen #owner-purse-header,
 :fullscreen #owner-purse-header {
-  padding: 0.35rem 1rem !important;
+  flex-shrink: 0 !important;
+  padding: 0.45rem 1rem !important;
   margin-bottom: 0 !important;
   border-radius: 0.85rem !important;
-  border: 1.5px solid rgba(200, 169, 106, 0.35) !important;
-  display: grid !important;
-  grid-template-columns: 1fr 1fr !important;
-  align-items: center !important;
-  gap: 1rem !important;
+  gap: 0.85rem !important;
 }
 
-body.is-fullscreen #owner-purse-header > div:first-child p.font-mono-num,
-:fullscreen #owner-purse-header > div:first-child p.font-mono-num {
-  font-size: 1.25rem !important;
+body.is-fullscreen .owner-hud-col-brand,
+:fullscreen .owner-hud-col-brand {
+  padding-bottom: 0 !important;
+  padding-right: 0.85rem !important;
+}
+
+body.is-fullscreen .owner-hud-team-avatar,
+:fullscreen .owner-hud-team-avatar {
+  width: 38px !important;
+  height: 38px !important;
+}
+
+body.is-fullscreen .owner-hud-team-avatar span,
+:fullscreen .owner-hud-team-avatar span {
+  font-size: 1.35rem !important;
+}
+
+body.is-fullscreen #owner-remaining-budget,
+:fullscreen #owner-remaining-budget {
+  font-size: 1.5rem !important;
   line-height: 1.1 !important;
-  margin-top: 0.1rem !important;
 }
 
-body.is-fullscreen #owner-purse-header .w-full.bg-\[\#0F3D34\],
-:fullscreen #owner-purse-header .w-full.bg-\[\#0F3D34\] {
-  margin-top: 0.2rem !important;
-  height: 4px !important;
+body.is-fullscreen .owner-hud-progress-track,
+:fullscreen .owner-hud-progress-track {
+  height: 6px !important;
+  margin-top: 0.25rem !important;
 }
 
-body.is-fullscreen #owner-purse-header #owner-budget-bar,
-:fullscreen #owner-purse-header #owner-budget-bar {
-  height: 4px !important;
+body.is-fullscreen .owner-slot-pip,
+:fullscreen .owner-slot-pip {
+  height: 10px !important;
 }
 
-body.is-fullscreen #owner-purse-header .gauge-container,
-:fullscreen #owner-purse-header .gauge-container {
-  width: 90px !important;
-  height: 46px !important;
-  margin: 0.1rem auto 0 !important;
-}
-
-body.is-fullscreen #owner-purse-header .gauge-arc,
-:fullscreen #owner-purse-header .gauge-arc {
-  width: 90px !important;
-  height: 90px !important;
-  border-width: 8px !important;
-}
-
-body.is-fullscreen #owner-purse-header #owner-slots-count,
-:fullscreen #owner-purse-header #owner-slots-count {
-  font-size: 1rem !important;
-}
-
-/* 2. Main Bidding Row (Constrained to Fit Screen with Buttons Intact) */
+/* 2. Main Bidding Row in Fullscreen: Flexible Grid Filling Viewport */
 body.is-fullscreen #owner-bidding-main-row,
 :fullscreen #owner-bidding-main-row {
   display: grid !important;
-  height: calc(100vh - 135px) !important;
+  grid-template-columns: minmax(0, 1.7fr) minmax(280px, 1fr) !important;
+  flex: 1 1 auto !important;
   min-height: 0 !important;
-  max-height: calc(100vh - 135px) !important;
-  gap: 0.75rem !important;
+  max-height: none !important;
+  height: auto !important;
+  gap: 0.65rem !important;
   margin-bottom: 0 !important;
 }
 
@@ -1629,25 +1881,22 @@ body.is-fullscreen #owner-bidding-main-row > div:first-child,
 :fullscreen #owner-bidding-main-row > div:first-child {
   display: flex !important;
   flex-direction: column !important;
-  justify-content: space-between !important;
   height: 100% !important;
-  max-height: 100% !important;
   min-height: 0 !important;
   gap: 0.35rem !important;
 }
 
 body.is-fullscreen #owner-bidding-main-row > div:first-child > :not([hidden]) ~ :not([hidden]),
 :fullscreen #owner-bidding-main-row > div:first-child > :not([hidden]) ~ :not([hidden]) {
-  margin-top: 0.35rem !important;
+  margin-top: 0 !important;
   margin-bottom: 0 !important;
 }
 
 body.is-fullscreen #view-owner .live-spotlight-box,
 :fullscreen #view-owner .live-spotlight-box {
-  flex: 1 1 0% !important;
-  height: auto !important;
+  flex: 1 1 auto !important;
   min-height: 0 !important;
-  padding: 0.65rem 1.25rem !important;
+  padding: 0.65rem 1.15rem !important;
   border-width: 2px !important;
   border-color: var(--gold-primary) !important;
   box-shadow: 0 0 25px rgba(200, 169, 106, 0.2), inset 0 0 15px rgba(200, 169, 106, 0.06) !important;
@@ -1660,93 +1909,100 @@ body.is-fullscreen #view-owner .live-spotlight-box,
 
 body.is-fullscreen #view-owner .live-spotlight-box > :not([hidden]) ~ :not([hidden]),
 :fullscreen #view-owner .live-spotlight-box > :not([hidden]) ~ :not([hidden]) {
-  margin-top: 0.25rem !important;
+  margin-top: 0.2rem !important;
   margin-bottom: 0 !important;
 }
 
 body.is-fullscreen #owner-countdown-banner,
 :fullscreen #owner-countdown-banner {
-  font-size: 0.75rem !important;
-  padding: 0.2rem 0.75rem !important;
+  font-size: 0.72rem !important;
+  padding: 0.2rem 0.7rem !important;
 }
 
-body.is-fullscreen #view-owner .spotlight-live-badge,
-:fullscreen #view-owner .spotlight-live-badge {
-  font-size: 0.75rem !important;
-  padding: 0.2rem 0.75rem !important;
+body.is-fullscreen .owner-countdown-meter-bar,
+:fullscreen .owner-countdown-meter-bar {
+  margin-top: 0.25rem !important;
+  padding: 0.2rem !important;
+  gap: 0.35rem !important;
+}
+
+body.is-fullscreen .countdown-step,
+:fullscreen .countdown-step {
+  padding: 0.25rem 0.45rem !important;
+  font-size: 0.68rem !important;
 }
 
 body.is-fullscreen #owner-current-player-name,
 :fullscreen #owner-current-player-name {
-  font-size: clamp(1.6rem, 2.3vw, 2.4rem) !important;
+  font-size: clamp(1.4rem, 2.1vw, 2.2rem) !important;
   line-height: 1.1 !important;
-  letter-spacing: -0.02em !important;
-  margin-top: 0.2rem !important;
+  margin-top: 0.15rem !important;
 }
 
 body.is-fullscreen #owner-current-player-stats,
 :fullscreen #owner-current-player-stats {
-  font-size: 0.8rem !important;
-  margin-top: 0.15rem !important;
+  font-size: 0.78rem !important;
+  margin-top: 0.1rem !important;
 }
 
 body.is-fullscreen #owner-active-bidders-ring,
 :fullscreen #owner-active-bidders-ring {
-  margin-top: 0.25rem !important;
+  margin-top: 0.2rem !important;
 }
 
 body.is-fullscreen #owner-active-bidders-ring > div,
 :fullscreen #owner-active-bidders-ring > div {
-  padding: 0.35rem 0.75rem !important;
-  min-height: 48px !important;
+  padding: 0.3rem 0.7rem !important;
+  min-height: 44px !important;
 }
 
 /* Owner Bid Cards */
 body.is-fullscreen #view-owner .spotlight-bid-cards-grid,
 :fullscreen #view-owner .spotlight-bid-cards-grid {
-  gap: 0.6rem !important;
-  margin-top: 0.25rem !important;
+  gap: 0.5rem !important;
+  margin-top: 0.2rem !important;
 }
 
 body.is-fullscreen #view-owner .spotlight-bid-card,
 :fullscreen #view-owner .spotlight-bid-card {
-  padding: 0.5rem 0.9rem !important;
-  min-height: 65px !important;
+  padding: 0.45rem 0.85rem !important;
+  min-height: 60px !important;
   border-radius: 0.85rem !important;
 }
 
 body.is-fullscreen #view-owner .spotlight-bid-card p.tracking-wider,
 :fullscreen #view-owner .spotlight-bid-card p.tracking-wider {
-  font-size: 0.7rem !important;
-  letter-spacing: 0.05em !important;
+  font-size: 0.68rem !important;
 }
 
 body.is-fullscreen #owner-current-bid-display,
 :fullscreen #owner-current-bid-display {
-  font-size: clamp(1.7rem, 2.3vw, 2.4rem) !important;
+  font-size: clamp(1.6rem, 2.2vw, 2.3rem) !important;
   line-height: 1.05 !important;
-  margin: 0.1rem 0 !important;
+  margin: 0.05rem 0 !important;
 }
 
 body.is-fullscreen #owner-next-bid-step,
 :fullscreen #owner-next-bid-step {
-  font-size: clamp(1.5rem, 2vw, 2.1rem) !important;
+  font-size: clamp(1.35rem, 1.8vw, 1.9rem) !important;
   line-height: 1.05 !important;
-  margin: 0.1rem 0 !important;
+  margin: 0.05rem 0 !important;
 }
 
 body.is-fullscreen #owner-leading-badge,
 :fullscreen #owner-leading-badge {
-  font-size: 0.7rem !important;
-  padding: 0.15rem 0.55rem !important;
+  font-size: 0.68rem !important;
+  padding: 0.12rem 0.5rem !important;
 }
 
-/* Owner Bidding Action Buttons: GUARANTEED ZERO CUTTING OFF */
+/* Owner Bidding Action Buttons: GUARANTEED 100% VISIBLE */
 body.is-fullscreen #owner-bidding-actions-row,
 :fullscreen #owner-bidding-actions-row {
-  margin-top: 0.35rem !important;
+  margin-top: auto !important;
   flex-shrink: 0 !important;
   gap: 0.5rem !important;
+  z-index: 25 !important;
+  padding-bottom: 0.15rem !important;
 }
 
 body.is-fullscreen #owner-raise-bid-btn,
@@ -1755,7 +2011,8 @@ body.is-fullscreen #owner-raise-bid-btn,
   padding-bottom: 0.65rem !important;
   padding-left: 1rem !important;
   padding-right: 1rem !important;
-  font-size: 0.95rem !important;
+  min-height: 50px !important;
+  font-size: clamp(0.85rem, 1.1vw, 1rem) !important;
   border-radius: 0.75rem !important;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.45) !important;
 }
@@ -1766,7 +2023,8 @@ body.is-fullscreen #owner-withdraw-btn,
   padding-bottom: 0.65rem !important;
   padding-left: 0.85rem !important;
   padding-right: 0.85rem !important;
-  font-size: 0.85rem !important;
+  min-height: 50px !important;
+  font-size: clamp(0.75rem, 0.95vw, 0.88rem) !important;
   border-radius: 0.75rem !important;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.45) !important;
 }
@@ -1786,7 +2044,7 @@ body.is-fullscreen #view-owner .owner-player-spotlight-card,
   height: 100% !important;
   max-height: 100% !important;
   min-height: 0 !important;
-  padding: 0.65rem 1rem !important;
+  padding: 0.6rem 0.85rem !important;
   border-width: 2px !important;
   border-color: rgba(200, 169, 106, 0.55) !important;
   box-shadow: 0 10px 25px -8px rgba(10, 35, 30, 0.8) !important;
@@ -1797,50 +2055,38 @@ body.is-fullscreen #view-owner .owner-player-spotlight-card,
   overflow: hidden !important;
 }
 
-body.is-fullscreen #view-owner .owner-player-spotlight-card h3,
-:fullscreen #view-owner .owner-player-spotlight-card h3 {
-  font-size: 0.95rem !important;
-  letter-spacing: 0.1em !important;
-  margin-bottom: 0.15rem !important;
+body.is-fullscreen .owner-card-header,
+:fullscreen .owner-card-header {
+  padding-bottom: 0.25rem !important;
   flex-shrink: 0 !important;
 }
 
 body.is-fullscreen #view-owner .owner-photo-frame,
 :fullscreen #view-owner .owner-photo-frame {
   width: auto !important;
-  max-width: 220px !important;
-  aspect-ratio: 4 / 3 !important;
+  aspect-ratio: 3 / 4 !important;
   height: auto !important;
-  max-height: clamp(100px, 16vh, 150px) !important;
-  min-height: 85px !important;
+  max-height: clamp(130px, 25vh, 230px) !important;
+  min-height: 100px !important;
   margin-left: auto !important;
   margin-right: auto !important;
-  border-radius: 1rem !important;
+  border-radius: 0.85rem !important;
   border: 2px solid rgba(200, 169, 106, 0.65) !important;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5), inset 0 0 12px rgba(200, 169, 106, 0.2) !important;
   flex-shrink: 1 !important;
 }
 
-body.is-fullscreen #view-owner .owner-player-spotlight-card .w-full.space-y-3,
-:fullscreen #view-owner .owner-player-spotlight-card .w-full.space-y-3 {
+body.is-fullscreen .owner-attr-grid,
+:fullscreen .owner-attr-grid {
   gap: 0.3rem !important;
-  display: flex !important;
-  flex-direction: column !important;
   flex-shrink: 0 !important;
-  padding-top: 0 !important;
-}
-
-body.is-fullscreen #view-owner .owner-player-spotlight-card .w-full.space-y-3 > :not([hidden]) ~ :not([hidden]),
-:fullscreen #view-owner .owner-player-spotlight-card .w-full.space-y-3 > :not([hidden]) ~ :not([hidden]) {
-  margin-top: 0.3rem !important;
-  margin-bottom: 0 !important;
 }
 
 body.is-fullscreen #view-owner .owner-attr-pill,
 :fullscreen #view-owner .owner-attr-pill {
-  padding: 0.38rem 0.75rem !important;
-  border-radius: 0.65rem !important;
-  gap: 0.5rem !important;
+  padding: 0.32rem 0.65rem !important;
+  border-radius: 0.6rem !important;
+  gap: 0.35rem !important;
   border-width: 1.5px !important;
   border-color: rgba(200, 169, 106, 0.4) !important;
   background: rgba(10, 46, 38, 0.9) !important;
@@ -1848,13 +2094,13 @@ body.is-fullscreen #view-owner .owner-attr-pill,
 
 body.is-fullscreen #view-owner .owner-attr-label,
 :fullscreen #view-owner .owner-attr-label {
-  font-size: 0.9rem !important;
-  letter-spacing: 0.04em !important;
+  font-size: 0.78rem !important;
+  letter-spacing: 0.03em !important;
 }
 
 body.is-fullscreen #view-owner .owner-attr-value,
 :fullscreen #view-owner .owner-attr-value {
-  font-size: 0.9rem !important;
+  font-size: 0.78rem !important;
 }
 
 

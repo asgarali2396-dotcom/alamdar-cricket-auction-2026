@@ -135,7 +135,7 @@ const AuctionEngine = {
     const players = StorageManager.get(STORAGE_KEYS.PLAYERS);
     const team = teams.find((t) => t.id === teamId);
 
-    if (!state || state.status !== 'BIDDING') {
+    if (!state || (state.status !== 'BIDDING' && state.status !== 'COUNTDOWN')) {
       return { success: false, error: 'Auction is not in active bidding phase.' };
     }
 
@@ -167,6 +167,7 @@ const AuctionEngine = {
     }
 
     // Update auction state
+    state.status = 'BIDDING'; // Abort countdown and resume active bidding
     state.currentBid = nextBid;
     state.nextMinBid = this.getNextValidBid(nextBid, state.basePrice);
     state.highestBidderTeamId = teamId;
