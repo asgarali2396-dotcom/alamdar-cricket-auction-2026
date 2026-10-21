@@ -644,23 +644,6 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('resize', updateFullscreenUI);
     updateFullscreenUI();
 
-    // 12-Franchise Demo Simulator Toggle Button
-    const demoBotBtn = document.getElementById('admin-demo-bot-btn');
-    if (demoBotBtn) {
-      demoBotBtn.addEventListener('click', () => {
-        const isActive = AuctionEngine.toggleDemoSimulator();
-        if (isActive) {
-          demoBotBtn.innerHTML = '🤖 12-Team Demo: <span class="text-emerald-300 font-extrabold">SIMULATING</span>';
-          demoBotBtn.className = 'btn-primary btn-emerald text-xs py-2 px-3.5 rounded-xl font-black flex items-center gap-1.5 shadow-lg transition-all';
-          showToast('🤖 12-Franchise Demo Simulator ACTIVATED! Eligible franchise owners will simulate realistic bids automatically.', 'gold');
-        } else {
-          demoBotBtn.innerHTML = '🤖 12-Team Demo Simulator: OFF';
-          demoBotBtn.className = 'btn-outline text-amber-300 border-2 border-amber-500/50 hover:bg-amber-500/20 text-xs py-2 px-3.5 rounded-xl font-black flex items-center gap-1.5 transition-all';
-          showToast('🤖 Demo Simulator paused.', 'info');
-        }
-      });
-    }
-
     // Reset Tournament Button
     const resetBtn = document.getElementById('admin-reset-btn');
     if (resetBtn) {
@@ -2103,15 +2086,6 @@ document.addEventListener('DOMContentLoaded', () => {
       showToast('⚡ Bidding is now UNLOCKED! Franchise owners can enter the ring and place bids!', 'success');
       if (window.soundManager) {
         window.soundManager.playBiddingUnlocked();
-      }
-      // If demo bot is active, kick off the cycle now that bidding is open
-      if (window.AuctionEngine && window.AuctionEngine.demoActive) {
-        setTimeout(() => {
-          if (window.AuctionEngine && window.AuctionEngine.demoActive) {
-            window.AuctionEngine.executeDemoBiddingCycle();
-            window.AuctionEngine.scheduleDemoTick();
-          }
-        }, 300);
       }
     }
 
