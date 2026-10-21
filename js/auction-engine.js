@@ -77,6 +77,10 @@ const AuctionEngine = {
       return { success: false, error: 'Auction is not actively accepting bids right now.' };
     }
 
+    if (state.biddingLocked) {
+      return { success: false, error: '🔒 Bidding is currently locked. The auctioneer is introducing the player.' };
+    }
+
     // Guard: Prevent joining battle on already sold player
     const currentPlayer = players.find((p) => p.id === state.currentPlayerId);
     if (!currentPlayer || currentPlayer.status === 'SOLD') {
@@ -137,6 +141,10 @@ const AuctionEngine = {
 
     if (!state || state.status !== 'BIDDING') {
       return { success: false, error: 'Auction is not in active bidding phase.' };
+    }
+
+    if (state.biddingLocked) {
+      return { success: false, error: '🔒 Bidding is currently locked. The auctioneer is introducing the player.' };
     }
 
     // Guard: Prevent bidding on already sold player
@@ -273,6 +281,7 @@ const AuctionEngine = {
 
     // Update state to lock against any further sales
     state.status = 'SOLD';
+    state.biddingLocked = false;
     state.hammerCountdown = null;
     state.activeBidders = { slot1: null, slot2: null };
     state.lastActionTimestamp = Date.now();
@@ -317,6 +326,7 @@ const AuctionEngine = {
     player.roundNumber = 2; // Pushed to next representation round
 
     state.status = 'UNSOLD';
+    state.biddingLocked = false;
     state.hammerCountdown = null;
     state.activeBidders = { slot1: null, slot2: null };
 
@@ -600,7 +610,7 @@ const AuctionEngine = {
     const teams = StorageManager.get(STORAGE_KEYS.TEAMS);
     const players = StorageManager.get(STORAGE_KEYS.PLAYERS);
 
-    if (!state || state.status !== 'BIDDING' || !state.currentPlayerId) {
+    if (!state || state.status !== 'BIDDING' || !state.currentPlayerId || state.biddingLocked) {
       return;
     }
 

@@ -165,7 +165,8 @@ def generate_default_state():
         'hammerCountdown': None,
         'roundNumber': 1,
         'lastActionTimestamp': int(time.time() * 1000),
-        'version': 1
+        'version': 1,
+        'biddingLocked': False
     }
 
 # Persistent in-memory data store

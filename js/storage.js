@@ -140,7 +140,8 @@ const StorageManager = {
         hammerCountdown: null,
         roundNumber: 1,
         lastActionTimestamp: Date.now(),
-        version: 1
+        version: 1,
+        biddingLocked: false
       };
       localStorage.setItem(STORAGE_KEYS.STATE, JSON.stringify(state));
     }

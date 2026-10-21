@@ -683,6 +683,11 @@ document.addEventListener('DOMContentLoaded', () => {
           return;
         }
 
+        if (currentAuctionState.biddingLocked) {
+          showToast('🔒 Bidding is locked! The auctioneer is introducing this player. Please wait until bidding is unlocked.', 'error');
+          return;
+        }
+
         const teamId = activeUser.teamId;
         const { slot1, slot2 } = currentAuctionState.activeBidders || {};
         const isSlot1 = slot1?.teamId === teamId;
@@ -729,6 +734,11 @@ document.addEventListener('DOMContentLoaded', () => {
       adminSoldBtn.addEventListener('click', () => {
         if (!activeUser || activeUser.role !== 'admin') {
           showToast('Security Violation: Only Master Admin / Auctioneer can hammer the gavel.', 'error');
+          return;
+        }
+
+        if (currentAuctionState.biddingLocked) {
+          showToast('Cannot hammer gavel: Player is still in introduction phase and bidding is locked.', 'error');
           return;
         }
 
@@ -782,6 +792,12 @@ document.addEventListener('DOMContentLoaded', () => {
           showToast('Security Violation: Only Master Admin can trigger countdown.', 'error');
           return;
         }
+
+        if (currentAuctionState.biddingLocked) {
+          showToast('Cannot start countdown: Player is in introduction phase and bidding is locked. Please unlock bidding first.', 'error');
+          return;
+        }
+
         triggerCountdown();
       });
     }
@@ -806,6 +822,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const state = StorageManager.get(STORAGE_KEYS.STATE);
     if (!state.currentPlayerId || state.status !== 'BIDDING') {
       showToast('No active player currently under bidding.', 'error');
+      return;
+    }
+
+    if (state.biddingLocked) {
+      showToast('Cannot start countdown: Player is in introduction phase and bidding is locked. Please unlock bidding first.', 'error');
       return;
     }
 
@@ -1072,9 +1093,53 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (bidEl) bidEl.innerText = `₹${currentAuctionState.currentBid.toLocaleString()}`;
     if (bidderEl) {
-      bidderEl.innerText = currentAuctionState.highestBidderTeamName
-        ? `Leading: ${currentAuctionState.highestBidderTeamName}`
-        : 'Awaiting Opening Bid';
+      if (currentAuctionState.biddingLocked && hasPlayer) {
+        bidderEl.innerText = '🔒 Bidding Locked (Intro in Progress)';
+        bidderEl.className = 'bg-amber-900/80 border border-amber-500/50 text-amber-300 text-xs font-bold px-3 py-1 rounded-full';
+      } else {
+        bidderEl.innerText = currentAuctionState.highestBidderTeamName
+          ? `Leading: ${currentAuctionState.highestBidderTeamName}`
+          : 'Awaiting Opening Bid';
+        bidderEl.className = 'bg-[#0F3D34] text-[#F7F6F1] text-xs font-bold px-3 py-1 rounded-full';
+      }
+    }
+
+    // Update live screen top badges (Countdown / Intro / Standby)
+    const liveCountdownBanner = document.getElementById('live-countdown-banner');
+    const liveLiveBadge = document.querySelector('#view-live .spotlight-live-badge');
+
+    if (liveCountdownBanner) {
+      if (!hasPlayer) {
+        liveCountdownBanner.style.display = 'none';
+      } else if (currentAuctionState.status === 'COUNTDOWN') {
+        liveCountdownBanner.style.display = 'inline-flex';
+        liveCountdownBanner.className = 'spotlight-countdown-badge px-3.5 py-1 rounded-full text-xs font-black tracking-wider text-cyan-300 border border-cyan-500/60 bg-cyan-950/70 flex items-center gap-1.5 shadow-xl animate-pulse';
+        liveCountdownBanner.innerHTML = `<span class="animate-pulse">⏳</span> COUNT GOING, GOING (${currentAuctionState.hammerCountdown})...`;
+      } else if (currentAuctionState.biddingLocked) {
+        liveCountdownBanner.style.display = 'inline-flex';
+        liveCountdownBanner.className = 'spotlight-countdown-badge px-3.5 py-1 rounded-full text-xs font-black tracking-wider text-amber-300 border border-amber-500/60 bg-amber-950/70 flex items-center gap-1.5 shadow-md';
+        liveCountdownBanner.innerHTML = '<span class="animate-pulse">🎙️</span> AUCTIONEER INTRODUCING PLAYER';
+      } else {
+        liveCountdownBanner.style.display = 'none';
+      }
+    }
+
+    if (liveLiveBadge) {
+      if (!hasPlayer) {
+        liveLiveBadge.style.display = 'none';
+      } else if (currentAuctionState.status === 'COUNTDOWN') {
+        liveLiveBadge.style.display = 'inline-flex';
+        liveLiveBadge.className = 'spotlight-live-badge px-3.5 py-1 rounded-full text-xs font-black tracking-wider text-rose-300 border border-rose-500/60 bg-rose-950/50 flex items-center gap-1.5';
+        liveLiveBadge.innerHTML = '<span class="animate-ping">((•))</span> FINAL CALL';
+      } else if (currentAuctionState.biddingLocked) {
+        liveLiveBadge.style.display = 'inline-flex';
+        liveLiveBadge.className = 'spotlight-live-badge px-3.5 py-1 rounded-full text-xs font-black tracking-wider text-amber-300 border border-amber-500/60 bg-amber-950/50 flex items-center gap-1.5';
+        liveLiveBadge.innerHTML = '<span class="animate-pulse">🔒</span> BIDDING STANDBY';
+      } else {
+        liveLiveBadge.style.display = 'inline-flex';
+        liveLiveBadge.className = 'spotlight-live-badge px-3.5 py-1 rounded-full text-xs font-black tracking-wider text-rose-300 border border-rose-500/50 bg-rose-950/40 flex items-center gap-1.5';
+        liveLiveBadge.innerHTML = '<span class="animate-ping">((•))</span> LIVE';
+      }
     }
 
     // Update Right Column Player Spotlight Photo & Attributes Card (Audience Screen)
@@ -1125,9 +1190,53 @@ document.addEventListener('DOMContentLoaded', () => {
       nextBid.innerText = `₹${currentAuctionState.basePrice.toLocaleString()} / ₹${currentAuctionState.nextMinBid.toLocaleString()}`;
     }
     if (leadBadge) {
-      leadBadge.innerText = currentAuctionState.highestBidderTeamName
-        ? `Leading: ${currentAuctionState.highestBidderTeamName}`
-        : 'Awaiting Opening Bid';
+      if (currentAuctionState.biddingLocked && hasPlayer) {
+        leadBadge.innerText = '🔒 Bidding Locked for Intro';
+        leadBadge.className = 'bg-amber-900/80 border border-amber-500/50 text-amber-300 text-xs font-bold px-3 py-1 rounded-full';
+      } else {
+        leadBadge.innerText = currentAuctionState.highestBidderTeamName
+          ? `Leading: ${currentAuctionState.highestBidderTeamName}`
+          : 'Awaiting Opening Bid';
+        leadBadge.className = 'bg-[#0F3D34] text-[#F7F6F1] text-xs font-bold px-3 py-1 rounded-full';
+      }
+    }
+
+    // Update Owner Screen Top Badges (Countdown / Intro / Standby)
+    const ownerCountdownBanner = document.getElementById('owner-countdown-banner');
+    const ownerLiveBadge = document.querySelector('#view-owner .spotlight-live-badge');
+
+    if (ownerCountdownBanner) {
+      if (!hasPlayer) {
+        ownerCountdownBanner.style.display = 'none';
+      } else if (currentAuctionState.status === 'COUNTDOWN') {
+        ownerCountdownBanner.style.display = 'inline-flex';
+        ownerCountdownBanner.className = 'spotlight-countdown-badge px-3.5 py-1 rounded-full text-xs font-black tracking-wider text-cyan-300 border border-cyan-500/60 bg-cyan-950/70 flex items-center gap-1.5 shadow-xl animate-pulse';
+        ownerCountdownBanner.innerHTML = `<span class="animate-pulse">⏳</span> COUNT GOING, GOING (${currentAuctionState.hammerCountdown})...`;
+      } else if (currentAuctionState.biddingLocked) {
+        ownerCountdownBanner.style.display = 'inline-flex';
+        ownerCountdownBanner.className = 'spotlight-countdown-badge px-3.5 py-1 rounded-full text-xs font-black tracking-wider text-amber-300 border border-amber-500/60 bg-amber-950/70 flex items-center gap-1.5 shadow-md';
+        ownerCountdownBanner.innerHTML = '<span class="animate-pulse">🔒</span> PLAYER INTRO IN PROGRESS — BIDDING LOCKED';
+      } else {
+        ownerCountdownBanner.style.display = 'none';
+      }
+    }
+
+    if (ownerLiveBadge) {
+      if (!hasPlayer) {
+        ownerLiveBadge.style.display = 'none';
+      } else if (currentAuctionState.status === 'COUNTDOWN') {
+        ownerLiveBadge.style.display = 'inline-flex';
+        ownerLiveBadge.className = 'spotlight-live-badge px-3.5 py-1 rounded-full text-xs font-black tracking-wider text-rose-300 border border-rose-500/60 bg-rose-950/50 flex items-center gap-1.5';
+        ownerLiveBadge.innerHTML = '<span class="animate-ping">((•))</span> FINAL CALL';
+      } else if (currentAuctionState.biddingLocked) {
+        ownerLiveBadge.style.display = 'inline-flex';
+        ownerLiveBadge.className = 'spotlight-live-badge px-3.5 py-1 rounded-full text-xs font-black tracking-wider text-amber-300 border border-amber-500/60 bg-amber-950/50 flex items-center gap-1.5';
+        ownerLiveBadge.innerHTML = '<span class="animate-pulse">🔒</span> INTRO STAGE';
+      } else {
+        ownerLiveBadge.style.display = 'inline-flex';
+        ownerLiveBadge.className = 'spotlight-live-badge px-3.5 py-1 rounded-full text-xs font-black tracking-wider text-[#F7F6F1] border border-[#9e2a2b]/60 bg-[#9e2a2b]/50 flex items-center gap-1.5';
+        ownerLiveBadge.innerHTML = '<span class="animate-ping">((•))</span> LIVE';
+      }
     }
 
     // Update Right Column Player Spotlight Photo & Attributes Card (As in Reference Photo)
@@ -1175,6 +1284,11 @@ document.addEventListener('DOMContentLoaded', () => {
         raiseBtn.disabled = true;
         raiseBtn.className = 'w-full py-4 px-6 rounded-2xl font-bold text-sm uppercase bg-[#134E43] border border-[#C8A96A] text-[#C8A96A]';
         raiseBtn.innerText = '🏆 SQUAD COMPLETE (8 PLAYERS ACQUIRED)';
+      } else if (currentAuctionState.biddingLocked && hasPlayer) {
+        // Player is on stage for introduction - Bidding is locked!
+        raiseBtn.disabled = true;
+        raiseBtn.className = 'w-full py-4 px-6 rounded-2xl font-black text-sm sm:text-base uppercase tracking-wider bg-[#0a2c25] border-2 border-amber-500/70 text-amber-300 shadow-xl cursor-not-allowed flex items-center justify-center gap-2 select-none';
+        raiseBtn.innerHTML = '<span class="animate-pulse text-lg">🔒</span> BIDDING LOCKED — PLAYER INTRO IN PROGRESS';
       } else if (!isInBattle) {
         raiseBtn.disabled = isBattleFull || !hasPlayer;
         if (isBattleFull) {
@@ -1199,11 +1313,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (withdrawBtn) {
-      withdrawBtn.disabled = isLeading || !isInBattle;
-      if (isLeading) {
-        withdrawBtn.className = 'w-full py-4 px-6 rounded-2xl font-bold text-sm text-[#E6F0E9]/40 bg-[#0a2c25] border border-[#C8A96A]/10 opacity-50 cursor-not-allowed';
+      if (currentAuctionState.biddingLocked) {
+        withdrawBtn.disabled = true;
+        withdrawBtn.className = 'w-full py-4 px-6 rounded-2xl font-bold text-sm text-[#E6F0E9]/30 bg-[#0a2c25] border border-[#C8A96A]/10 opacity-40 cursor-not-allowed';
       } else {
-        withdrawBtn.className = 'w-full py-4 px-6 rounded-2xl font-bold text-sm text-[#E6F0E9] bg-[#0a2c25] hover:bg-[#134E43] border border-[#C8A96A]/20 shadow-xl cursor-pointer';
+        withdrawBtn.disabled = isLeading || !isInBattle;
+        if (isLeading) {
+          withdrawBtn.className = 'w-full py-4 px-6 rounded-2xl font-bold text-sm text-[#E6F0E9]/40 bg-[#0a2c25] border border-[#C8A96A]/10 opacity-50 cursor-not-allowed';
+        } else {
+          withdrawBtn.className = 'w-full py-4 px-6 rounded-2xl font-bold text-sm text-[#E6F0E9] bg-[#0a2c25] hover:bg-[#134E43] border border-[#C8A96A]/20 shadow-xl cursor-pointer';
+        }
       }
     }
 
@@ -1237,12 +1356,80 @@ document.addEventListener('DOMContentLoaded', () => {
     const gavelLabel = document.getElementById('admin-gavel-player-label');
     if (gavelLabel) {
       if (currentAuctionState.currentPlayer && (currentAuctionState.status === 'BIDDING' || currentAuctionState.status === 'COUNTDOWN')) {
+        const lockNote = currentAuctionState.biddingLocked ? ' • 🔒 Bidding Locked (Intro)' : '';
         const lead = currentAuctionState.highestBidderTeamName ? ` • Leading: ${currentAuctionState.highestBidderTeamName}` : ' • Opening ₹1,000';
-        gavelLabel.innerText = `${currentAuctionState.currentPlayer.name} (₹${currentAuctionState.currentBid.toLocaleString()}${lead})`;
-        gavelLabel.className = 'font-black text-[#C8A96A]';
+        gavelLabel.innerText = `${currentAuctionState.currentPlayer.name} (₹${currentAuctionState.currentBid.toLocaleString()}${lead}${lockNote})`;
+        gavelLabel.className = currentAuctionState.biddingLocked ? 'font-black text-amber-400' : 'font-black text-[#C8A96A]';
       } else {
         gavelLabel.innerText = 'No player currently on stage';
         gavelLabel.className = 'font-bold text-[#E6F0E9]/60';
+      }
+    }
+
+    // Render Introduction Bidding Lock Control Banner in Admin Gavel Panel
+    const lockBanner = document.getElementById('admin-bidding-lock-banner');
+    if (lockBanner) {
+      const p = currentAuctionState.currentPlayer;
+      const hasPlayer = Boolean(p && (currentAuctionState.status === 'BIDDING' || currentAuctionState.status === 'COUNTDOWN'));
+      const isLocked = Boolean(currentAuctionState.biddingLocked);
+
+      if (hasPlayer) {
+        if (isLocked) {
+          lockBanner.innerHTML = `
+            <div class="p-4 rounded-2xl bg-gradient-to-r from-[#092520] via-[#0e3830] to-[#092520] border-2 border-amber-500 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div class="flex items-center gap-3.5 w-full sm:w-auto">
+                <div class="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center shrink-0">
+                  <span class="text-2xl animate-pulse">🔒</span>
+                </div>
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="font-black text-sm text-amber-300 uppercase tracking-wider">BIDDING CURRENTLY LOCKED (INTRO IN PROGRESS)</span>
+                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-500/25 text-amber-200 border border-amber-500/50">STAGE INTRO</span>
+                  </div>
+                  <p class="text-xs text-[#E6F0E9]/85 mt-1 font-medium">
+                    Player <strong>${p.name}</strong> is displayed to everyone. Franchise owners cannot place bids until you click unlock.
+                  </p>
+                </div>
+              </div>
+              <button onclick="toggleBiddingLockAdmin()" class="w-full sm:w-auto px-6 py-3.5 rounded-xl font-black text-sm uppercase tracking-wider bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-[#092520] shadow-2xl hover:scale-105 active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-2 shrink-0">
+                <span class="text-lg">🔓</span>
+                <span>UNLOCK BIDDING NOW</span>
+              </button>
+            </div>
+          `;
+        } else {
+          lockBanner.innerHTML = `
+            <div class="p-4 rounded-2xl bg-[#092520] border-2 border-emerald-500/60 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div class="flex items-center gap-3.5 w-full sm:w-auto">
+                <div class="w-12 h-12 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center shrink-0">
+                  <span class="text-2xl text-emerald-400">⚡</span>
+                </div>
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="font-black text-sm text-emerald-400 uppercase tracking-wider">BIDDING IS ACTIVE & OPEN</span>
+                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 animate-pulse">LIVE BIDS</span>
+                  </div>
+                  <p class="text-xs text-[#E6F0E9]/85 mt-1 font-medium">
+                    Franchise owners can enter the 2-player battle ring and place bids in real-time.
+                  </p>
+                </div>
+              </div>
+              <button onclick="toggleBiddingLockAdmin()" class="w-full sm:w-auto px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider bg-[#0a2c25] hover:bg-[#134E43] text-amber-300 border border-amber-500/40 shadow transition-all cursor-pointer flex items-center justify-center gap-2 shrink-0">
+                <span>🔒</span>
+                <span>PAUSE / LOCK BIDDING</span>
+              </button>
+            </div>
+          `;
+        }
+      } else {
+        lockBanner.innerHTML = `
+          <div class="p-3.5 rounded-2xl bg-[#092520]/60 border border-[#C8A96A]/20 flex items-center justify-between text-xs text-[#E6F0E9]/70">
+            <div class="flex items-center gap-2">
+              <span class="text-base">🎤</span>
+              <span>Stage is currently on standby. Select a player below and click <strong>"PUSH LIVE"</strong> to begin their introduction with bidding locked.</span>
+            </div>
+          </div>
+        `;
       }
     }
 
@@ -1274,14 +1461,16 @@ document.addEventListener('DOMContentLoaded', () => {
             <span class="font-bold text-[#F7F6F1] text-sm">${p.name}</span>
             <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${
               isLive
-                ? 'bg-[#C8A96A] text-[#0F3D34]'
+                ? currentAuctionState.biddingLocked
+                  ? 'bg-amber-500 text-[#0F3D34]'
+                  : 'bg-[#C8A96A] text-[#0F3D34]'
                 : p.status === 'AVAILABLE'
                   ? 'bg-[#0F3D34] border border-[#C8A96A]/50 text-[#C8A96A]'
                   : p.status === 'SOLD'
                     ? 'bg-[#134E43] text-[#E6F0E9]'
                     : 'bg-[#9e2a2b] text-[#F7F6F1]'
             }">
-              ${isLive ? 'CURRENTLY LIVE' : p.status}
+              ${isLive ? (currentAuctionState.biddingLocked ? 'LIVE • INTRO' : 'LIVE • BIDDING') : p.status}
             </span>
           </div>
           <p class="text-xs text-[#E6F0E9] mt-1">${p.specialization} • ${p.batsmanType}</p>
@@ -1290,13 +1479,20 @@ document.addEventListener('DOMContentLoaded', () => {
           ${
             p.status === 'SOLD'
               ? `<span class="font-mono-num text-[#C8A96A] font-black text-sm">₹${p.soldPrice.toLocaleString()} (${p.soldToTeamName})</span>`
-              : `<button onclick="pushPlayerLiveAdmin('${p.id}')" class="px-4 py-2 rounded-xl font-black text-xs uppercase tracking-wider ${
-                  isLive
-                    ? 'bg-[#C8A96A] text-[#0F3D34] shadow-lg'
-                    : 'bg-[#C8A96A] hover:bg-[#DFC897] text-[#0F3D34] shadow-md cursor-pointer'
-                }">
-                    ${isLive ? 'CURRENTLY LIVE' : 'PUSH LIVE'}
-                  </button>`
+              : isLive
+              ? `<div class="flex items-center gap-2">
+                  <button onclick="toggleBiddingLockAdmin()" class="px-3.5 py-2 rounded-xl font-black text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-md cursor-pointer ${
+                    currentAuctionState.biddingLocked
+                      ? 'bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 text-[#092520]'
+                      : 'bg-[#0a2c25] hover:bg-[#134E43] text-amber-300 border border-amber-500/40'
+                  }">
+                    <span>${currentAuctionState.biddingLocked ? '🔓' : '🔒'}</span>
+                    <span>${currentAuctionState.biddingLocked ? 'UNLOCK BIDS' : 'LOCK BIDS'}</span>
+                  </button>
+                </div>`
+              : `<button onclick="pushPlayerLiveAdmin('${p.id}')" class="px-4 py-2 rounded-xl font-black text-xs uppercase tracking-wider bg-[#C8A96A] hover:bg-[#DFC897] text-[#0F3D34] shadow-md cursor-pointer">
+                  PUSH LIVE
+                </button>`
           }
         </div>
       </div>
@@ -1364,17 +1560,21 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
       } else {
         return `
-          <div class="p-3.5 rounded-xl border-2 border-dashed border-[#C8A96A]/30 bg-[#092520]/50 text-center flex flex-col items-center justify-center min-h-[96px]">
-            <span class="text-base text-[#C8A96A]">➕</span>
-            <p class="text-xs font-black text-[#F7F6F1] mt-0.5">Franchise Slot #${slotNum} Open</p>
-            <p class="text-[10px] text-[#E6F0E9]/70 mt-0.5">Click "Join Bidding Battle" to lock in</p>
+          <div class="p-3.5 rounded-xl border-2 border-dashed ${
+            state.biddingLocked ? 'border-amber-500/30 bg-[#092520]/60' : 'border-[#C8A96A]/30 bg-[#092520]/50'
+          } text-center flex flex-col items-center justify-center min-h-[96px]">
+            <span class="text-base ${state.biddingLocked ? 'text-amber-400' : 'text-[#C8A96A]'}">${state.biddingLocked ? '🔒' : '➕'}</span>
+            <p class="text-xs font-black text-[#F7F6F1] mt-0.5">Franchise Slot #${slotNum} ${state.biddingLocked ? 'Locked' : 'Open'}</p>
+            <p class="text-[10px] ${state.biddingLocked ? 'text-amber-300/80' : 'text-[#E6F0E9]/70'} mt-0.5">${state.biddingLocked ? 'Awaiting auctioneer to open bidding' : 'Click "Join Bidding Battle" to lock in'}</p>
           </div>
         `;
       }
     };
 
     const isRingFull = Boolean(team1 && team2);
-    const ringStatusText = isRingFull
+    const ringStatusText = state.biddingLocked
+      ? '🔒 AUCTIONEER INTRODUCING PLAYER: Bidding is locked! Franchise owners will be able to join when introduction finishes.'
+      : isRingFull
       ? '🔒 BATTLE RING LOCKED: 2 Franchises are in head-to-head war! (Only they can raise bids until one withdraws)'
       : team1 || team2
       ? '⚡ 1 SLOT REMAINING: Another franchise can click "Join Bidding Battle" to challenge!'
@@ -1388,9 +1588,19 @@ document.addEventListener('DOMContentLoaded', () => {
             ACTIVE BIDDING BATTLE (2 FRANCHISES IN RING)
           </span>
           <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full ${
-            isRingFull ? 'bg-[#9e2a2b]/60 text-[#F7F6F1] border border-[#9e2a2b]' : 'bg-[#134E43] text-[#C8A96A] border border-[#C8A96A]/30'
+            state.biddingLocked
+              ? 'bg-amber-900/60 text-amber-300 border border-amber-500/50 animate-pulse'
+              : isRingFull
+              ? 'bg-[#9e2a2b]/60 text-[#F7F6F1] border border-[#9e2a2b]'
+              : 'bg-[#134E43] text-[#C8A96A] border border-[#C8A96A]/30'
           }">
-            ${isRingFull ? 'RING LOCKED (2/2 TEAMS)' : 'OPEN FOR CHALLENGER (1/2)'}
+            ${
+              state.biddingLocked
+                ? '🔒 INTRO PHASE (BIDDING LOCKED)'
+                : isRingFull
+                ? 'RING LOCKED (2/2 TEAMS)'
+                : 'OPEN FOR CHALLENGER (1/2)'
+            }
           </span>
         </div>
 
@@ -1399,7 +1609,9 @@ document.addEventListener('DOMContentLoaded', () => {
           ${renderSlotCard(2, slot2, team2)}
         </div>
 
-        <p class="text-[11px] font-bold text-center mt-3 ${isRingFull ? 'text-[#C8A96A]' : 'text-[#E6F0E9]'}">
+        <p class="text-[11px] font-bold text-center mt-3 ${
+          state.biddingLocked ? 'text-amber-300' : isRingFull ? 'text-[#C8A96A]' : 'text-[#E6F0E9]'
+        }">
           ${ringStatusText}
         </p>
       </div>
@@ -1849,23 +2061,75 @@ document.addEventListener('DOMContentLoaded', () => {
     state.highestBidderTeamName = null;
     state.activeBidders = { slot1: null, slot2: null };
     state.hammerCountdown = null;
+    state.biddingLocked = true; // Lock bidding initially so auctioneer can introduce player
     state.lastActionTimestamp = Date.now();
     state.version = (state.version || 0) + 1;
 
     currentAuctionState = state;
     StorageManager.set(STORAGE_KEYS.STATE, state);
-    showToast(`Player ${p.name} is now LIVE on stage!`, 'gold');
 
-    if (window.AuctionEngine && window.AuctionEngine.demoActive) {
-      setTimeout(() => {
-        if (window.AuctionEngine && window.AuctionEngine.demoActive) {
-          window.AuctionEngine.executeDemoBiddingCycle();
-          window.AuctionEngine.scheduleDemoTick();
-        }
-      }, 350);
+    if (window.soundManager) {
+      window.soundManager.playPlayerStageIntro();
+    }
+
+    showToast(`Player ${p.name} is now LIVE on stage! Bidding is LOCKED for introduction.`, 'gold');
+
+    renderApp();
+  };
+
+  // Master Admin Toggle / Unlock Bidding Controller
+  window.toggleBiddingLockAdmin = function () {
+    if (!activeUser || activeUser.role !== 'admin') {
+      showToast('Security Violation: Only Master Admin can lock or unlock bidding.', 'error');
+      return;
+    }
+
+    const state = StorageManager.get(STORAGE_KEYS.STATE);
+    if (!state.currentPlayerId || (state.status !== 'BIDDING' && state.status !== 'COUNTDOWN')) {
+      showToast('No active player currently on stage.', 'error');
+      return;
+    }
+
+    state.biddingLocked = !state.biddingLocked;
+    state.lastActionTimestamp = Date.now();
+    state.version = (state.version || 0) + 1;
+
+    currentAuctionState = state;
+    StorageManager.set(STORAGE_KEYS.STATE, state);
+
+    if (state.biddingLocked) {
+      showToast('🔒 Bidding LOCKED! Franchise owners cannot place bids during introduction.', 'info');
+    } else {
+      showToast('⚡ Bidding is now UNLOCKED! Franchise owners can enter the ring and place bids!', 'success');
+      if (window.soundManager) {
+        window.soundManager.playBiddingUnlocked();
+      }
+      // If demo bot is active, kick off the cycle now that bidding is open
+      if (window.AuctionEngine && window.AuctionEngine.demoActive) {
+        setTimeout(() => {
+          if (window.AuctionEngine && window.AuctionEngine.demoActive) {
+            window.AuctionEngine.executeDemoBiddingCycle();
+            window.AuctionEngine.scheduleDemoTick();
+          }
+        }, 300);
+      }
     }
 
     renderApp();
+  };
+
+  window.unlockBiddingAdmin = function () {
+    const state = StorageManager.get(STORAGE_KEYS.STATE);
+    if (state && state.biddingLocked) {
+      window.toggleBiddingLockAdmin();
+    }
+  };
+
+  window.lockBiddingAdmin = function () {
+    const state = StorageManager.get(STORAGE_KEYS.STATE);
+    if (state && !state.biddingLocked) {
+      window.toggleBiddingLockAdmin();
+    }
   };
 
   // Sync owner card heights on resize or fullscreen toggle (desktop only)
