@@ -246,6 +246,9 @@ const StorageManager = {
       localStorage.setItem('alamdar_device_user_v1', JSON.stringify(user));
       localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(user));
       bus.emit('DATA_CHANGED', { key: STORAGE_KEYS.CURRENT_USER, value: user });
+
+      // Atomically notify server of session without wiping other members
+      this.executeServerAction('session_login', { userId: user.userId, session: user });
     } catch (e) {
       console.error('Storage setActiveUser error:', e);
     }
@@ -274,9 +277,7 @@ const StorageManager = {
     localStorage.removeItem(STORAGE_KEYS.STATE);
     localStorage.removeItem(STORAGE_KEYS.SESSIONS);
     this.clearActiveUser();
-    if (typeof fetch !== 'undefined') {
-      fetch('/api/reset', { method: 'POST' }).catch(() => {});
-    }
+    this.executeServerAction('reset_tournament');
     return this.initializeDefaults();
   },
 
@@ -285,6 +286,7 @@ const StorageManager = {
   _syncDisabled: false,
   _pollIntervalId: null,
   _connected: false,
+  _isPolling: false,
 
   _setConnectionStatus(connected) {
     if (this._connected === connected) return;
@@ -293,7 +295,7 @@ const StorageManager = {
     if (el) {
       if (connected) {
         el.className = 'sync-status-pill connected';
-        el.title = 'Real-time multi-device sync active (Connected to Render Server)';
+        el.title = 'Real-time multi-device sync active';
         const textEl = el.querySelector('.sync-text');
         if (textEl) textEl.innerText = 'Live Sync';
       } else {
@@ -304,6 +306,33 @@ const StorageManager = {
       }
     }
     bus.emit('SYNC_STATUS', { connected });
+  },
+
+  // Execute atomic action on server to prevent concurrent race conditions
+  async executeServerAction(action, data = {}) {
+    if (this._syncDisabled || typeof fetch === 'undefined') {
+      return { success: false, offline: true };
+    }
+    try {
+      const res = await fetch('/api/action', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action, data })
+      });
+      if (!res.ok) {
+        return { success: false, error: 'Server error: ' + res.status };
+      }
+      const result = await res.json();
+      if (result && result.version) {
+        this._serverVersion = Math.max(this._serverVersion, result.version);
+      }
+      // Immediately pull fresh state without waiting for next poll tick
+      setTimeout(() => this.pollServer(), 50);
+      return result;
+    } catch (err) {
+      console.warn('executeServerAction error:', err);
+      return { success: false, error: err.message };
+    }
   },
 
   syncToServer(key, value) {
@@ -324,7 +353,6 @@ const StorageManager = {
     })
       .then((res) => {
         if (!res.ok) {
-          // Only permanently disable sync when run purely locally via file:// protocol
           if (res.status === 404 && (window.location.protocol === 'file:' || !window.location.origin)) {
             this._syncDisabled = true;
             if (this._pollIntervalId) clearInterval(this._pollIntervalId);
@@ -342,74 +370,72 @@ const StorageManager = {
       })
       .catch((err) => {
         this._setConnectionStatus(false);
-        // Do not disable sync on temporary network hiccup! Automatically recovers.
         console.warn('Sync POST error (will retry on next poll):', err);
       });
+  },
+
+  async pollServer() {
+    if (this._syncDisabled || this._isPolling || typeof fetch === 'undefined') return;
+    this._isPolling = true;
+
+    try {
+      // Pass ?v=<version> so the server can return a lightweight 35-byte response if nothing changed
+      const res = await fetch('/api/sync?v=' + this._serverVersion + '&t=' + Date.now(), { cache: 'no-store' });
+      if (!res.ok) {
+        if (res.status === 404 && (window.location.protocol === 'file:' || !window.location.origin)) {
+          this._syncDisabled = true;
+          if (this._pollIntervalId) {
+            clearInterval(this._pollIntervalId);
+            this._pollIntervalId = null;
+          }
+        }
+        this._setConnectionStatus(false);
+        this._isPolling = false;
+        return;
+      }
+
+      const data = await res.json();
+      this._setConnectionStatus(true);
+
+      // If server confirms client data is already up-to-date, do nothing!
+      // This completely eliminates UI freezing, JSON parsing lag, and memory churn
+      if (data && data.upToDate) {
+        this._isPolling = false;
+        return;
+      }
+
+      if (data && data.version) {
+        const isNewVersion = data.version > this._serverVersion;
+        const isInitialSync = this._serverVersion === 0;
+
+        if (isNewVersion || isInitialSync) {
+          this._serverVersion = data.version;
+
+          if (data.state) localStorage.setItem(STORAGE_KEYS.STATE, JSON.stringify(data.state));
+          if (data.teams) localStorage.setItem(STORAGE_KEYS.TEAMS, JSON.stringify(data.teams));
+          if (data.players) localStorage.setItem(STORAGE_KEYS.PLAYERS, JSON.stringify(data.players));
+          if (data.sessions) localStorage.setItem(STORAGE_KEYS.SESSIONS, JSON.stringify(data.sessions));
+
+          // Directly invoke application render hook
+          if (typeof window.onServerDataReceived === 'function') {
+            window.onServerDataReceived(data);
+          }
+        }
+      }
+    } catch (e) {
+      this._setConnectionStatus(false);
+    } finally {
+      this._isPolling = false;
+    }
   },
 
   startServerSync() {
     if (typeof fetch === 'undefined') return;
 
-    const pollServer = async () => {
-      if (this._syncDisabled) return;
-      try {
-        const res = await fetch('/api/sync?t=' + Date.now(), { cache: 'no-store' });
-        if (!res.ok) {
-          if (res.status === 404 && (window.location.protocol === 'file:' || !window.location.origin)) {
-            this._syncDisabled = true;
-            if (this._pollIntervalId) {
-              clearInterval(this._pollIntervalId);
-              this._pollIntervalId = null;
-            }
-          }
-          this._setConnectionStatus(false);
-          return;
-        }
-        const data = await res.json();
-        if (!data) {
-          this._setConnectionStatus(false);
-          return;
-        }
-
-        this._setConnectionStatus(true);
-
-        // Synchronize whenever server has a newer version OR on initial connection
-        const isNewVersion = data.version && data.version > this._serverVersion;
-        const isInitialSync = this._serverVersion === 0;
-
-        if (isNewVersion || isInitialSync) {
-          this._serverVersion = data.version || this._serverVersion;
-
-          if (data.state) {
-            localStorage.setItem(STORAGE_KEYS.STATE, JSON.stringify(data.state));
-          }
-          if (data.teams) {
-            localStorage.setItem(STORAGE_KEYS.TEAMS, JSON.stringify(data.teams));
-          }
-          if (data.players) {
-            localStorage.setItem(STORAGE_KEYS.PLAYERS, JSON.stringify(data.players));
-          }
-          if (data.sessions) {
-            localStorage.setItem(STORAGE_KEYS.SESSIONS, JSON.stringify(data.sessions));
-          }
-
-          // Directly invoke application render hook so UI reflects changes instantly
-          if (typeof window.onServerDataReceived === 'function') {
-            window.onServerDataReceived(data);
-          }
-          bus.emit('DATA_CHANGED', { key: STORAGE_KEYS.STATE, value: data.state });
-        }
-      } catch (e) {
-        this._setConnectionStatus(false);
-        // Wi-Fi packet drop or momentary sleep on mobile device:
-        // DO NOT disable polling! Next tick in 400ms will seamlessly reconnect.
-      }
-    };
-
     if (this._pollIntervalId) clearInterval(this._pollIntervalId);
-    // 400ms polling interval ensures sub-half-second updates across all 12 devices
-    this._pollIntervalId = setInterval(pollServer, 400);
-    pollServer();
+    // 500ms interval with ?v= lightweight check keeps ping super low without flooding the network
+    this._pollIntervalId = setInterval(() => this.pollServer(), 500);
+    this.pollServer();
   }
 };
 

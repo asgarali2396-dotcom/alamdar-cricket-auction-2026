@@ -179,17 +179,30 @@ server_data = {
 }
 
 _cached_bytes = b""
+_save_timer = None
+_save_timer_lock = threading.Lock()
 
 def update_cache():
     global _cached_bytes
     _cached_bytes = json.dumps(server_data).encode('utf-8')
 
-def save_to_disk():
+def _do_disk_save():
     try:
+        with lock:
+            data_to_write = json.dumps(server_data)
         with open(DATA_FILE, 'w', encoding='utf-8') as f:
-            json.dump(server_data, f)
+            f.write(data_to_write)
     except Exception as e:
-        print("[Server] Save to disk error:", e)
+        print("[Server] Background disk save error:", e)
+
+def trigger_async_save():
+    global _save_timer
+    with _save_timer_lock:
+        if _save_timer is not None:
+            _save_timer.cancel()
+        _save_timer = threading.Timer(0.8, _do_disk_save)
+        _save_timer.daemon = True
+        _save_timer.start()
 
 # Restore previously saved data if valid
 if os.path.exists(DATA_FILE):
@@ -214,6 +227,84 @@ if os.path.exists(DATA_FILE):
 update_cache()
 
 
+def calculate_increment(current_bid):
+    if current_bid < 10000:
+        return 1000
+    if current_bid < 20000:
+        return 2000
+    return 5000
+
+def get_next_valid_bid(current_bid, base_price=1000):
+    if current_bid <= 0:
+        return base_price
+    return current_bid + calculate_increment(current_bid)
+
+def evaluate_auto_assignment():
+    """Rule: If 1 player remaining in set and exactly 1 team left that hasn't bought from this set,
+    auto-assign at base price (1,000)."""
+    state = server_data['state']
+    set_id = state.get('currentSetId')
+    if not set_id:
+        return None
+
+    remaining_players = [
+        p for p in server_data['players']
+        if p['setId'] == set_id and p['status'] in ('AVAILABLE', 'UNSOLD')
+    ]
+    if len(remaining_players) != 1:
+        return None
+
+    eligible_teams = [
+        t for t in server_data['teams']
+        if set_id not in t.get('ownedSetIds', []) and t.get('acquiredCount', 0) < t.get('maxAuctionSlots', 8)
+    ]
+    if len(eligible_teams) != 1:
+        return None
+
+    target_player = remaining_players[0]
+    target_team = eligible_teams[0]
+    base_price = 1000
+
+    # Ensure not already in roster
+    if any(r.get('playerId') == target_player['id'] for r in target_team.get('roster', [])):
+        return None
+
+    if target_team.get('remainingBudget', 0) < base_price:
+        return None
+
+    target_team['remainingBudget'] -= base_price
+    target_team['acquiredCount'] = target_team.get('acquiredCount', 0) + 1
+    if 'ownedSetIds' not in target_team:
+        target_team['ownedSetIds'] = []
+    if set_id not in target_team['ownedSetIds']:
+        target_team['ownedSetIds'].append(set_id)
+
+    target_team.setdefault('roster', []).append({
+        'playerId': target_player['id'],
+        'name': target_player['name'],
+        'role': target_player.get('specialization', 'All-Rounder'),
+        'setId': set_id,
+        'setName': target_player.get('setName', ''),
+        'price': base_price,
+        'isOwner': False,
+        'autoAssigned': True,
+        'timestamp': int(time.time() * 1000)
+    })
+
+    target_player['status'] = 'SOLD'
+    target_player['soldPrice'] = base_price
+    target_player['soldToTeamId'] = target_team['id']
+    target_player['soldToTeamName'] = target_team['name']
+    target_player['autoAssigned'] = True
+
+    return {
+        'triggered': True,
+        'player': target_player,
+        'team': target_team,
+        'price': base_price
+    }
+
+
 class AuctionSyncHandler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=BASE_DIR, **kwargs)
@@ -226,6 +317,7 @@ class AuctionSyncHandler(SimpleHTTPRequestHandler):
         self.send_header('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0')
         self.send_header('Pragma', 'no-cache')
         self.send_header('Expires', '0')
+        self.send_header('Connection', 'keep-alive')
         super().end_headers()
 
     def do_OPTIONS(self):
@@ -235,6 +327,29 @@ class AuctionSyncHandler(SimpleHTTPRequestHandler):
     def do_GET(self):
         # API: Real-time sync poll endpoint (< 1ms response)
         if self.path == '/api/sync' or self.path.startswith('/api/sync?'):
+            # Check for version query parameter: /api/sync?v=12
+            client_v = None
+            if '?' in self.path:
+                try:
+                    q = self.path.split('?', 1)[1]
+                    for part in q.split('&'):
+                        if part.startswith('v='):
+                            client_v = int(part.split('=', 1)[1])
+                            break
+                except Exception:
+                    client_v = None
+
+            # If client already has the latest version, return tiny 35-byte response
+            # This reduces 99.9% of network bandwidth and prevents cellular data choke
+            if client_v is not None and client_v == server_data.get('version', 0):
+                up_to_date_bytes = json.dumps({"upToDate": True, "version": client_v}).encode('utf-8')
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.send_header('Content-Length', str(len(up_to_date_bytes)))
+                self.end_headers()
+                self.wfile.write(up_to_date_bytes)
+                return
+
             self.send_response(200)
             self.send_header('Content-Type', 'application/json')
             self.send_header('Content-Length', str(len(_cached_bytes)))
@@ -246,10 +361,289 @@ class AuctionSyncHandler(SimpleHTTPRequestHandler):
         super().do_GET()
 
     def do_POST(self):
-        # API: Real-time state update endpoint
+        length = int(self.headers.get('Content-Length', 0))
+        raw_body = self.rfile.read(length).decode('utf-8') if length > 0 else "{}"
+
+        # API: Atomic Server-Side Actions (Eliminates all race conditions and state conflicts)
+        if self.path == '/api/action':
+            try:
+                payload = json.loads(raw_body)
+                action = payload.get('action')
+                data = payload.get('data', {})
+                result = {"success": False}
+
+                with lock:
+                    state = server_data['state']
+                    teams = server_data['teams']
+                    players = server_data['players']
+                    sessions = server_data['sessions']
+
+                    if action == 'bid':
+                        team_id = data.get('teamId')
+                        team = next((t for t in teams if t['id'] == team_id), None)
+                        if not team:
+                            result = {"success": False, "error": "Team not found."}
+                        elif state.get('status') not in ('BIDDING', 'COUNTDOWN'):
+                            result = {"success": False, "error": "Auction is not actively accepting bids."}
+                        elif state.get('biddingLocked'):
+                            result = {"success": False, "error": "🔒 Bidding is locked for player introduction."}
+                        else:
+                            curr_ply = next((p for p in players if p['id'] == state.get('currentPlayerId')), None)
+                            if not curr_ply or curr_ply.get('status') == 'SOLD':
+                                result = {"success": False, "error": "Player is already SOLD."}
+                            else:
+                                slot1 = state.get('activeBidders', {}).get('slot1')
+                                slot2 = state.get('activeBidders', {}).get('slot2')
+                                is_slot1 = slot1 and slot1.get('teamId') == team_id
+                                is_slot2 = slot2 and slot2.get('teamId') == team_id
+                                if not is_slot1 and not is_slot2:
+                                    result = {"success": False, "error": "You must join the 2-player battle ring first."}
+                                elif state.get('highestBidderTeamId') == team_id:
+                                    result = {"success": False, "error": "You already hold the leading bid!"}
+                                else:
+                                    next_bid = get_next_valid_bid(state.get('currentBid', 0), state.get('basePrice', 1000))
+                                    remaining_slots = team.get('maxAuctionSlots', 8) - (team.get('acquiredCount', 0) + 1)
+                                    min_reserve = max(0, remaining_slots * 1000)
+
+                                    if next_bid > team.get('remainingBudget', 0):
+                                        result = {"success": False, "error": f"Bid (₹{next_bid:,}) exceeds your purse (₹{team.get('remainingBudget', 0):,})."}
+                                    elif team.get('remainingBudget', 0) - next_bid < min_reserve:
+                                        result = {"success": False, "error": f"Reserve Violation: You must retain at least ₹{min_reserve:,} for remaining {remaining_slots} slot(s)."}
+                                    else:
+                                        state['currentBid'] = next_bid
+                                        state['nextMinBid'] = get_next_valid_bid(next_bid, state.get('basePrice', 1000))
+                                        state['highestBidderTeamId'] = team_id
+                                        state['highestBidderTeamName'] = team.get('name', 'Franchise')
+                                        state['hammerCountdown'] = None
+                                        state['status'] = 'BIDDING'  # Reset countdown if active
+                                        state['lastActionTimestamp'] = int(time.time() * 1000)
+                                        server_data['version'] = int(server_data.get('version', 0)) + 1
+                                        update_cache()
+                                        trigger_async_save()
+                                        result = {"success": True, "newBid": next_bid, "version": server_data['version']}
+
+                    elif action == 'join_battle':
+                        team_id = data.get('teamId')
+                        team = next((t for t in teams if t['id'] == team_id), None)
+                        if not team:
+                            result = {"success": False, "error": "Team not found."}
+                        elif state.get('status') != 'BIDDING':
+                            result = {"success": False, "error": "Auction is not actively accepting bids."}
+                        elif state.get('biddingLocked'):
+                            result = {"success": False, "error": "🔒 Bidding is locked during introduction."}
+                        elif team.get('acquiredCount', 0) >= team.get('maxAuctionSlots', 8):
+                            result = {"success": False, "error": f"Roster Full: Your team already has {team.get('maxAuctionSlots', 8)} players."}
+                        elif state.get('currentSetId') in team.get('ownedSetIds', []):
+                            result = {"success": False, "error": "Set Constraint: Your team already owns a player from this set."}
+                        else:
+                            active_bidders = state.setdefault('activeBidders', {'slot1': None, 'slot2': None})
+                            s1 = active_bidders.get('slot1')
+                            s2 = active_bidders.get('slot2')
+
+                            if (s1 and s1.get('teamId') == team_id) or (s2 and s2.get('teamId') == team_id):
+                                result = {"success": True, "message": "Already in the battle ring."}
+                            elif not s1:
+                                active_bidders['slot1'] = {
+                                    'teamId': team_id,
+                                    'teamName': team.get('name'),
+                                    'ownerName': team.get('ownerName') or team.get('playingOwner'),
+                                    'color': team.get('color', '#C8A96A'),
+                                    'icon': team.get('icon', '🏏'),
+                                    'joinedAt': int(time.time() * 1000)
+                                }
+                                state['lastActionTimestamp'] = int(time.time() * 1000)
+                                server_data['version'] = int(server_data.get('version', 0)) + 1
+                                update_cache()
+                                trigger_async_save()
+                                result = {"success": True, "version": server_data['version']}
+                            elif not s2:
+                                active_bidders['slot2'] = {
+                                    'teamId': team_id,
+                                    'teamName': team.get('name'),
+                                    'ownerName': team.get('ownerName') or team.get('playingOwner'),
+                                    'color': team.get('color', '#C8A96A'),
+                                    'icon': team.get('icon', '🏏'),
+                                    'joinedAt': int(time.time() * 1000)
+                                }
+                                state['lastActionTimestamp'] = int(time.time() * 1000)
+                                server_data['version'] = int(server_data.get('version', 0)) + 1
+                                update_cache()
+                                trigger_async_save()
+                                result = {"success": True, "version": server_data['version']}
+                            else:
+                                result = {"success": False, "error": "Battle Ring Full! Two teams are already locked in this bidding war."}
+
+                    elif action == 'withdraw':
+                        team_id = data.get('teamId')
+                        if state.get('highestBidderTeamId') == team_id:
+                            result = {"success": False, "error": "The highest bidder cannot withdraw while holding the lead."}
+                        else:
+                            active_bidders = state.setdefault('activeBidders', {'slot1': None, 'slot2': None})
+                            if active_bidders.get('slot1', {}).get('teamId') == team_id:
+                                active_bidders['slot1'] = None
+                            elif active_bidders.get('slot2', {}).get('teamId') == team_id:
+                                active_bidders['slot2'] = None
+                            state['lastActionTimestamp'] = int(time.time() * 1000)
+                            server_data['version'] = int(server_data.get('version', 0)) + 1
+                            update_cache()
+                            trigger_async_save()
+                            result = {"success": True, "version": server_data['version']}
+
+                    elif action == 'push_player':
+                        player_id = data.get('playerId')
+                        p = next((ply for ply in players if ply['id'] == player_id), None)
+                        if not p:
+                            result = {"success": False, "error": "Player not found."}
+                        elif p.get('status') == 'SOLD':
+                            result = {"success": False, "error": f"Cannot auction {p.get('name')}: Already SOLD!"}
+                        else:
+                            state['status'] = 'BIDDING'
+                            state['currentSetId'] = p['setId']
+                            state['currentSetName'] = p['setName']
+                            state['currentPlayerId'] = p['id']
+                            state['currentPlayer'] = p
+                            state['basePrice'] = 1000
+                            state['currentBid'] = 0
+                            state['nextMinBid'] = 1000
+                            state['highestBidderTeamId'] = None
+                            state['highestBidderTeamName'] = None
+                            state['activeBidders'] = {'slot1': None, 'slot2': None}
+                            state['hammerCountdown'] = None
+                            state['biddingLocked'] = True
+                            state['lastActionTimestamp'] = int(time.time() * 1000)
+                            server_data['version'] = int(server_data.get('version', 0)) + 1
+                            update_cache()
+                            trigger_async_save()
+                            result = {"success": True, "version": server_data['version']}
+
+                    elif action == 'toggle_lock':
+                        state['biddingLocked'] = not state.get('biddingLocked', False)
+                        state['lastActionTimestamp'] = int(time.time() * 1000)
+                        server_data['version'] = int(server_data.get('version', 0)) + 1
+                        update_cache()
+                        trigger_async_save()
+                        result = {"success": True, "biddingLocked": state['biddingLocked'], "version": server_data['version']}
+
+                    elif action == 'countdown_tick':
+                        count = data.get('count')
+                        state['status'] = 'COUNTDOWN'
+                        state['hammerCountdown'] = count
+                        state['lastActionTimestamp'] = int(time.time() * 1000)
+                        server_data['version'] = int(server_data.get('version', 0)) + 1
+                        update_cache()
+                        trigger_async_save()
+                        result = {"success": True, "version": server_data['version']}
+
+                    elif action == 'confirm_sale':
+                        if state.get('status') == 'SOLD':
+                            result = {"success": False, "error": "This player has already been sold."}
+                        elif not state.get('highestBidderTeamId'):
+                            result = {"success": False, "error": "No bids placed. Use 'Mark Unsold' instead."}
+                        else:
+                            winner_team = next((t for t in teams if t['id'] == state.get('highestBidderTeamId')), None)
+                            sold_player = next((p for p in players if p['id'] == state.get('currentPlayerId')), None)
+
+                            if not winner_team or not sold_player:
+                                result = {"success": False, "error": "Invalid team or player id."}
+                            elif sold_player.get('status') == 'SOLD':
+                                result = {"success": False, "error": f"Player {sold_player['name']} is already SOLD."}
+                            else:
+                                final_price = state.get('currentBid', 1000)
+                                winner_team['remainingBudget'] -= final_price
+                                winner_team['acquiredCount'] = winner_team.get('acquiredCount', 0) + 1
+                                if 'ownedSetIds' not in winner_team:
+                                    winner_team['ownedSetIds'] = []
+                                if state['currentSetId'] not in winner_team['ownedSetIds']:
+                                    winner_team['ownedSetIds'].append(state['currentSetId'])
+
+                                winner_team.setdefault('roster', []).append({
+                                    'playerId': sold_player['id'],
+                                    'name': sold_player['name'],
+                                    'role': sold_player.get('specialization', 'All-Rounder'),
+                                    'setId': state['currentSetId'],
+                                    'setName': state.get('currentSetName', ''),
+                                    'price': final_price,
+                                    'isOwner': False,
+                                    'timestamp': int(time.time() * 1000)
+                                })
+
+                                sold_player['status'] = 'SOLD'
+                                sold_player['soldPrice'] = final_price
+                                sold_player['soldToTeamId'] = winner_team['id']
+                                sold_player['soldToTeamName'] = winner_team['name']
+
+                                state['status'] = 'SOLD'
+                                state['biddingLocked'] = False
+                                state['hammerCountdown'] = None
+                                state['activeBidders'] = {'slot1': None, 'slot2': None}
+                                state['lastActionTimestamp'] = int(time.time() * 1000)
+
+                                auto_res = evaluate_auto_assignment()
+
+                                server_data['version'] = int(server_data.get('version', 0)) + 1
+                                update_cache()
+                                trigger_async_save()
+                                result = {
+                                    "success": True,
+                                    "soldPlayer": sold_player,
+                                    "winningTeam": winner_team,
+                                    "finalPrice": final_price,
+                                    "autoAssigned": auto_res,
+                                    "version": server_data['version']
+                                }
+
+                    elif action == 'mark_unsold':
+                        player_id = state.get('currentPlayerId')
+                        p = next((ply for ply in players if ply['id'] == player_id), None)
+                        if not p:
+                            result = {"success": False, "error": "No player on the block."}
+                        elif p.get('status') == 'SOLD':
+                            result = {"success": False, "error": f"Cannot mark unsold: {p['name']} is already SOLD!"}
+                        else:
+                            p['status'] = 'UNSOLD'
+                            p['roundNumber'] = 2
+                            state['status'] = 'UNSOLD'
+                            state['biddingLocked'] = False
+                            state['hammerCountdown'] = None
+                            state['activeBidders'] = {'slot1': None, 'slot2': None}
+                            state['lastActionTimestamp'] = int(time.time() * 1000)
+                            server_data['version'] = int(server_data.get('version', 0)) + 1
+                            update_cache()
+                            trigger_async_save()
+                            result = {"success": True, "player": p, "version": server_data['version']}
+
+                    elif action == 'session_login':
+                        # Atomically records user session without wiping out other members' sessions!
+                        user_id = data.get('userId')
+                        session_obj = data.get('session')
+                        if user_id and session_obj:
+                            sessions[user_id] = session_obj
+                            server_data['version'] = int(server_data.get('version', 0)) + 1
+                            update_cache()
+                            trigger_async_save()
+                        result = {"success": True, "version": server_data['version']}
+
+                    else:
+                        result = {"success": False, "error": f"Unknown action '{action}'"}
+
+                resp_bytes = json.dumps(result).encode('utf-8')
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.send_header('Content-Length', str(len(resp_bytes)))
+                self.end_headers()
+                self.wfile.write(resp_bytes)
+                return
+            except Exception as e:
+                err_bytes = json.dumps({"success": False, "error": str(e)}).encode('utf-8')
+                self.send_response(500)
+                self.send_header('Content-Type', 'application/json')
+                self.send_header('Content-Length', str(len(err_bytes)))
+                self.end_headers()
+                self.wfile.write(err_bytes)
+                return
+
+        # API: Real-time state update endpoint (Legacy compatibility)
         if self.path == '/api/sync':
-            length = int(self.headers.get('Content-Length', 0))
-            raw_body = self.rfile.read(length).decode('utf-8')
             try:
                 incoming = json.loads(raw_body)
                 with lock:
@@ -260,11 +654,15 @@ class AuctionSyncHandler(SimpleHTTPRequestHandler):
                     if 'players' in incoming and incoming['players'] is not None:
                         server_data['players'] = incoming['players']
                     if 'sessions' in incoming and incoming['sessions'] is not None:
-                        server_data['sessions'] = incoming['sessions']
+                        # Merge sessions rather than overwriting completely
+                        if isinstance(incoming['sessions'], dict):
+                            server_data['sessions'].update(incoming['sessions'])
+                        else:
+                            server_data['sessions'] = incoming['sessions']
 
                     server_data['version'] = int(server_data.get('version', 0)) + 1
                     update_cache()
-                    save_to_disk()
+                    trigger_async_save()
 
                 resp_bytes = json.dumps({"success": True, "version": server_data['version']}).encode('utf-8')
                 self.send_response(200)
@@ -290,7 +688,7 @@ class AuctionSyncHandler(SimpleHTTPRequestHandler):
                 server_data['sessions'] = {}
                 server_data['version'] = int(server_data.get('version', 0)) + 1
                 update_cache()
-                save_to_disk()
+                trigger_async_save()
 
             resp_bytes = json.dumps({"success": True, "version": server_data['version']}).encode('utf-8')
             self.send_response(200)

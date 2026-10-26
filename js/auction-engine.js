@@ -67,7 +67,17 @@ const AuctionEngine = {
   },
 
   // 3. Two-Player Rule: Join Bidding Battle
-  joinBattle(teamId) {
+  async joinBattle(teamId) {
+    if (!StorageManager._syncDisabled && typeof fetch !== 'undefined') {
+      const res = await StorageManager.executeServerAction('join_battle', { teamId });
+      if (res && res.success) {
+        if (window.soundManager) window.soundManager.playBattleJoin();
+        return res;
+      }
+      if (res && res.error) return res;
+    }
+
+    // Local Fallback (file:// or standalone offline mode)
     const state = StorageManager.get(STORAGE_KEYS.STATE);
     const teams = StorageManager.get(STORAGE_KEYS.TEAMS);
     const players = StorageManager.get(STORAGE_KEYS.PLAYERS);
@@ -81,7 +91,6 @@ const AuctionEngine = {
       return { success: false, error: '🔒 Bidding is currently locked. The auctioneer is introducing the player.' };
     }
 
-    // Guard: Prevent joining battle on already sold player
     const currentPlayer = players.find((p) => p.id === state.currentPlayerId);
     if (!currentPlayer || currentPlayer.status === 'SOLD') {
       return { success: false, error: 'This player is already SOLD. Bidding is closed.' };
@@ -94,12 +103,10 @@ const AuctionEngine = {
 
     const { slot1, slot2 } = state.activeBidders || {};
 
-    // Already in battle
     if (slot1?.teamId === teamId || slot2?.teamId === teamId) {
       return { success: true, message: 'Already in the active bidding ring.' };
     }
 
-    // Try slot 1
     if (!slot1) {
       state.activeBidders.slot1 = {
         teamId,
@@ -133,7 +140,17 @@ const AuctionEngine = {
   },
 
   // 4. Place Bid / Raise Bid
-  placeBid(teamId) {
+  async placeBid(teamId) {
+    if (!StorageManager._syncDisabled && typeof fetch !== 'undefined') {
+      const res = await StorageManager.executeServerAction('bid', { teamId });
+      if (res && res.success) {
+        if (window.soundManager) window.soundManager.playBidChime();
+        return res;
+      }
+      if (res && res.error) return res;
+    }
+
+    // Local Fallback (file:// or standalone offline mode)
     const state = StorageManager.get(STORAGE_KEYS.STATE);
     const teams = StorageManager.get(STORAGE_KEYS.TEAMS);
     const players = StorageManager.get(STORAGE_KEYS.PLAYERS);
@@ -147,13 +164,11 @@ const AuctionEngine = {
       return { success: false, error: '🔒 Bidding is currently locked. The auctioneer is introducing the player.' };
     }
 
-    // Guard: Prevent bidding on already sold player
     const currentPlayer = players.find((p) => p.id === state.currentPlayerId);
     if (!currentPlayer || currentPlayer.status === 'SOLD') {
       return { success: false, error: 'This player is already SOLD. Bidding is closed.' };
     }
 
-    // Must be in active 2-player battle
     const isSlot1 = state.activeBidders?.slot1?.teamId === teamId;
     const isSlot2 = state.activeBidders?.slot2?.teamId === teamId;
 
@@ -161,25 +176,22 @@ const AuctionEngine = {
       return { success: false, error: 'You must click "Join Bid" to enter the 2-player battle first.' };
     }
 
-    // Disallow self-raise
     if (state.highestBidderTeamId === teamId) {
       return { success: false, error: 'You already hold the leading bid!' };
     }
 
     const nextBid = this.getNextValidBid(state.currentBid, state.basePrice);
 
-    // Validate budget & reserve constraint
     const affordability = this.canTeamAffordBid(team, nextBid);
     if (!affordability.canBid) {
       return { success: false, error: affordability.reason };
     }
 
-    // Update auction state
     state.currentBid = nextBid;
     state.nextMinBid = this.getNextValidBid(nextBid, state.basePrice);
     state.highestBidderTeamId = teamId;
     state.highestBidderTeamName = team.name;
-    state.hammerCountdown = null; // Reset any countdown
+    state.hammerCountdown = null;
     state.lastActionTimestamp = Date.now();
     state.version = (state.version || 0) + 1;
 
@@ -190,7 +202,14 @@ const AuctionEngine = {
   },
 
   // 5. Withdraw from Battle Ring
-  withdrawFromBattle(teamId) {
+  async withdrawFromBattle(teamId) {
+    if (!StorageManager._syncDisabled && typeof fetch !== 'undefined') {
+      const res = await StorageManager.executeServerAction('withdraw', { teamId });
+      if (res && res.success) return res;
+      if (res && res.error) return res;
+    }
+
+    // Local Fallback
     const state = StorageManager.get(STORAGE_KEYS.STATE);
     if (!state || !state.activeBidders) return { success: false, error: 'No active battle.' };
 
@@ -210,7 +229,17 @@ const AuctionEngine = {
   },
 
   // 6. Finalize Sale (HAMMER SOLD)
-  confirmSale() {
+  async confirmSale() {
+    if (!StorageManager._syncDisabled && typeof fetch !== 'undefined') {
+      const res = await StorageManager.executeServerAction('confirm_sale');
+      if (res && res.success) {
+        if (window.soundManager) window.soundManager.playSoldFanfare();
+        return res;
+      }
+      if (res && res.error) return res;
+    }
+
+    // Local Fallback
     const state = StorageManager.get(STORAGE_KEYS.STATE);
     const teams = StorageManager.get(STORAGE_KEYS.TEAMS);
     const players = StorageManager.get(STORAGE_KEYS.PLAYERS);
@@ -219,7 +248,6 @@ const AuctionEngine = {
       return { success: false, error: 'No player currently on the block.' };
     }
 
-    // HARD GUARD 1: Prevent selling if auction state is already marked SOLD
     if (state.status === 'SOLD') {
       return { success: false, error: 'This player has already been sold! Select next player in Admin queue.' };
     }
@@ -238,12 +266,10 @@ const AuctionEngine = {
     const winningTeam = teams[teamIndex];
     const soldPlayer = players[playerIndex];
 
-    // HARD GUARD 2: Prevent selling if player object status is already SOLD
     if (soldPlayer.status === 'SOLD') {
       return { success: false, error: `Player ${soldPlayer.name} is already SOLD to ${soldPlayer.soldToTeamName || 'another franchise'}!` };
     }
 
-    // HARD GUARD 3: Prevent duplicate roster insertion if player already exists in ANY team roster
     const alreadySoldTo = teams.find((t) => t.roster && t.roster.some((r) => r.playerId === soldPlayer.id));
     if (alreadySoldTo) {
       soldPlayer.status = 'SOLD';
@@ -255,7 +281,6 @@ const AuctionEngine = {
 
     const finalPrice = state.currentBid;
 
-    // Deduct purse and add player to roster
     winningTeam.remainingBudget -= finalPrice;
     winningTeam.acquiredCount += 1;
     if (!winningTeam.ownedSetIds) winningTeam.ownedSetIds = [];
@@ -279,7 +304,6 @@ const AuctionEngine = {
     soldPlayer.soldToTeamId = winningTeam.id;
     soldPlayer.soldToTeamName = winningTeam.name;
 
-    // Update state to lock against any further sales
     state.status = 'SOLD';
     state.biddingLocked = false;
     state.hammerCountdown = null;
@@ -292,7 +316,6 @@ const AuctionEngine = {
 
     if (window.soundManager) window.soundManager.playSoldFanfare();
 
-    // Check Auto-Assignment condition
     const autoAssignResult = this.evaluateAutoAssignment(state.currentSetId);
 
     return {
@@ -305,7 +328,17 @@ const AuctionEngine = {
   },
 
   // 7. Mark Player UNSOLD and push to end of Set queue
-  markPlayerUnsold() {
+  async markPlayerUnsold() {
+    if (!StorageManager._syncDisabled && typeof fetch !== 'undefined') {
+      const res = await StorageManager.executeServerAction('mark_unsold');
+      if (res && res.success) {
+        if (window.soundManager) window.soundManager.playUnsoldTone();
+        return res;
+      }
+      if (res && res.error) return res;
+    }
+
+    // Local Fallback
     const state = StorageManager.get(STORAGE_KEYS.STATE);
     const players = StorageManager.get(STORAGE_KEYS.PLAYERS);
 
@@ -323,7 +356,7 @@ const AuctionEngine = {
     }
 
     player.status = 'UNSOLD';
-    player.roundNumber = 2; // Pushed to next representation round
+    player.roundNumber = 2;
 
     state.status = 'UNSOLD';
     state.biddingLocked = false;
@@ -419,15 +452,18 @@ const AuctionEngine = {
     const sessions = StorageManager.get(STORAGE_KEYS.SESSIONS, {});
 
     // Save active session token for this user in shared session registry
-    sessions[userId] = {
+    const sessionObj = {
       sessionId,
       role,
       teamId,
       loginTime: Date.now(),
       userAgent: navigator.userAgent
     };
+    sessions[userId] = sessionObj;
 
-    StorageManager.set(STORAGE_KEYS.SESSIONS, sessions);
+    localStorage.setItem(STORAGE_KEYS.SESSIONS, JSON.stringify(sessions));
+    // Atomically register on server without wiping other franchise sessions
+    StorageManager.executeServerAction('session_login', { userId, session: sessionObj });
     return sessionId;
   },
 

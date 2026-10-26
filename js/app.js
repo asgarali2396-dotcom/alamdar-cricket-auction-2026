@@ -43,9 +43,6 @@ document.addEventListener('DOMContentLoaded', () => {
   switchView(currentTab);
   checkSingleSessionHealth();
 
-  // Periodic heartbeat single-session monitor (every 2.5 seconds)
-  setInterval(checkSingleSessionHealth, 2500);
-
   // Modal Helpers (Dual-Slider Modal - Default Admin)
   function openLoginModal(mode = 'admin') {
     const modal = document.getElementById('auth-page-modal');
@@ -90,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Cinematic JAFAR Creation Animation Burst (5 Seconds Duration)
+  // Snappy Authentication Burst (Optimized for instant feedback without locking users out)
   let burstFinishTimeout = null;
 
   function triggerCinematicLoginBurst(roleName = 'Tournament Portal', callback = null) {
@@ -103,11 +100,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (roleName.includes('JAFAR')) {
         targetRoleEl.innerText = '⚡ JAFAR Creation • Official Platform Architect';
       } else {
-        targetRoleEl.innerText = `⚡ Authenticating & Entering ${roleName}...`;
+        targetRoleEl.innerText = `⚡ Authenticating ${roleName}...`;
       }
     }
 
-    // Play opening fanfare / chime
     if (window.soundManager && typeof window.soundManager.playBattleJoin === 'function') {
       window.soundManager.playBattleJoin();
     }
@@ -117,19 +113,9 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // Clear any previous active burst timeout
     if (burstFinishTimeout) {
       clearTimeout(burstFinishTimeout);
       burstFinishTimeout = null;
-    }
-
-    if (progressFill) {
-      progressFill.style.transition = 'none';
-      progressFill.style.width = '0%';
-      setTimeout(() => {
-        progressFill.style.transition = 'width 5s linear';
-        progressFill.style.width = '100%';
-      }, 50);
     }
 
     burstLayer.classList.add('active');
@@ -151,10 +137,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
       setTimeout(() => {
         burstLayer.classList.remove('active');
-      }, 350);
+      }, 150);
     }
 
-    // Connect skip button
     if (skipBtn) {
       skipBtn.onclick = (e) => {
         e.stopPropagation();
@@ -162,18 +147,12 @@ document.addEventListener('DOMContentLoaded', () => {
       };
     }
 
-    // Click anywhere on overlay background to close
     burstLayer.onclick = (e) => {
-      if (e.target.closest('#burst-skip-btn')) return;
-      if (e.target === burstLayer || e.target.classList.contains('burst-rays-bg')) {
-        finishBurst();
-      }
+      finishBurst();
     };
 
-    // Conclude after exactly 5 seconds (5,000ms)
-    burstFinishTimeout = setTimeout(() => {
-      finishBurst();
-    }, 5000);
+    // Complete in a snappy 400ms instead of 5,000ms delay!
+    burstFinishTimeout = setTimeout(finishBurst, 400);
   }
 
 
@@ -228,27 +207,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Real-time Event Subscriptions
+  // Real-time Event Subscriptions (Local user changes & cross-tab sync)
   function setupRealtimeListeners() {
     window.auctionBus.subscribe((event) => {
-      currentAuctionState = StorageManager.get(STORAGE_KEYS.STATE) || currentAuctionState;
-      currentTeams = StorageManager.get(STORAGE_KEYS.TEAMS) || currentTeams;
-      currentPlayers = StorageManager.get(STORAGE_KEYS.PLAYERS) || currentPlayers;
-
-      if (event && event.type === 'DATA_CHANGED' && event.payload?.key === STORAGE_KEYS.SESSIONS) {
-        checkSingleSessionHealth();
+      if (event && event.type === 'DATA_CHANGED') {
+        if (event.payload?.key === STORAGE_KEYS.CURRENT_USER) {
+          activeUser = StorageManager.getActiveUser();
+          renderApp();
+        } else if (event.payload?.key === STORAGE_KEYS.SESSIONS) {
+          checkSingleSessionHealth();
+        }
       }
-
-      if (currentAuctionState && currentAuctionState.currentBid > previousBid) {
-        if (window.soundManager) window.soundManager.playBidChime();
-        triggerBidFlash();
-      }
-      if (currentAuctionState) {
-        previousBid = currentAuctionState.currentBid || 0;
-        previousBidder = currentAuctionState.highestBidderTeamId || null;
-      }
-
-      renderApp();
     });
   }
 
@@ -257,18 +226,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!data) return;
     if (data.state) {
       currentAuctionState = data.state;
-    } else {
-      currentAuctionState = StorageManager.get(STORAGE_KEYS.STATE) || currentAuctionState;
     }
     if (data.teams) {
       currentTeams = data.teams;
-    } else {
-      currentTeams = StorageManager.get(STORAGE_KEYS.TEAMS) || currentTeams;
     }
     if (data.players) {
       currentPlayers = data.players;
-    } else {
-      currentPlayers = StorageManager.get(STORAGE_KEYS.PLAYERS) || currentPlayers;
     }
 
     if (currentAuctionState && currentAuctionState.currentBid > previousBid) {
@@ -280,7 +243,10 @@ document.addEventListener('DOMContentLoaded', () => {
       previousBidder = currentAuctionState.highestBidderTeamId || null;
     }
 
-    checkSingleSessionHealth();
+    if (data.sessions) {
+      checkSingleSessionHealth();
+    }
+
     renderApp();
   };
 
@@ -679,7 +645,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!isInBattle) {
           // Join Battle Ring
-          const joinRes = AuctionEngine.joinBattle(teamId);
+          const joinRes = await AuctionEngine.joinBattle(teamId);
           if (joinRes.success) {
             showToast('Entered the Bidding Ring!', 'success');
           } else {
@@ -687,9 +653,9 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         } else {
           // Raise Bid
-          const res = AuctionEngine.placeBid(teamId);
+          const res = await AuctionEngine.placeBid(teamId);
           if (res.success) {
-            showToast(`Bid raised to ₹${res.newBid.toLocaleString()}!`, 'gold');
+            showToast(`Bid raised to ₹${(res.newBid || 0).toLocaleString()}!`, 'gold');
           } else {
             showToast(res.error, 'error');
           }
@@ -700,9 +666,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Owner Withdraw Button
     const withdrawBtn = document.getElementById('owner-withdraw-btn');
     if (withdrawBtn) {
-      withdrawBtn.addEventListener('click', () => {
+      withdrawBtn.addEventListener('click', async () => {
         if (!activeUser || !activeUser.teamId) return;
-        const res = AuctionEngine.withdrawFromBattle(activeUser.teamId);
+        const res = await AuctionEngine.withdrawFromBattle(activeUser.teamId);
         if (res.success) {
           showToast('Withdrew from battle ring.', 'info');
         } else {
@@ -714,7 +680,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Master Admin Official Gavel Controls (Admin ONLY)
     const adminSoldBtn = document.getElementById('admin-sold-btn');
     if (adminSoldBtn) {
-      adminSoldBtn.addEventListener('click', () => {
+      adminSoldBtn.addEventListener('click', async () => {
         if (!activeUser || activeUser.role !== 'admin') {
           showToast('Security Violation: Only Master Admin / Auctioneer can hammer the gavel.', 'error');
           return;
@@ -731,7 +697,7 @@ document.addEventListener('DOMContentLoaded', () => {
           window._activeCountdownTimer = null;
         }
 
-        const res = AuctionEngine.confirmSale();
+        const res = await AuctionEngine.confirmSale();
         if (res.success) {
           showToast(`🔨 SOLD! ${res.soldPlayer.name} to ${res.winningTeam.name} for ₹${res.finalPrice.toLocaleString()}`, 'success');
           if (res.autoAssigned && res.autoAssigned.triggered) {
@@ -747,7 +713,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const adminUnsoldBtn = document.getElementById('admin-unsold-btn');
     if (adminUnsoldBtn) {
-      adminUnsoldBtn.addEventListener('click', () => {
+      adminUnsoldBtn.addEventListener('click', async () => {
         if (!activeUser || activeUser.role !== 'admin') {
           showToast('Security Violation: Only Master Admin can mark players unsold.', 'error');
           return;
@@ -759,7 +725,7 @@ document.addEventListener('DOMContentLoaded', () => {
           window._activeCountdownTimer = null;
         }
 
-        const res = AuctionEngine.markPlayerUnsold();
+        const res = await AuctionEngine.markPlayerUnsold();
         if (res.success) {
           showToast('Player marked UNSOLD and moved to end of Set queue.', 'info');
         } else {
@@ -801,7 +767,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // 3-2-1 Countdown Trigger
-  function triggerCountdown() {
+  async function triggerCountdown() {
     const state = StorageManager.get(STORAGE_KEYS.STATE);
     if (!state.currentPlayerId || state.status !== 'BIDDING') {
       showToast('No active player currently under bidding.', 'error');
@@ -825,16 +791,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     let count = 3;
-    state.status = 'COUNTDOWN';
-    state.hammerCountdown = count;
-    StorageManager.set(STORAGE_KEYS.STATE, state);
-
+    await StorageManager.executeServerAction('countdown_tick', { count });
     if (window.soundManager) window.soundManager.playGavelStrike();
 
-    window._activeCountdownTimer = setInterval(() => {
+    window._activeCountdownTimer = setInterval(async () => {
       count--;
       const curState = StorageManager.get(STORAGE_KEYS.STATE);
-      // If sale concluded or player changed or countdown aborted, stop interval
+      // If sale concluded or player changed or countdown aborted (e.g. new bid arrived), stop interval
       if (curState.status !== 'COUNTDOWN' || !curState.currentPlayerId) {
         clearInterval(window._activeCountdownTimer);
         window._activeCountdownTimer = null;
@@ -842,15 +805,12 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       if (count > 0) {
-        curState.hammerCountdown = count;
-        StorageManager.set(STORAGE_KEYS.STATE, curState);
+        await StorageManager.executeServerAction('countdown_tick', { count });
         if (window.soundManager) window.soundManager.playGavelStrike();
       } else {
         clearInterval(window._activeCountdownTimer);
         window._activeCountdownTimer = null;
-        curState.hammerCountdown = null;
-        StorageManager.set(STORAGE_KEYS.STATE, curState);
-        const res = AuctionEngine.confirmSale();
+        const res = await AuctionEngine.confirmSale();
         if (res.success) {
           showToast(`🔨 Hammer fell! ${res.soldPlayer.name} SOLD to ${res.winningTeam.name}!`, 'success');
         } else {
@@ -907,8 +867,17 @@ document.addEventListener('DOMContentLoaded', () => {
     renderApp();
   }
 
-  // Master Render Coordinator
+  // Master Render Coordinator (Debounced with requestAnimationFrame for smooth 60fps UI)
+  let _renderRaf = null;
   function renderApp() {
+    if (_renderRaf) return;
+    _renderRaf = requestAnimationFrame(() => {
+      _renderRaf = null;
+      _executeRenderApp();
+    });
+  }
+
+  function _executeRenderApp() {
     renderAuthBar();
 
     // Default to the logged in team if owner; otherwise default to Husaini Hawks for viewer
@@ -2007,7 +1976,7 @@ document.addEventListener('DOMContentLoaded', () => {
     showToast(`🏆 Downloaded ${team.name} Official Squad Poster!`, 'success');
   };
 
-  window.pushPlayerLiveAdmin = function (playerId) {
+  window.pushPlayerLiveAdmin = async function (playerId) {
     const players = StorageManager.get(STORAGE_KEYS.PLAYERS) || currentPlayers;
     const p = players.find((ply) => ply.id === playerId);
     if (!p) return;
@@ -2031,6 +2000,20 @@ document.addEventListener('DOMContentLoaded', () => {
       window._activeCountdownTimer = null;
     }
 
+    if (!StorageManager._syncDisabled && typeof fetch !== 'undefined') {
+      const res = await StorageManager.executeServerAction('push_player', { playerId: p.id });
+      if (res && res.success) {
+        if (window.soundManager) window.soundManager.playPlayerStageIntro();
+        showToast(`Player ${p.name} is now LIVE on stage! Bidding is LOCKED for introduction.`, 'gold');
+        return;
+      }
+      if (res && res.error) {
+        showToast(res.error, 'error');
+        return;
+      }
+    }
+
+    // Local fallback
     const state = StorageManager.get(STORAGE_KEYS.STATE) || {};
     state.status = 'BIDDING';
     state.currentSetId = p.setId;
@@ -2044,7 +2027,7 @@ document.addEventListener('DOMContentLoaded', () => {
     state.highestBidderTeamName = null;
     state.activeBidders = { slot1: null, slot2: null };
     state.hammerCountdown = null;
-    state.biddingLocked = true; // Lock bidding initially so auctioneer can introduce player
+    state.biddingLocked = true;
     state.lastActionTimestamp = Date.now();
     state.version = (state.version || 0) + 1;
 
@@ -2056,12 +2039,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     showToast(`Player ${p.name} is now LIVE on stage! Bidding is LOCKED for introduction.`, 'gold');
-
     renderApp();
   };
 
   // Master Admin Toggle / Unlock Bidding Controller
-  window.toggleBiddingLockAdmin = function () {
+  window.toggleBiddingLockAdmin = async function () {
     if (!activeUser || activeUser.role !== 'admin') {
       showToast('Security Violation: Only Master Admin can lock or unlock bidding.', 'error');
       return;
@@ -2073,6 +2055,25 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
+    if (!StorageManager._syncDisabled && typeof fetch !== 'undefined') {
+      const res = await StorageManager.executeServerAction('toggle_lock');
+      if (res && res.success) {
+        const isLocked = res.biddingLocked;
+        if (isLocked) {
+          showToast('🔒 Bidding LOCKED! Franchise owners cannot place bids during introduction.', 'info');
+        } else {
+          showToast('⚡ Bidding is now UNLOCKED! Franchise owners can enter the ring and place bids!', 'success');
+          if (window.soundManager) window.soundManager.playBiddingUnlocked();
+        }
+        return;
+      }
+      if (res && res.error) {
+        showToast(res.error, 'error');
+        return;
+      }
+    }
+
+    // Local fallback
     state.biddingLocked = !state.biddingLocked;
     state.lastActionTimestamp = Date.now();
     state.version = (state.version || 0) + 1;
