@@ -19,6 +19,9 @@ let previousBidder = null;
 
 // Initialize App
 document.addEventListener('DOMContentLoaded', () => {
+  let _renderRaf = null;
+  let burstFinishTimeout = null;
+
   // Register Service Worker for PWA
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js').catch((err) => {
@@ -87,10 +90,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Snappy Authentication Burst (Optimized for instant feedback without locking users out)
-  let burstFinishTimeout = null;
-
-  function triggerCinematicLoginBurst(roleName = 'Tournament Portal', callback = null) {
+  // Cinematic JAFAR Creation Animation Burst (7 Seconds Duration)
+  function triggerCinematicLoginBurst(roleName = 'Tournament Portal', callback = null, durationMs = 7000) {
     const burstLayer = document.getElementById('auth-burst-effect');
     const targetRoleEl = document.getElementById('burst-target-role');
     const progressFill = document.getElementById('burst-progress-fill');
@@ -100,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (roleName.includes('JAFAR')) {
         targetRoleEl.innerText = '⚡ JAFAR Creation • Official Platform Architect';
       } else {
-        targetRoleEl.innerText = `⚡ Authenticating ${roleName}...`;
+        targetRoleEl.innerText = `⚡ Authenticating & Entering ${roleName}...`;
       }
     }
 
@@ -116,6 +117,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if (burstFinishTimeout) {
       clearTimeout(burstFinishTimeout);
       burstFinishTimeout = null;
+    }
+
+    // Smooth 7-second progress bar animation
+    if (progressFill) {
+      progressFill.style.transition = 'none';
+      progressFill.style.width = '0%';
+      setTimeout(() => {
+        progressFill.style.transition = `width ${durationMs / 1000}s linear`;
+        progressFill.style.width = '100%';
+      }, 50);
     }
 
     burstLayer.classList.add('active');
@@ -137,7 +148,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
       setTimeout(() => {
         burstLayer.classList.remove('active');
-      }, 150);
+        if (progressFill) {
+          progressFill.style.transition = 'none';
+          progressFill.style.width = '0%';
+        }
+      }, 350);
     }
 
     if (skipBtn) {
@@ -148,11 +163,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     burstLayer.onclick = (e) => {
-      finishBurst();
+      if (e.target.closest('#burst-skip-btn')) return;
+      if (e.target === burstLayer || e.target.classList.contains('burst-rays-bg')) {
+        finishBurst();
+      }
     };
 
-    // Complete in a snappy 400ms instead of 5,000ms delay!
-    burstFinishTimeout = setTimeout(finishBurst, 400);
+    // Conclude after exactly 7 seconds (7,000ms) as configured
+    burstFinishTimeout = setTimeout(finishBurst, durationMs);
   }
 
 
@@ -625,7 +643,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Owner Bidding Button (Giant Button in Owner Dashboard)
     const raiseBidBtn = document.getElementById('owner-raise-bid-btn');
     if (raiseBidBtn) {
-      raiseBidBtn.addEventListener('click', () => {
+      raiseBidBtn.addEventListener('click', async () => {
         if (!activeUser || !activeUser.teamId) {
           showToast('Please sign in as a franchise owner first.', 'error');
           openLoginModal('owner');
@@ -868,7 +886,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Master Render Coordinator (Debounced with requestAnimationFrame for smooth 60fps UI)
-  let _renderRaf = null;
   function renderApp() {
     if (_renderRaf) return;
     _renderRaf = requestAnimationFrame(() => {
