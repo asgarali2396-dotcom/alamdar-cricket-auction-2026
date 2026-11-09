@@ -382,46 +382,6 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    // Collapsible Password Cheat-sheet for Senior Owners
-    const cheatsheetBtn = document.getElementById('toggle-cheatsheet-btn');
-    const cheatsheetBox = document.getElementById('team-credentials-cheatsheet');
-    const cheatsheetLabel = document.getElementById('cheatsheet-btn-label');
-    const quickFillGrid = document.getElementById('quick-fill-teams-grid');
-
-    if (quickFillGrid && window.ALAMDAR_DATA?.INITIAL_TEAMS) {
-      quickFillGrid.innerHTML = window.ALAMDAR_DATA.INITIAL_TEAMS.map((t) => `
-        <button type="button" class="quick-fill-team-chip p-1.5 rounded-lg bg-slate-900 border border-slate-700 hover:border-amber-400 text-left flex justify-between items-center transition-all cursor-pointer" data-team-id="${t.id}" data-user="${t.username}" data-pass="${t.password}">
-          <span class="truncate">${t.icon || '🏏'} <strong class="text-white">${t.name.split(' ')[0]}</strong></span>
-          <span class="font-mono text-amber-300 text-[10px] shrink-0 ml-1 font-bold">${t.username}</span>
-        </button>
-      `).join('');
-
-      quickFillGrid.querySelectorAll('.quick-fill-team-chip').forEach((chip) => {
-        chip.addEventListener('click', () => {
-          const tId = chip.getAttribute('data-team-id');
-          const tUser = chip.getAttribute('data-user');
-          const tPass = chip.getAttribute('data-pass');
-
-          if (teamSelect) teamSelect.value = tId;
-          if (teamUserInput) teamUserInput.value = tUser;
-          const passInp = document.getElementById('login-team-password');
-          if (passInp) passInp.value = tPass;
-
-          showToast(`Credentials filled for ${tUser}! Click Sign In.`, 'gold');
-        });
-      });
-    }
-
-    if (cheatsheetBtn && cheatsheetBox) {
-      cheatsheetBtn.addEventListener('click', () => {
-        const isHidden = cheatsheetBox.style.display === 'none' || !cheatsheetBox.style.display;
-        cheatsheetBox.style.display = isHidden ? 'block' : 'none';
-        if (cheatsheetLabel) {
-          cheatsheetLabel.innerText = isHidden ? 'Hide Team Passwords List' : 'Show All 12 Team Passwords List';
-        }
-      });
-    }
-
     // Quick Fill Admin Button
     const quickFillAdminBtn = document.getElementById('quick-fill-admin-btn');
     if (quickFillAdminBtn) {

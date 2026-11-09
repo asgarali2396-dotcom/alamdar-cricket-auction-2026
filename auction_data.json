@@ -1,5 +1,5 @@
 {
-  "version": 427,
+  "version": 428,
   "state": {
     "status": "IDLE",
     "currentSetId": "set_aqeeq",
@@ -18,19 +18,19 @@
     "hammerCountdown": null,
     "roundNumber": 1,
     "lastActionTimestamp": 1794218686704,
-    "version": 427,
+    "version": 428,
     "biddingLocked": false
   },
   "teams": [
     {
       "id": "team_01",
-      "name": "Burhani Blasters",
-      "icon": "\u26a1",
-      "username": "burhani",
-      "password": "burhani@2026",
-      "ownerName": "Murtaza Bhai",
+      "name": "Fatemi Falcons",
+      "icon": "\ud83e\udd85",
+      "username": "fatemi",
+      "password": "fatemi@2026",
+      "ownerName": "Burhanuddin Hussain",
       "phone": "9820011111",
-      "playingOwner": "Murtaza (C)",
+      "playingOwner": "Burhanuddin (C)",
       "color": "#3b82f6",
       "initialBudget": 100000,
       "remainingBudget": 99000,
@@ -42,13 +42,12 @@
       "roster": [
         {
           "playerId": "owner_team_01",
-          "name": "Murtaza (C)",
+          "name": "Burhanuddin (C)",
           "role": "Playing Owner (Captain)",
           "setId": "set_aqeeq",
           "setName": "Aqeeq",
           "price": 1000,
-          "isOwner": true,
-          "timestamp": 1793943185732
+          "isOwner": true
         }
       ],
       "captainSetId": "set_aqeeq",
@@ -56,14 +55,14 @@
     },
     {
       "id": "team_02",
-      "name": "Saifee Strikers",
-      "icon": "\ud83c\udfcf",
-      "username": "saifee",
-      "password": "saifee@2026",
-      "ownerName": "Mustafa Bhai",
+      "name": "Kanchwala Knight Riders",
+      "icon": "\ud83d\udee1\ufe0f",
+      "username": "kanchwala",
+      "password": "kanchwala@2026",
+      "ownerName": "Taha Sajid Husain kanchwala",
       "phone": "9820022222",
-      "playingOwner": "Mustafa (C)",
-      "color": "#10b981",
+      "playingOwner": "Taha (C)",
+      "color": "#8b5cf6",
       "initialBudget": 100000,
       "remainingBudget": 99000,
       "maxAuctionSlots": 8,
@@ -74,13 +73,12 @@
       "roster": [
         {
           "playerId": "owner_team_02",
-          "name": "Mustafa (C)",
+          "name": "Taha (C)",
           "role": "Playing Owner (Captain)",
           "setId": "set_firoza",
           "setName": "Firoza",
           "price": 1000,
-          "isOwner": true,
-          "timestamp": 1793943185732
+          "isOwner": true
         }
       ],
       "captainSetId": "set_firoza",
@@ -88,14 +86,14 @@
     },
     {
       "id": "team_03",
-      "name": "Husaini Hawks",
-      "icon": "\ud83e\udd85",
-      "username": "husaini",
-      "password": "husaini@2026",
-      "ownerName": "Shabbir Bhai",
+      "name": "Telwala Challengers",
+      "icon": "\ud83e\udd81",
+      "username": "telwala",
+      "password": "telwala@2026",
+      "ownerName": "Abdul Taiyeb Telwala",
       "phone": "9820033333",
-      "playingOwner": "Shabbir (C)",
-      "color": "#f59e0b",
+      "playingOwner": "Abdul Taiyeb (C)",
+      "color": "#ef4444",
       "initialBudget": 100000,
       "remainingBudget": 99000,
       "maxAuctionSlots": 8,
@@ -106,13 +104,12 @@
       "roster": [
         {
           "playerId": "owner_team_03",
-          "name": "Shabbir (C)",
+          "name": "Abdul Taiyeb (C)",
           "role": "Playing Owner (Captain)",
           "setId": "set_yaqoot",
           "setName": "Yaqoot",
           "price": 1000,
-          "isOwner": true,
-          "timestamp": 1793943185732
+          "isOwner": true
         }
       ],
       "captainSetId": "set_yaqoot",
@@ -120,14 +117,14 @@
     },
     {
       "id": "team_04",
-      "name": "Najmi Knights",
-      "icon": "\ud83d\udee1\ufe0f",
-      "username": "najmi",
-      "password": "najmi@2026",
-      "ownerName": "Ali Asgar Bhai",
+      "name": "Hussaini Strikers",
+      "icon": "\ud83c\udfcf",
+      "username": "hussaini",
+      "password": "hussaini@2026",
+      "ownerName": "Burhanuddin Husain Rampurawala",
       "phone": "9820044444",
-      "playingOwner": "Ali Asgar (C)",
-      "color": "#ef4444",
+      "playingOwner": "Burhanuddin (C)",
+      "color": "#10b981",
       "initialBudget": 100000,
       "remainingBudget": 99000,
       "maxAuctionSlots": 8,
@@ -138,13 +135,12 @@
       "roster": [
         {
           "playerId": "owner_team_04",
-          "name": "Ali Asgar (C)",
+          "name": "Burhanuddin (C)",
           "role": "Playing Owner (Captain)",
           "setId": "set_zumurrud",
           "setName": "Zumurrud",
           "price": 1000,
-          "isOwner": true,
-          "timestamp": 1793943185732
+          "isOwner": true
         }
       ],
       "captainSetId": "set_zumurrud",
@@ -152,14 +148,14 @@
     },
     {
       "id": "team_05",
-      "name": "Tayyebi Titans",
-      "icon": "\u2694\ufe0f",
-      "username": "tayyebi",
-      "password": "tayyebi@2026",
-      "ownerName": "Huzefa Bhai",
+      "name": "Bagichawala Blasters",
+      "icon": "\u26a1",
+      "username": "bagichawala",
+      "password": "bagichawala@2026",
+      "ownerName": "Shabbir bagichawala",
       "phone": "9820055555",
-      "playingOwner": "Huzefa (C)",
-      "color": "#8b5cf6",
+      "playingOwner": "Shabbir (C)",
+      "color": "#f59e0b",
       "initialBudget": 100000,
       "remainingBudget": 99000,
       "maxAuctionSlots": 8,
@@ -170,13 +166,12 @@
       "roster": [
         {
           "playerId": "owner_team_05",
-          "name": "Huzefa (C)",
+          "name": "Shabbir (C)",
           "role": "Playing Owner (Captain)",
           "setId": "set_marjan",
           "setName": "Marjan",
           "price": 1000,
-          "isOwner": true,
-          "timestamp": 1793943185732
+          "isOwner": true
         }
       ],
       "captainSetId": "set_marjan",
@@ -184,14 +179,14 @@
     },
     {
       "id": "team_06",
-      "name": "Qutbi Challengers",
-      "icon": "\ud83e\udd81",
-      "username": "qutbi",
-      "password": "qutbi@2026",
-      "ownerName": "Taha Bhai",
+      "name": "Galaxy Titans",
+      "icon": "\u2694\ufe0f",
+      "username": "galaxy",
+      "password": "galaxy@2026",
+      "ownerName": "Mustafa akolawala/muffadal hussain",
       "phone": "9820066666",
-      "playingOwner": "Taha (C)",
-      "color": "#ec4899",
+      "playingOwner": "Mustafa (C)",
+      "color": "#6366f1",
       "initialBudget": 100000,
       "remainingBudget": 99000,
       "maxAuctionSlots": 8,
@@ -202,13 +197,12 @@
       "roster": [
         {
           "playerId": "owner_team_06",
-          "name": "Taha (C)",
+          "name": "Mustafa (C)",
           "role": "Playing Owner (Captain)",
           "setId": "set_pukhraj",
           "setName": "Pukhraj",
           "price": 1000,
-          "isOwner": true,
-          "timestamp": 1793943185732
+          "isOwner": true
         }
       ],
       "captainSetId": "set_pukhraj",
@@ -216,14 +210,14 @@
     },
     {
       "id": "team_07",
-      "name": "Badri Royals",
-      "icon": "\ud83d\udc51",
-      "username": "badri",
-      "password": "badri@2026",
-      "ownerName": "Abbas Bhai",
+      "name": "Ezzy Stars",
+      "icon": "\u2b50",
+      "username": "ezzy",
+      "password": "ezzy@2026",
+      "ownerName": "Murtaza ali jamnagarwala",
       "phone": "9820077777",
-      "playingOwner": "Abbas (C)",
-      "color": "#14b8a6",
+      "playingOwner": "Murtaza (C)",
+      "color": "#ec4899",
       "initialBudget": 100000,
       "remainingBudget": 99000,
       "maxAuctionSlots": 8,
@@ -234,13 +228,12 @@
       "roster": [
         {
           "playerId": "owner_team_07",
-          "name": "Abbas (C)",
+          "name": "Murtaza (C)",
           "role": "Playing Owner (Captain)",
           "setId": "set_neelam",
           "setName": "Neelam",
           "price": 1000,
-          "isOwner": true,
-          "timestamp": 1793943185732
+          "isOwner": true
         }
       ],
       "captainSetId": "set_neelam",
@@ -248,14 +241,14 @@
     },
     {
       "id": "team_08",
-      "name": "Fakhri Fighters",
-      "icon": "\ud83e\udd4a",
-      "username": "fakhri",
-      "password": "fakhri@2026",
-      "ownerName": "Zainuddin Bhai",
+      "name": "Supreme Squad",
+      "icon": "\ud83d\udc51",
+      "username": "supreme",
+      "password": "supreme@2026",
+      "ownerName": "Shabbir murtazapurwala",
       "phone": "9820088888",
-      "playingOwner": "Zainuddin (C)",
-      "color": "#6366f1",
+      "playingOwner": "Shabbir (C)",
+      "color": "#14b8a6",
       "initialBudget": 100000,
       "remainingBudget": 99000,
       "maxAuctionSlots": 8,
@@ -266,13 +259,12 @@
       "roster": [
         {
           "playerId": "owner_team_08",
-          "name": "Zainuddin (C)",
+          "name": "Shabbir (C)",
           "role": "Playing Owner (Captain)",
           "setId": "set_durenajaf",
           "setName": "Dur-e-Najaf",
           "price": 1000,
-          "isOwner": true,
-          "timestamp": 1793943185732
+          "isOwner": true
         }
       ],
       "captainSetId": "set_durenajaf",
@@ -280,13 +272,13 @@
     },
     {
       "id": "team_09",
-      "name": "Hakimi Super Kings",
-      "icon": "\ud83c\udfc6",
-      "username": "hakimi",
-      "password": "hakimi@2026",
-      "ownerName": "Mohammed Bhai",
+      "name": "Raj Strickers",
+      "icon": "\ud83e\udd4a",
+      "username": "raj",
+      "password": "raj@2026",
+      "ownerName": "Ali chandurwala",
       "phone": "9820099999",
-      "playingOwner": "Mohammed (C)",
+      "playingOwner": "Ali (C)",
       "color": "#eab308",
       "initialBudget": 100000,
       "remainingBudget": 99000,
@@ -298,13 +290,12 @@
       "roster": [
         {
           "playerId": "owner_team_09",
-          "name": "Mohammed (C)",
+          "name": "Ali (C)",
           "role": "Playing Owner (Captain)",
           "setId": "set_aqeeq",
           "setName": "Aqeeq",
           "price": 1000,
-          "isOwner": true,
-          "timestamp": 1793943185732
+          "isOwner": true
         }
       ],
       "captainSetId": "set_aqeeq",
@@ -312,13 +303,13 @@
     },
     {
       "id": "team_10",
-      "name": "Imadi Warriors",
-      "icon": "\ud83c\udff9",
-      "username": "imadi",
-      "password": "imadi@2026",
-      "ownerName": "Adnan Bhai",
+      "name": "Burhanpurwala Dominators",
+      "icon": "\ud83c\udfc6",
+      "username": "burhanpur",
+      "password": "burhanpur@2026",
+      "ownerName": "Zoeb Chappalwala",
       "phone": "9820010101",
-      "playingOwner": "Adnan (C)",
+      "playingOwner": "Zoeb (C)",
       "color": "#06b6d4",
       "initialBudget": 100000,
       "remainingBudget": 99000,
@@ -330,13 +321,12 @@
       "roster": [
         {
           "playerId": "owner_team_10",
-          "name": "Adnan (C)",
+          "name": "Zoeb (C)",
           "role": "Playing Owner (Captain)",
           "setId": "set_firoza",
           "setName": "Firoza",
           "price": 1000,
-          "isOwner": true,
-          "timestamp": 1793943185732
+          "isOwner": true
         }
       ],
       "captainSetId": "set_firoza",
@@ -344,13 +334,13 @@
     },
     {
       "id": "team_11",
-      "name": "Mohammedi Mavericks",
-      "icon": "\ud83d\udc0e",
-      "username": "mohammedi",
-      "password": "mohammedi@2026",
-      "ownerName": "Ibrahim Bhai",
+      "name": "Choudhary Thunderbolts",
+      "icon": "\ud83c\udff9",
+      "username": "choudhary",
+      "password": "choudhary@2026",
+      "ownerName": "Altaf chaudhary",
       "phone": "9820020202",
-      "playingOwner": "Ibrahim (C)",
+      "playingOwner": "Altaf (C)",
       "color": "#f97316",
       "initialBudget": 100000,
       "remainingBudget": 99000,
@@ -362,13 +352,12 @@
       "roster": [
         {
           "playerId": "owner_team_11",
-          "name": "Ibrahim (C)",
+          "name": "Altaf (C)",
           "role": "Playing Owner (Captain)",
           "setId": "set_yaqoot",
           "setName": "Yaqoot",
           "price": 1000,
-          "isOwner": true,
-          "timestamp": 1793943185732
+          "isOwner": true
         }
       ],
       "captainSetId": "set_yaqoot",
@@ -376,13 +365,13 @@
     },
     {
       "id": "team_12",
-      "name": "Zahra Superstars",
-      "icon": "\u2b50",
-      "username": "zahra",
-      "password": "zahra@2026",
-      "ownerName": "Burhanuddin Bhai",
+      "name": "Lucky Legends",
+      "icon": "\ud83d\udc0e",
+      "username": "lucky",
+      "password": "lucky@2026",
+      "ownerName": "Mustufa Bhai Chandurwala",
       "phone": "9820030303",
-      "playingOwner": "Burhanuddin (C)",
+      "playingOwner": "Mustufa (C)",
       "color": "#84cc16",
       "initialBudget": 100000,
       "remainingBudget": 99000,
@@ -394,13 +383,12 @@
       "roster": [
         {
           "playerId": "owner_team_12",
-          "name": "Burhanuddin (C)",
+          "name": "Mustufa (C)",
           "role": "Playing Owner (Captain)",
           "setId": "set_zumurrud",
           "setName": "Zumurrud",
           "price": 1000,
-          "isOwner": true,
-          "timestamp": 1793943185732
+          "isOwner": true
         }
       ],
       "captainSetId": "set_zumurrud",
