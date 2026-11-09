@@ -1599,7 +1599,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!gridEl) return;
 
-    // Card 1: Playing Owner (Captain) - Slot #1 (Acquired for ₹1,000 Base Price or Reserved pending registration)
+    // Card 1: Playing Owner (Captain) - Slot #1 (Acquired for ₹0 cost or Reserved pending registration)
     const captainItem = (team.roster || []).find((r) => r.isOwner) || {};
     const hasAssignedCaptain = Boolean(captainItem.name && !captainItem.name.includes('Pending') && (captainItem.setId || team.captainSetId));
     const captainSet = window.ALAMDAR_DATA.SET_CONFIG.find((s) => s.id === (captainItem.setId || team.captainSetId)) || { name: team.captainSetName || 'Stone Set', color: '#C8A96A' };
@@ -1613,7 +1613,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#C8A96A] text-[#0F3D34] shadow">
             👑 CAPTAIN & OWNER (SLOT #1)
           </span>
-          <span class="text-xs text-[#C8A96A] font-black font-mono-num">₹1,000 (Base Price)</span>
+          <span class="text-xs text-[#C8A96A] font-black font-mono-num">₹0 Cost (Captain)</span>
         </div>
         <div>
           <h4 class="text-lg font-black text-[#F7F6F1] uppercase tracking-tight">${captainDisplayName}</h4>
@@ -1633,7 +1633,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#C8A96A]/20 text-[#C8A96A] border border-[#C8A96A]/40 shadow">
             👑 PLAYING CAPTAIN (SLOT #1)
           </span>
-          <span class="text-xs text-amber-300 font-bold font-mono-num">Pending Registration</span>
+          <span class="text-xs text-amber-300 font-bold font-mono-num">₹0 Cost (Pending Reg.)</span>
         </div>
         <div>
           <h4 class="text-base font-black text-[#F7F6F1] uppercase tracking-tight">${captainDisplayName}</h4>
@@ -1862,7 +1862,7 @@ document.addEventListener('DOMContentLoaded', () => {
         role: 'Playing Captain',
         spec: hasAssignedPoster ? 'Team Captain & Leader' : 'Pending Player Registration',
         setName: captainSetNamePoster,
-        price: hasAssignedPoster ? '₹1,000 (Base)' : 'Reserved',
+        price: hasAssignedPoster ? '₹0 (Captain)' : '₹0 (Pending)',
         isCaptain: true,
         filled: hasAssignedPoster
       }

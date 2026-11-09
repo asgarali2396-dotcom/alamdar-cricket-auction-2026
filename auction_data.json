@@ -1,5 +1,5 @@
 {
-  "version": 429,
+  "version": 430,
   "state": {
     "status": "IDLE",
     "currentSetId": "set_aqeeq",
@@ -18,7 +18,7 @@
     "hammerCountdown": null,
     "roundNumber": 1,
     "lastActionTimestamp": 1794218686704,
-    "version": 429,
+    "version": 430,
     "biddingLocked": false
   },
   "teams": [

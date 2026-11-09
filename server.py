@@ -397,13 +397,15 @@ class AuctionSyncHandler(SimpleHTTPRequestHandler):
                                     result = {"success": False, "error": "You already hold the leading bid!"}
                                 else:
                                     next_bid = get_next_valid_bid(state.get('currentBid', 0), state.get('basePrice', 1000))
-                                    remaining_slots = team.get('maxAuctionSlots', 8) - (team.get('acquiredCount', 0) + 1)
-                                    min_reserve = max(0, remaining_slots * 1000)
+                                    roster = team.get('roster', [])
+                                    auction_players_count = len([r for r in roster if not r.get('isOwner')])
+                                    remaining_auction_slots = max(0, 7 - (auction_players_count + 1))
+                                    min_reserve = remaining_auction_slots * 1000
 
                                     if next_bid > team.get('remainingBudget', 0):
                                         result = {"success": False, "error": f"Bid (₹{next_bid:,}) exceeds your purse (₹{team.get('remainingBudget', 0):,})."}
                                     elif team.get('remainingBudget', 0) - next_bid < min_reserve:
-                                        result = {"success": False, "error": f"Reserve Violation: You must retain at least ₹{min_reserve:,} for remaining {remaining_slots} slot(s)."}
+                                        result = {"success": False, "error": f"Reserve Violation: You must retain at least ₹{min_reserve:,} for remaining {remaining_auction_slots} auction slot(s)."}
                                     else:
                                         state['currentBid'] = next_bid
                                         state['nextMinBid'] = get_next_valid_bid(next_bid, state.get('basePrice', 1000))

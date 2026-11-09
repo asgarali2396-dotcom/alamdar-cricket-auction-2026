@@ -75,7 +75,7 @@ const StorageManager = {
       teams = window.ALAMDAR_DATA.INITIAL_TEAMS.map((t) => ({
         ...t,
         initialBudget: 100000,
-        remainingBudget: t.captainSetId ? 99000 : 100000,
+        remainingBudget: 100000,
         maxAuctionSlots: 8,
         acquiredCount: t.captainSetId ? 1 : 0,
         ownedSetIds: t.captainSetId ? [t.captainSetId] : [],
@@ -87,7 +87,7 @@ const StorageManager = {
                 role: 'Playing Owner (Captain)',
                 setId: t.captainSetId,
                 setName: t.captainSetName || 'Stone Set',
-                price: 1000,
+                price: 0,
                 isOwner: true
               }
             ]
@@ -121,7 +121,7 @@ const StorageManager = {
               if (hadDummyCaptain) {
                 cleanRoster = cleanRoster.filter((r) => !r.isOwner);
                 acqCount = cleanRoster.length;
-                remBudget = 100000 - cleanRoster.reduce((sum, r) => sum + (r.price || 0), 0);
+                remBudget = 100000 - cleanRoster.reduce((sum, r) => sum + (r.isOwner ? 0 : (r.price || 0)), 0);
                 cleanOwnedSets = cleanRoster.map((r) => r.setId).filter(Boolean);
               }
             }

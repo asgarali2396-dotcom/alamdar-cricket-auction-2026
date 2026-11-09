@@ -30,12 +30,15 @@ const AuctionEngine = {
   },
 
   // 2. Budget Reservation Check
-  // Team must reserve at least 1,000 coins for every future slot to guarantee 8 players
+  // Team must reserve at least 1,000 coins for every future auction slot to guarantee full squad
+  // Exact 8-Player Rule: 1 Captain (sold @ ₹0 cost) + 7 Auction players (base min ₹1,000 each)
   canTeamAffordBid(team, proposedBid) {
     if (!team) return { canBid: false, reason: 'Team record not found.' };
 
-    const remainingSlotsAfterThis = team.maxAuctionSlots - (team.acquiredCount + 1);
-    const minReserveNeeded = Math.max(0, remainingSlotsAfterThis * 1000);
+    const roster = team.roster || [];
+    const auctionPlayersAcquired = roster.filter((r) => !r.isOwner).length;
+    const remainingAuctionSlotsAfterThis = Math.max(0, 7 - (auctionPlayersAcquired + 1));
+    const minReserveNeeded = remainingAuctionSlotsAfterThis * 1000;
 
     if (proposedBid > team.remainingBudget) {
       return {
@@ -47,7 +50,7 @@ const AuctionEngine = {
     if (team.remainingBudget - proposedBid < minReserveNeeded) {
       return {
         canBid: false,
-        reason: `Reserve Violation: You must retain at least ₹${minReserveNeeded.toLocaleString()} to purchase remaining ${remainingSlotsAfterThis} player slot(s).`
+        reason: `Reserve Violation: You must retain at least ₹${minReserveNeeded.toLocaleString()} to purchase remaining ${remainingAuctionSlotsAfterThis} auction player slot(s).`
       };
     }
 

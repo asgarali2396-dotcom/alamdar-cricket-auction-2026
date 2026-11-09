@@ -129,7 +129,7 @@ def main():
                 'captainSetName': c_set_name,
                 'color': color,
                 'initialBudget': 100000,
-                'remainingBudget': 99000,       # ₹100,000 - ₹1,000 for Playing Captain
+                'remainingBudget': 100000,      # Captain sold at ₹0 cost (full ₹100,000 for auction)
                 'maxAuctionSlots': 8,           # Exactly 8 players total per team
                 'acquiredCount': 1,             # Captain counts as slot #1
                 'ownedSetIds': [c_set_id],      # Blocks purchasing another player from captain's stone set
@@ -139,7 +139,7 @@ def main():
                     'role': 'Playing Owner (Captain)',
                     'setId': c_set_id,
                     'setName': c_set_name,
-                    'price': 1000,
+                    'price': 0,
                     'isOwner': True,
                     'timestamp': now_ts
                 }]
@@ -244,9 +244,9 @@ def main():
 
     print("==================================================")
     print("✅ SUCCESS: Tournament data updated in auction_data.json!")
-    print(f"   • Total Teams:   {len(imported_teams)} (Each initialized with Playing Captain @ ₹1,000)")
+    print(f"   • Total Teams:   {len(imported_teams)} (Each initialized with Playing Captain @ ₹0 cost)")
     print(f"   • Total Players: {len(imported_players)} ready for live auction")
-    print(f"   • Starting Purse: ₹99,000 per team (1/8 slots acquired)")
+    print(f"   • Starting Purse: ₹100,000 per team (Full purse available for 7 auction slots)")
     print("==================================================")
 
 if __name__ == '__main__':
