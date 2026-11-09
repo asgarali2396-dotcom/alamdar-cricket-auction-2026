@@ -75,17 +75,18 @@ const StorageManager = {
       teams = window.ALAMDAR_DATA.INITIAL_TEAMS.map((t) => ({
         ...t,
         initialBudget: 100000,
-        remainingBudget: 100000,
+        remainingBudget: 99000,
         maxAuctionSlots: 8,
-        acquiredCount: 0,
-        ownedSetIds: [],
+        acquiredCount: 1,
+        ownedSetIds: [t.captainSetId || 'set_aqeeq'],
         roster: [
           {
             playerId: `owner_${t.id}`,
             name: t.playingOwner,
             role: 'Playing Owner (Captain)',
-            setId: 'OWNER_PERM',
-            price: 0,
+            setId: t.captainSetId || 'set_aqeeq',
+            setName: t.captainSetName || 'Aqeeq',
+            price: 1000,
             isOwner: true
           }
         ]
@@ -323,11 +324,21 @@ const StorageManager = {
         return { success: false, error: 'Server error: ' + res.status };
       }
       const result = await res.json();
-      if (result && result.version) {
-        this._serverVersion = Math.max(this._serverVersion, result.version);
+      if (result && result.success) {
+        if (result.version) {
+          this._serverVersion = result.version;
+        }
+        if (result.state) localStorage.setItem(STORAGE_KEYS.STATE, JSON.stringify(result.state));
+        if (result.teams) localStorage.setItem(STORAGE_KEYS.TEAMS, JSON.stringify(result.teams));
+        if (result.players) localStorage.setItem(STORAGE_KEYS.PLAYERS, JSON.stringify(result.players));
+        if (result.sessions) localStorage.setItem(STORAGE_KEYS.SESSIONS, JSON.stringify(result.sessions));
+
+        // Directly invoke application render hook so UI reflects changes instantly
+        if (typeof window.onServerDataReceived === 'function') {
+          window.onServerDataReceived(result);
+        }
+        bus.emit('DATA_CHANGED', { key: STORAGE_KEYS.STATE, value: result.state });
       }
-      // Immediately pull fresh state without waiting for next poll tick
-      setTimeout(() => this.pollServer(), 50);
       return result;
     } catch (err) {
       console.warn('executeServerAction error:', err);
@@ -397,16 +408,16 @@ const StorageManager = {
       const data = await res.json();
       this._setConnectionStatus(true);
 
-      // If server confirms client data is already up-to-date, do nothing!
+      // If server confirms client data is already up-to-date and state exists locally, do nothing!
       // This completely eliminates UI freezing, JSON parsing lag, and memory churn
-      if (data && data.upToDate) {
+      if (data && data.upToDate && localStorage.getItem(STORAGE_KEYS.STATE)) {
         this._isPolling = false;
         return;
       }
 
       if (data && data.version) {
-        const isNewVersion = data.version > this._serverVersion;
-        const isInitialSync = this._serverVersion === 0;
+        const isNewVersion = data.version !== this._serverVersion;
+        const isInitialSync = this._serverVersion === 0 || !localStorage.getItem(STORAGE_KEYS.STATE);
 
         if (isNewVersion || isInitialSync) {
           this._serverVersion = data.version;

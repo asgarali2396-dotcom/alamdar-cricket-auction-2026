@@ -43,7 +43,7 @@
   </script>
 
   <!-- Custom Stylesheet (with cache-bust) -->
-  <link rel="stylesheet" href="./css/style.css?v=2026.31">
+  <link rel="stylesheet" href="./css/style.css?v=2026.35">
 </head>
 
 <body class="bg-[#0F3D34] text-[#F7F6F1] min-h-screen flex flex-col">
@@ -302,11 +302,11 @@
       <div>
         <p class="text-[11px] font-bold text-[#E6F0E9]">Remaining Budget</p>
         <p class="text-xl sm:text-2xl font-black text-[#F7F6F1] font-mono-num mt-0.5">
-          <span id="owner-remaining-budget">₹100,000</span> <span
+          <span id="owner-remaining-budget">₹99,000</span> <span
             class="text-[11px] font-medium text-[#E6F0E9] font-sans">/ ₹1,00,000 Purse Cap</span>
         </p>
         <div class="w-full bg-[#0F3D34] rounded-full h-1.5 mt-2.5 overflow-hidden">
-          <div id="owner-budget-bar" class="bg-[#C8A96A] h-1.5 rounded-full" style="width: 100%;"></div>
+          <div id="owner-budget-bar" class="bg-[#C8A96A] h-1.5 rounded-full" style="width: 99%;"></div>
         </div>
         <p class="text-[10px] text-[#E6F0E9] mt-1">Progress/ Purse Cap</p>
       </div>
@@ -318,7 +318,7 @@
         <div class="gauge-container">
           <div class="gauge-arc"></div>
           <div class="gauge-text">
-            <span id="owner-slots-count" class="text-lg font-black text-[#F7F6F1] font-mono-num">0 / 8</span>
+            <span id="owner-slots-count" class="text-lg font-black text-[#F7F6F1] font-mono-num">1 / 8</span>
             <p class="text-[10px] text-[#E6F0E9] -mt-0.5">Players</p>
           </div>
         </div>
@@ -499,7 +499,7 @@
             </span>
             <span id="owner-squad-slots-badge"
               class="px-3 py-1 rounded-full text-[11px] font-bold bg-[#0F3D34] text-[#E6F0E9] border border-[#C8A96A]/20">
-              0 / 8 Auction Slots Acquired
+              1 / 8 Slots Acquired
             </span>
           </div>
           <h2 id="owner-squad-team-name"
@@ -538,7 +538,7 @@
         </button>
       </div>
 
-      <!-- 9 Player Cards Grid: Captain + 8 Auction Slots -->
+      <!-- 8 Player Cards Grid: Captain (Slot #1) + 7 Auction Slots -->
       <div id="owner-squad-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
         <!-- Dynamically populated -->
       </div>
@@ -546,14 +546,14 @@
       <!-- Financial Summary Footer -->
       <div class="pt-3 border-t border-[#C8A96A]/20 flex flex-wrap justify-between items-center gap-3 text-xs">
         <div class="text-[#E6F0E9]">
-          Squad Allocation: <strong class="text-[#F7F6F1] font-mono-num">1 Playing Captain + 8 Auction Slots (Max 9
-            Players)</strong>
+          Squad Allocation: <strong class="text-[#F7F6F1] font-mono-num">1 Playing Captain (₹1,000) + 7 Auction Slots (8
+            Players Total)</strong>
         </div>
         <div class="flex items-center gap-4">
           <span class="text-[#E6F0E9]">Purse Spent: <strong id="owner-squad-spent-total"
-              class="text-[#C8A96A] font-mono-num font-black">₹0</strong></span>
+              class="text-[#C8A96A] font-mono-num font-black">₹1,000</strong></span>
           <span class="text-[#E6F0E9]">Remaining: <strong id="owner-squad-remaining-total"
-              class="text-emerald-400 font-mono-num font-black">₹100,000</strong></span>
+              class="text-emerald-400 font-mono-num font-black">₹99,000</strong></span>
         </div>
       </div>
     </div>
@@ -1004,11 +1004,11 @@
   <div id="toast-container"></div>
 
   <!-- Scripts -->
-  <script src="./js/data.js?v=2026.34"></script>
-  <script src="./js/storage.js?v=2026.34"></script>
-  <script src="./js/sound.js?v=2026.34"></script>
-  <script src="./js/auction-engine.js?v=2026.34"></script>
-  <script src="./js/app.js?v=2026.34"></script>
+  <script src="./js/data.js?v=2026.36"></script>
+  <script src="./js/storage.js?v=2026.36"></script>
+  <script src="./js/sound.js?v=2026.36"></script>
+  <script src="./js/auction-engine.js?v=2026.36"></script>
+  <script src="./js/app.js?v=2026.36"></script>
 </body>
 
 </html>

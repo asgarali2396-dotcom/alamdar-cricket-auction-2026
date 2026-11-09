@@ -42,18 +42,18 @@ SET_CONFIG = [
 ]
 
 INITIAL_TEAMS_RAW = [
-  { 'id': 'team_01', 'name': 'Burhani Blasters', 'icon': '⚡', 'username': 'burhani', 'password': 'burhani@2026', 'ownerName': 'Murtaza Bhai', 'phone': '9820011111', 'playingOwner': 'Murtaza (C)', 'color': '#3b82f6' },
-  { 'id': 'team_02', 'name': 'Saifee Strikers', 'icon': '🏏', 'username': 'saifee', 'password': 'saifee@2026', 'ownerName': 'Mustafa Bhai', 'phone': '9820022222', 'playingOwner': 'Mustafa (C)', 'color': '#10b981' },
-  { 'id': 'team_03', 'name': 'Husaini Hawks', 'icon': '🦅', 'username': 'husaini', 'password': 'husaini@2026', 'ownerName': 'Shabbir Bhai', 'phone': '9820033333', 'playingOwner': 'Shabbir (C)', 'color': '#f59e0b' },
-  { 'id': 'team_04', 'name': 'Najmi Knights', 'icon': '🛡️', 'username': 'najmi', 'password': 'najmi@2026', 'ownerName': 'Ali Asgar Bhai', 'phone': '9820044444', 'playingOwner': 'Ali Asgar (C)', 'color': '#ef4444' },
-  { 'id': 'team_05', 'name': 'Tayyebi Titans', 'icon': '⚔️', 'username': 'tayyebi', 'password': 'tayyebi@2026', 'ownerName': 'Huzefa Bhai', 'phone': '9820055555', 'playingOwner': 'Huzefa (C)', 'color': '#8b5cf6' },
-  { 'id': 'team_06', 'name': 'Qutbi Challengers', 'icon': '🦁', 'username': 'qutbi', 'password': 'qutbi@2026', 'ownerName': 'Taha Bhai', 'phone': '9820066666', 'playingOwner': 'Taha (C)', 'color': '#ec4899' },
-  { 'id': 'team_07', 'name': 'Badri Royals', 'icon': '👑', 'username': 'badri', 'password': 'badri@2026', 'ownerName': 'Abbas Bhai', 'phone': '9820077777', 'playingOwner': 'Abbas (C)', 'color': '#14b8a6' },
-  { 'id': 'team_08', 'name': 'Fakhri Fighters', 'icon': '🥊', 'username': 'fakhri', 'password': 'fakhri@2026', 'ownerName': 'Zainuddin Bhai', 'phone': '9820088888', 'playingOwner': 'Zainuddin (C)', 'color': '#6366f1' },
-  { 'id': 'team_09', 'name': 'Hakimi Super Kings', 'icon': '🏆', 'username': 'hakimi', 'password': 'hakimi@2026', 'ownerName': 'Mohammed Bhai', 'phone': '9820099999', 'playingOwner': 'Mohammed (C)', 'color': '#eab308' },
-  { 'id': 'team_10', 'name': 'Imadi Warriors', 'icon': '🏹', 'username': 'imadi', 'password': 'imadi@2026', 'ownerName': 'Adnan Bhai', 'phone': '9820010101', 'playingOwner': 'Adnan (C)', 'color': '#06b6d4' },
-  { 'id': 'team_11', 'name': 'Mohammedi Mavericks', 'icon': '🐎', 'username': 'mohammedi', 'password': 'mohammedi@2026', 'ownerName': 'Ibrahim Bhai', 'phone': '9820020202', 'playingOwner': 'Ibrahim (C)', 'color': '#f97316' },
-  { 'id': 'team_12', 'name': 'Zahra Superstars', 'icon': '⭐', 'username': 'zahra', 'password': 'zahra@2026', 'ownerName': 'Burhanuddin Bhai', 'phone': '9820030303', 'playingOwner': 'Burhanuddin (C)', 'color': '#84cc16' }
+  { 'id': 'team_01', 'name': 'Burhani Blasters', 'icon': '⚡', 'username': 'burhani', 'password': 'burhani@2026', 'ownerName': 'Murtaza Bhai', 'phone': '9820011111', 'playingOwner': 'Murtaza (C)', 'captainSetId': 'set_aqeeq', 'captainSetName': 'Aqeeq', 'color': '#3b82f6' },
+  { 'id': 'team_02', 'name': 'Saifee Strikers', 'icon': '🏏', 'username': 'saifee', 'password': 'saifee@2026', 'ownerName': 'Mustafa Bhai', 'phone': '9820022222', 'playingOwner': 'Mustafa (C)', 'captainSetId': 'set_firoza', 'captainSetName': 'Firoza', 'color': '#10b981' },
+  { 'id': 'team_03', 'name': 'Husaini Hawks', 'icon': '🦅', 'username': 'husaini', 'password': 'husaini@2026', 'ownerName': 'Shabbir Bhai', 'phone': '9820033333', 'playingOwner': 'Shabbir (C)', 'captainSetId': 'set_yaqoot', 'captainSetName': 'Yaqoot', 'color': '#f59e0b' },
+  { 'id': 'team_04', 'name': 'Najmi Knights', 'icon': '🛡️', 'username': 'najmi', 'password': 'najmi@2026', 'ownerName': 'Ali Asgar Bhai', 'phone': '9820044444', 'playingOwner': 'Ali Asgar (C)', 'captainSetId': 'set_zumurrud', 'captainSetName': 'Zumurrud', 'color': '#ef4444' },
+  { 'id': 'team_05', 'name': 'Tayyebi Titans', 'icon': '⚔️', 'username': 'tayyebi', 'password': 'tayyebi@2026', 'ownerName': 'Huzefa Bhai', 'phone': '9820055555', 'playingOwner': 'Huzefa (C)', 'captainSetId': 'set_marjan', 'captainSetName': 'Marjan', 'color': '#8b5cf6' },
+  { 'id': 'team_06', 'name': 'Qutbi Challengers', 'icon': '🦁', 'username': 'qutbi', 'password': 'qutbi@2026', 'ownerName': 'Taha Bhai', 'phone': '9820066666', 'playingOwner': 'Taha (C)', 'captainSetId': 'set_pukhraj', 'captainSetName': 'Pukhraj', 'color': '#ec4899' },
+  { 'id': 'team_07', 'name': 'Badri Royals', 'icon': '👑', 'username': 'badri', 'password': 'badri@2026', 'ownerName': 'Abbas Bhai', 'phone': '9820077777', 'playingOwner': 'Abbas (C)', 'captainSetId': 'set_neelam', 'captainSetName': 'Neelam', 'color': '#14b8a6' },
+  { 'id': 'team_08', 'name': 'Fakhri Fighters', 'icon': '🥊', 'username': 'fakhri', 'password': 'fakhri@2026', 'ownerName': 'Zainuddin Bhai', 'phone': '9820088888', 'playingOwner': 'Zainuddin (C)', 'captainSetId': 'set_durenajaf', 'captainSetName': 'Dur-e-Najaf', 'color': '#6366f1' },
+  { 'id': 'team_09', 'name': 'Hakimi Super Kings', 'icon': '🏆', 'username': 'hakimi', 'password': 'hakimi@2026', 'ownerName': 'Mohammed Bhai', 'phone': '9820099999', 'playingOwner': 'Mohammed (C)', 'captainSetId': 'set_aqeeq', 'captainSetName': 'Aqeeq', 'color': '#eab308' },
+  { 'id': 'team_10', 'name': 'Imadi Warriors', 'icon': '🏹', 'username': 'imadi', 'password': 'imadi@2026', 'ownerName': 'Adnan Bhai', 'phone': '9820010101', 'playingOwner': 'Adnan (C)', 'captainSetId': 'set_firoza', 'captainSetName': 'Firoza', 'color': '#06b6d4' },
+  { 'id': 'team_11', 'name': 'Mohammedi Mavericks', 'icon': '🐎', 'username': 'mohammedi', 'password': 'mohammedi@2026', 'ownerName': 'Ibrahim Bhai', 'phone': '9820020202', 'playingOwner': 'Ibrahim (C)', 'captainSetId': 'set_yaqoot', 'captainSetName': 'Yaqoot', 'color': '#f97316' },
+  { 'id': 'team_12', 'name': 'Zahra Superstars', 'icon': '⭐', 'username': 'zahra', 'password': 'zahra@2026', 'ownerName': 'Burhanuddin Bhai', 'phone': '9820030303', 'playingOwner': 'Burhanuddin (C)', 'captainSetId': 'set_zumurrud', 'captainSetName': 'Zumurrud', 'color': '#84cc16' }
 ]
 
 FIRST_NAMES = [
@@ -97,20 +97,27 @@ SPECIALIZATIONS = [
 
 def generate_default_teams():
     teams = []
-    for t in INITIAL_TEAMS_RAW:
+    for idx, t in enumerate(INITIAL_TEAMS_RAW):
         team = dict(t)
+        # Assign playing captain to one of the 8 stone sets
+        c_set = SET_CONFIG[idx % len(SET_CONFIG)]
+        c_set_id = c_set['id']
+        c_set_name = c_set['name']
         team.update({
+            'captainSetId': c_set_id,
+            'captainSetName': c_set_name,
             'initialBudget': 100000,
-            'remainingBudget': 100000,
+            'remainingBudget': 99000,
             'maxAuctionSlots': 8,
-            'acquiredCount': 0,
-            'ownedSetIds': [],
+            'acquiredCount': 1,
+            'ownedSetIds': [c_set_id],
             'roster': [{
                 'playerId': f"owner_{t['id']}",
                 'name': t['playingOwner'],
                 'role': 'Playing Owner (Captain)',
-                'setId': 'OWNER_PERM',
-                'price': 0,
+                'setId': c_set_id,
+                'setName': c_set_name,
+                'price': 1000,
                 'isOwner': True
             }]
         })
@@ -625,6 +632,13 @@ class AuctionSyncHandler(SimpleHTTPRequestHandler):
 
                     else:
                         result = {"success": False, "error": f"Unknown action '{action}'"}
+
+                    if result.get('success'):
+                        result['version'] = server_data.get('version', 1)
+                        result['state'] = server_data.get('state')
+                        result['teams'] = server_data.get('teams')
+                        result['players'] = server_data.get('players')
+                        result['sessions'] = server_data.get('sessions')
 
                 resp_bytes = json.dumps(result).encode('utf-8')
                 self.send_response(200)

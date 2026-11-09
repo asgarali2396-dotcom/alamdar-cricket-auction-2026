@@ -1248,7 +1248,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (hasBoughtFromSet) {
         raiseBtn.disabled = true;
         raiseBtn.className = 'w-full py-4 px-6 rounded-2xl font-bold text-sm uppercase bg-[#9e2a2b]/60 border border-[#9e2a2b] text-[#F7F6F1]';
-        raiseBtn.innerText = `⛔ MAX 1 PLAYER PER SET REACHED ("${currentAuctionState.currentSetName}")`;
+        const isCaptainSet = (team.captainSetId || team.roster?.[0]?.setId) === currentAuctionState.currentSetId;
+        raiseBtn.innerText = isCaptainSet
+          ? `⛔ SET LOCKED (Playing Captain represents "${currentAuctionState.currentSetName}")`
+          : `⛔ MAX 1 PLAYER PER SET REACHED ("${currentAuctionState.currentSetName}")`;
       } else if (isRosterFull) {
         raiseBtn.disabled = true;
         raiseBtn.className = 'w-full py-4 px-6 rounded-2xl font-bold text-sm uppercase bg-[#134E43] border border-[#C8A96A] text-[#C8A96A]';
@@ -1636,14 +1639,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!gridEl) return;
 
-    // Card 0: Playing Owner (Captain)
+    // Card 1: Playing Owner (Captain) - Slot #1 (Acquired for ₹1,000 Base Price)
+    const captainItem = (team.roster || []).find((r) => r.isOwner) || {};
+    const captainSet = window.ALAMDAR_DATA.SET_CONFIG.find((s) => s.id === (captainItem.setId || team.captainSetId)) || { name: team.captainSetName || 'Stone Set', color: '#C8A96A' };
+    const captainColor = captainSet.color || '#C8A96A';
+    const captainSetName = captainItem.setName || team.captainSetName || captainSet.name || 'Stone Set';
+
     const captainCard = `
       <div class="p-4 rounded-2xl bg-[#092520] border-2 border-[#C8A96A] shadow-xl flex flex-col justify-between space-y-3 relative overflow-hidden">
         <div class="flex items-center justify-between gap-2">
           <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#C8A96A] text-[#0F3D34] shadow">
-            👑 CAPTAIN & OWNER
+            👑 CAPTAIN & OWNER (SLOT #1)
           </span>
-          <span class="text-xs text-[#C8A96A] font-black">₹0 (Captain)</span>
+          <span class="text-xs text-[#C8A96A] font-black font-mono-num">₹1,000 (Base Price)</span>
         </div>
         <div>
           <h4 class="text-lg font-black text-[#F7F6F1] uppercase tracking-tight">${team.playingOwner}</h4>
@@ -1651,17 +1659,19 @@ document.addEventListener('DOMContentLoaded', () => {
           <p class="text-[11px] text-[#E6F0E9]/70 mt-1">Franchise Leader: ${team.ownerName || team.name}</p>
         </div>
         <div class="pt-2 border-t border-[#C8A96A]/20 flex items-center justify-between text-[11px]">
-          <span class="text-[#C8A96A] font-bold">Permanent Squad Member</span>
-          <span class="text-emerald-400 font-bold font-mono-num">Slot C</span>
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider" style="background:${captainColor}25; color:${captainColor}; border:1px solid ${captainColor}60">
+            💎 ${captainSetName} (Assigned Set)
+          </span>
+          <span class="text-emerald-400 font-bold font-mono-num">Slot #1 Acquired</span>
         </div>
       </div>
     `;
 
-    // Cards 1 to 8: Auction Slots
+    // Cards 2 to 8: The 7 Auction Slots (Total 8 Players)
     const acquiredList = (team.roster || []).filter((r) => !r.isOwner);
     const auctionCards = [];
 
-    for (let i = 0; i < (team.maxAuctionSlots || 8); i++) {
+    for (let i = 0; i < 7; i++) {
       const pItem = acquiredList[i];
       if (pItem) {
         const fullPly = currentPlayers.find((p) => p.id === pItem.playerId);
@@ -1685,7 +1695,7 @@ document.addEventListener('DOMContentLoaded', () => {
               </p>
             </div>
             <div class="pt-2 border-t border-[#C8A96A]/15 flex items-center justify-between text-[11px]">
-              <span class="text-[#E6F0E9] font-medium font-mono-num">Slot #${i + 1}</span>
+              <span class="text-[#E6F0E9] font-medium font-mono-num">Slot #${i + 2}</span>
               <span class="text-emerald-400 font-bold">Acquired</span>
             </div>
           </div>
@@ -1695,7 +1705,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="p-4 rounded-2xl border-2 border-dashed border-[#C8A96A]/25 bg-[#092520]/40 flex flex-col justify-between space-y-3 min-h-[140px]">
             <div class="flex items-center justify-between gap-2">
               <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#0F3D34] text-[#E6F0E9]/60 border border-[#C8A96A]/15">
-                OPEN SLOT #${i + 1}
+                OPEN SLOT #${i + 2}
               </span>
               <span class="text-xs text-[#E6F0E9]/40 font-mono-num">Empty</span>
             </div>
@@ -1852,30 +1862,34 @@ document.addEventListener('DOMContentLoaded', () => {
     ctx.textAlign = 'right';
     ctx.fillText('PRICE (INR)', 1110, 388);
 
-    // 6. Draw 9 Player Rows (Captain + 8 Slots)
+    // 6. Draw 8 Player Rows (1 Captain + 7 Auction Slots)
     const startY = 415;
     const rowHeight = 90;
 
+    const captainItemPoster = (team.roster || []).find((r) => r.isOwner) || {};
+    const captainSetPoster = window.ALAMDAR_DATA.SET_CONFIG.find((s) => s.id === (captainItemPoster.setId || team.captainSetId)) || { name: team.captainSetName || 'Stone Set', color: '#C8A96A' };
+    const captainSetNamePoster = captainItemPoster.setName || team.captainSetName || captainSetPoster.name || 'Stone Set';
+
     const rosterItems = [
       {
-        num: '👑',
+        num: '👑 1',
         name: team.playingOwner,
         role: 'Playing Owner (Captain)',
-        spec: 'Captain & Franchise Leader',
-        setName: 'Permanent Captain',
-        price: 'CAPTAIN (₹0)',
+        spec: 'Team Captain & Leader',
+        setName: captainSetNamePoster,
+        price: '₹1,000 (Base)',
         isCaptain: true,
         filled: true
       }
     ];
 
     const acquired = (team.roster || []).filter((r) => !r.isOwner);
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 7; i++) {
       const pItem = acquired[i];
       if (pItem) {
         const pFull = currentPlayers.find((ply) => ply.id === pItem.playerId);
         rosterItems.push({
-          num: `${i + 1}`,
+          num: `${i + 2}`,
           name: pItem.name,
           role: pFull ? `${pFull.specialization} • ${pFull.batsmanType?.split(' ')[0]}` : pItem.role,
           spec: pFull?.specialization || pItem.role || 'Player',
@@ -1886,8 +1900,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       } else {
         rosterItems.push({
-          num: `${i + 1}`,
-          name: `[ Slot #${i + 1} - Awaiting Auction ]`,
+          num: `${i + 2}`,
+          name: `[ Slot #${i + 2} - Awaiting Auction ]`,
           role: 'Pending Selection from Stone Sets',
           spec: 'Open Slot',
           setName: 'Available',
@@ -2020,8 +2034,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!StorageManager._syncDisabled && typeof fetch !== 'undefined') {
       const res = await StorageManager.executeServerAction('push_player', { playerId: p.id });
       if (res && res.success) {
+        if (res.state) {
+          currentAuctionState = res.state;
+        }
         if (window.soundManager) window.soundManager.playPlayerStageIntro();
         showToast(`Player ${p.name} is now LIVE on stage! Bidding is LOCKED for introduction.`, 'gold');
+        renderApp();
         return;
       }
       if (res && res.error) {
@@ -2066,8 +2084,8 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    const state = StorageManager.get(STORAGE_KEYS.STATE);
-    if (!state.currentPlayerId || (state.status !== 'BIDDING' && state.status !== 'COUNTDOWN')) {
+    const state = StorageManager.get(STORAGE_KEYS.STATE) || currentAuctionState;
+    if (!state || !state.currentPlayerId || (state.status !== 'BIDDING' && state.status !== 'COUNTDOWN')) {
       showToast('No active player currently on stage.', 'error');
       return;
     }
@@ -2075,13 +2093,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!StorageManager._syncDisabled && typeof fetch !== 'undefined') {
       const res = await StorageManager.executeServerAction('toggle_lock');
       if (res && res.success) {
-        const isLocked = res.biddingLocked;
+        if (res.state) {
+          currentAuctionState = res.state;
+        }
+        const isLocked = res.biddingLocked !== undefined ? res.biddingLocked : (res.state ? res.state.biddingLocked : false);
         if (isLocked) {
           showToast('🔒 Bidding LOCKED! Franchise owners cannot place bids during introduction.', 'info');
         } else {
           showToast('⚡ Bidding is now UNLOCKED! Franchise owners can enter the ring and place bids!', 'success');
           if (window.soundManager) window.soundManager.playBiddingUnlocked();
         }
+        renderApp();
         return;
       }
       if (res && res.error) {
