@@ -1599,13 +1599,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!gridEl) return;
 
-    // Card 1: Playing Owner (Captain) - Slot #1 (Acquired for ₹1,000 Base Price)
+    // Card 1: Playing Owner (Captain) - Slot #1 (Acquired for ₹1,000 Base Price or Reserved pending registration)
     const captainItem = (team.roster || []).find((r) => r.isOwner) || {};
+    const hasAssignedCaptain = Boolean(captainItem.name && !captainItem.name.includes('Pending') && (captainItem.setId || team.captainSetId));
     const captainSet = window.ALAMDAR_DATA.SET_CONFIG.find((s) => s.id === (captainItem.setId || team.captainSetId)) || { name: team.captainSetName || 'Stone Set', color: '#C8A96A' };
     const captainColor = captainSet.color || '#C8A96A';
-    const captainSetName = captainItem.setName || team.captainSetName || captainSet.name || 'Stone Set';
+    const captainSetName = hasAssignedCaptain ? (captainItem.setName || team.captainSetName || captainSet.name || 'Stone Set') : 'To Be Assigned';
+    const captainDisplayName = hasAssignedCaptain ? (captainItem.name || team.playingOwner) : 'TBD (Pending Registration)';
 
-    const captainCard = `
+    const captainCard = hasAssignedCaptain ? `
       <div class="p-4 rounded-2xl bg-[#092520] border-2 border-[#C8A96A] shadow-xl flex flex-col justify-between space-y-3 relative overflow-hidden">
         <div class="flex items-center justify-between gap-2">
           <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#C8A96A] text-[#0F3D34] shadow">
@@ -1614,8 +1616,8 @@ document.addEventListener('DOMContentLoaded', () => {
           <span class="text-xs text-[#C8A96A] font-black font-mono-num">₹1,000 (Base Price)</span>
         </div>
         <div>
-          <h4 class="text-lg font-black text-[#F7F6F1] uppercase tracking-tight">${team.playingOwner}</h4>
-          <p class="text-xs text-[#E6F0E9] mt-0.5 font-bold">Playing Owner (Team Captain)</p>
+          <h4 class="text-lg font-black text-[#F7F6F1] uppercase tracking-tight">${captainDisplayName}</h4>
+          <p class="text-xs text-[#E6F0E9] mt-0.5 font-bold">Playing Captain</p>
           <p class="text-[11px] text-[#E6F0E9]/70 mt-1">Franchise Leader: ${team.ownerName || team.name}</p>
         </div>
         <div class="pt-2 border-t border-[#C8A96A]/20 flex items-center justify-between text-[11px]">
@@ -1623,6 +1625,26 @@ document.addEventListener('DOMContentLoaded', () => {
             💎 ${captainSetName} (Assigned Set)
           </span>
           <span class="text-emerald-400 font-bold font-mono-num">Slot #1 Acquired</span>
+        </div>
+      </div>
+    ` : `
+      <div class="p-4 rounded-2xl bg-[#092520]/80 border-2 border-dashed border-[#C8A96A]/40 shadow-xl flex flex-col justify-between space-y-3 relative overflow-hidden">
+        <div class="flex items-center justify-between gap-2">
+          <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#C8A96A]/20 text-[#C8A96A] border border-[#C8A96A]/40 shadow">
+            👑 PLAYING CAPTAIN (SLOT #1)
+          </span>
+          <span class="text-xs text-amber-300 font-bold font-mono-num">Pending Registration</span>
+        </div>
+        <div>
+          <h4 class="text-base font-black text-[#F7F6F1] uppercase tracking-tight">${captainDisplayName}</h4>
+          <p class="text-xs text-amber-200/80 mt-0.5 font-medium">Captain & Stone Set will be revealed once registration completes</p>
+          <p class="text-[11px] text-[#E6F0E9]/60 mt-1">Franchise Owner: ${team.ownerName || team.name}</p>
+        </div>
+        <div class="pt-2 border-t border-[#C8A96A]/20 flex items-center justify-between text-[11px]">
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-400/10 text-amber-300 border border-amber-400/30">
+            💎 Stone Set: ${captainSetName}
+          </span>
+          <span class="text-amber-400 font-bold font-mono-num">Slot #1 Reserved</span>
         </div>
       </div>
     `;
@@ -1793,7 +1815,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Owner & Captain subtext
     ctx.fillStyle = '#F7F6F1';
     ctx.font = '600 20px "Segoe UI", Inter, sans-serif';
-    ctx.fillText(`Owner: ${team.ownerName || 'Bhai'}   •   Playing Captain: ${team.playingOwner}`, 90, 275);
+    const captainDisplayPoster = (team.playingOwner && !team.playingOwner.includes('Pending')) ? team.playingOwner : 'TBD (Pending Registration)';
+    ctx.fillText(`Owner: ${team.ownerName || 'Bhai'}   •   Playing Captain: ${captainDisplayPoster}`, 90, 275);
 
     // Purse Summary on Right of Hero Card
     ctx.textAlign = 'right';
@@ -1827,19 +1850,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const rowHeight = 90;
 
     const captainItemPoster = (team.roster || []).find((r) => r.isOwner) || {};
+    const hasAssignedPoster = Boolean(captainItemPoster.name && !captainItemPoster.name.includes('Pending') && (captainItemPoster.setId || team.captainSetId));
     const captainSetPoster = window.ALAMDAR_DATA.SET_CONFIG.find((s) => s.id === (captainItemPoster.setId || team.captainSetId)) || { name: team.captainSetName || 'Stone Set', color: '#C8A96A' };
-    const captainSetNamePoster = captainItemPoster.setName || team.captainSetName || captainSetPoster.name || 'Stone Set';
+    const captainSetNamePoster = hasAssignedPoster ? (captainItemPoster.setName || team.captainSetName || captainSetPoster.name || 'Stone Set') : 'To Be Assigned';
+    const captainNamePoster = hasAssignedPoster ? (captainItemPoster.name || team.playingOwner) : 'TBD (Pending Registration)';
 
     const rosterItems = [
       {
         num: '👑 1',
-        name: team.playingOwner,
-        role: 'Playing Owner (Captain)',
-        spec: 'Team Captain & Leader',
+        name: captainNamePoster,
+        role: 'Playing Captain',
+        spec: hasAssignedPoster ? 'Team Captain & Leader' : 'Pending Player Registration',
         setName: captainSetNamePoster,
-        price: '₹1,000 (Base)',
+        price: hasAssignedPoster ? '₹1,000 (Base)' : 'Reserved',
         isCaptain: true,
-        filled: true
+        filled: hasAssignedPoster
       }
     ];
 

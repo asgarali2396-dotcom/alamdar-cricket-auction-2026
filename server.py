@@ -42,18 +42,18 @@ SET_CONFIG = [
 ]
 
 INITIAL_TEAMS_RAW = [
-  { 'id': 'team_01', 'name': 'Fatemi Falcons', 'icon': '🦅', 'username': 'fatemi', 'password': 'fatemi@2026', 'ownerName': 'Burhanuddin Hussain', 'phone': '9820011111', 'playingOwner': 'Burhanuddin (C)', 'captainSetId': 'set_aqeeq', 'captainSetName': 'Aqeeq', 'color': '#3b82f6' },
-  { 'id': 'team_02', 'name': 'Kanchwala Knight Riders', 'icon': '🛡️', 'username': 'kanchwala', 'password': 'kanchwala@2026', 'ownerName': 'Taha Sajid Husain kanchwala', 'phone': '9820022222', 'playingOwner': 'Taha (C)', 'captainSetId': 'set_firoza', 'captainSetName': 'Firoza', 'color': '#8b5cf6' },
-  { 'id': 'team_03', 'name': 'Telwala Challengers', 'icon': '🦁', 'username': 'telwala', 'password': 'telwala@2026', 'ownerName': 'Abdul Taiyeb Telwala', 'phone': '9820033333', 'playingOwner': 'Abdul Taiyeb (C)', 'captainSetId': 'set_yaqoot', 'captainSetName': 'Yaqoot', 'color': '#ef4444' },
-  { 'id': 'team_04', 'name': 'Hussaini Strikers', 'icon': '🏏', 'username': 'hussaini', 'password': 'hussaini@2026', 'ownerName': 'Burhanuddin Husain Rampurawala', 'phone': '9820044444', 'playingOwner': 'Burhanuddin (C)', 'captainSetId': 'set_zumurrud', 'captainSetName': 'Zumurrud', 'color': '#10b981' },
-  { 'id': 'team_05', 'name': 'Bagichawala Blasters', 'icon': '⚡', 'username': 'bagichawala', 'password': 'bagichawala@2026', 'ownerName': 'Shabbir bagichawala', 'phone': '9820055555', 'playingOwner': 'Shabbir (C)', 'captainSetId': 'set_marjan', 'captainSetName': 'Marjan', 'color': '#f59e0b' },
-  { 'id': 'team_06', 'name': 'Galaxy Titans', 'icon': '⚔️', 'username': 'galaxy', 'password': 'galaxy@2026', 'ownerName': 'Mustafa akolawala/muffadal hussain', 'phone': '9820066666', 'playingOwner': 'Mustafa (C)', 'captainSetId': 'set_pukhraj', 'captainSetName': 'Pukhraj', 'color': '#6366f1' },
-  { 'id': 'team_07', 'name': 'Ezzy Stars', 'icon': '⭐', 'username': 'ezzy', 'password': 'ezzy@2026', 'ownerName': 'Murtaza ali jamnagarwala', 'phone': '9820077777', 'playingOwner': 'Murtaza (C)', 'captainSetId': 'set_neelam', 'captainSetName': 'Neelam', 'color': '#ec4899' },
-  { 'id': 'team_08', 'name': 'Supreme Squad', 'icon': '👑', 'username': 'supreme', 'password': 'supreme@2026', 'ownerName': 'Shabbir murtazapurwala', 'phone': '9820088888', 'playingOwner': 'Shabbir (C)', 'captainSetId': 'set_durenajaf', 'captainSetName': 'Dur-e-Najaf', 'color': '#14b8a6' },
-  { 'id': 'team_09', 'name': 'Raj Strickers', 'icon': '🥊', 'username': 'raj', 'password': 'raj@2026', 'ownerName': 'Ali chandurwala', 'phone': '9820099999', 'playingOwner': 'Ali (C)', 'captainSetId': 'set_aqeeq', 'captainSetName': 'Aqeeq', 'color': '#eab308' },
-  { 'id': 'team_10', 'name': 'Burhanpurwala Dominators', 'icon': '🏆', 'username': 'burhanpur', 'password': 'burhanpur@2026', 'ownerName': 'Zoeb Chappalwala', 'phone': '9820010101', 'playingOwner': 'Zoeb (C)', 'captainSetId': 'set_firoza', 'captainSetName': 'Firoza', 'color': '#06b6d4' },
-  { 'id': 'team_11', 'name': 'Choudhary Thunderbolts', 'icon': '🏹', 'username': 'choudhary', 'password': 'choudhary@2026', 'ownerName': 'Altaf chaudhary', 'phone': '9820020202', 'playingOwner': 'Altaf (C)', 'captainSetId': 'set_yaqoot', 'captainSetName': 'Yaqoot', 'color': '#f97316' },
-  { 'id': 'team_12', 'name': 'Lucky Legends', 'icon': '🐎', 'username': 'lucky', 'password': 'lucky@2026', 'ownerName': 'Mustufa Bhai Chandurwala', 'phone': '9820030303', 'playingOwner': 'Mustufa (C)', 'captainSetId': 'set_zumurrud', 'captainSetName': 'Zumurrud', 'color': '#84cc16' }
+  { 'id': 'team_01', 'name': 'Fatemi Falcons', 'icon': '🦅', 'username': 'fatemi', 'password': 'fatemi@2026', 'ownerName': 'Burhanuddin Hussain', 'phone': '9820011111', 'playingOwner': 'TBD (Pending Registration)', 'captainSetId': None, 'captainSetName': 'TBD', 'color': '#3b82f6' },
+  { 'id': 'team_02', 'name': 'Kanchwala Knight Riders', 'icon': '🛡️', 'username': 'kanchwala', 'password': 'kanchwala@2026', 'ownerName': 'Taha Sajid Husain kanchwala', 'phone': '9820022222', 'playingOwner': 'TBD (Pending Registration)', 'captainSetId': None, 'captainSetName': 'TBD', 'color': '#8b5cf6' },
+  { 'id': 'team_03', 'name': 'Telwala Challengers', 'icon': '🦁', 'username': 'telwala', 'password': 'telwala@2026', 'ownerName': 'Abdul Taiyeb Telwala', 'phone': '9820033333', 'playingOwner': 'TBD (Pending Registration)', 'captainSetId': None, 'captainSetName': 'TBD', 'color': '#ef4444' },
+  { 'id': 'team_04', 'name': 'Hussaini Strikers', 'icon': '🏏', 'username': 'hussaini', 'password': 'hussaini@2026', 'ownerName': 'Burhanuddin Husain Rampurawala', 'phone': '9820044444', 'playingOwner': 'TBD (Pending Registration)', 'captainSetId': None, 'captainSetName': 'TBD', 'color': '#10b981' },
+  { 'id': 'team_05', 'name': 'Bagichawala Blasters', 'icon': '⚡', 'username': 'bagichawala', 'password': 'bagichawala@2026', 'ownerName': 'Shabbir bagichawala', 'phone': '9820055555', 'playingOwner': 'TBD (Pending Registration)', 'captainSetId': None, 'captainSetName': 'TBD', 'color': '#f59e0b' },
+  { 'id': 'team_06', 'name': 'Galaxy Titans', 'icon': '⚔️', 'username': 'galaxy', 'password': 'galaxy@2026', 'ownerName': 'Mustafa akolawala/muffadal hussain', 'phone': '9820066666', 'playingOwner': 'TBD (Pending Registration)', 'captainSetId': None, 'captainSetName': 'TBD', 'color': '#6366f1' },
+  { 'id': 'team_07', 'name': 'Ezzy Stars', 'icon': '⭐', 'username': 'ezzy', 'password': 'ezzy@2026', 'ownerName': 'Murtaza ali jamnagarwala', 'phone': '9820077777', 'playingOwner': 'TBD (Pending Registration)', 'captainSetId': None, 'captainSetName': 'TBD', 'color': '#ec4899' },
+  { 'id': 'team_08', 'name': 'Supreme Squad', 'icon': '👑', 'username': 'supreme', 'password': 'supreme@2026', 'ownerName': 'Shabbir murtazapurwala', 'phone': '9820088888', 'playingOwner': 'TBD (Pending Registration)', 'captainSetId': None, 'captainSetName': 'TBD', 'color': '#14b8a6' },
+  { 'id': 'team_09', 'name': 'Raj Strickers', 'icon': '🥊', 'username': 'raj', 'password': 'raj@2026', 'ownerName': 'Ali chandurwala', 'phone': '9820099999', 'playingOwner': 'TBD (Pending Registration)', 'captainSetId': None, 'captainSetName': 'TBD', 'color': '#eab308' },
+  { 'id': 'team_10', 'name': 'Burhanpurwala Dominators', 'icon': '🏆', 'username': 'burhanpur', 'password': 'burhanpur@2026', 'ownerName': 'Zoeb Chappalwala', 'phone': '9820010101', 'playingOwner': 'TBD (Pending Registration)', 'captainSetId': None, 'captainSetName': 'TBD', 'color': '#06b6d4' },
+  { 'id': 'team_11', 'name': 'Choudhary Thunderbolts', 'icon': '🏹', 'username': 'choudhary', 'password': 'choudhary@2026', 'ownerName': 'Altaf chaudhary', 'phone': '9820020202', 'playingOwner': 'TBD (Pending Registration)', 'captainSetId': None, 'captainSetName': 'TBD', 'color': '#f97316' },
+  { 'id': 'team_12', 'name': 'Lucky Legends', 'icon': '🐎', 'username': 'lucky', 'password': 'lucky@2026', 'ownerName': 'Mustufa Bhai Chandurwala', 'phone': '9820030303', 'playingOwner': 'TBD (Pending Registration)', 'captainSetId': None, 'captainSetName': 'TBD', 'color': '#84cc16' }
 ]
 
 FIRST_NAMES = [
@@ -99,27 +99,15 @@ def generate_default_teams():
     teams = []
     for idx, t in enumerate(INITIAL_TEAMS_RAW):
         team = dict(t)
-        # Assign playing captain to one of the 8 stone sets
-        c_set = SET_CONFIG[idx % len(SET_CONFIG)]
-        c_set_id = c_set['id']
-        c_set_name = c_set['name']
         team.update({
-            'captainSetId': c_set_id,
-            'captainSetName': c_set_name,
+            'captainSetId': None,
+            'captainSetName': 'TBD',
             'initialBudget': 100000,
-            'remainingBudget': 99000,
+            'remainingBudget': 100000,
             'maxAuctionSlots': 8,
-            'acquiredCount': 1,
-            'ownedSetIds': [c_set_id],
-            'roster': [{
-                'playerId': f"owner_{t['id']}",
-                'name': t['playingOwner'],
-                'role': 'Playing Owner (Captain)',
-                'setId': c_set_id,
-                'setName': c_set_name,
-                'price': 1000,
-                'isOwner': True
-            }]
+            'acquiredCount': 0,
+            'ownedSetIds': [],
+            'roster': []
         })
         teams.append(team)
     return teams

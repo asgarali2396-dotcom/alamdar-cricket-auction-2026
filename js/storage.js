@@ -75,38 +75,74 @@ const StorageManager = {
       teams = window.ALAMDAR_DATA.INITIAL_TEAMS.map((t) => ({
         ...t,
         initialBudget: 100000,
-        remainingBudget: 99000,
+        remainingBudget: t.captainSetId ? 99000 : 100000,
         maxAuctionSlots: 8,
-        acquiredCount: 1,
-        ownedSetIds: [t.captainSetId || 'set_aqeeq'],
-        roster: [
-          {
-            playerId: `owner_${t.id}`,
-            name: t.playingOwner,
-            role: 'Playing Owner (Captain)',
-            setId: t.captainSetId || 'set_aqeeq',
-            setName: t.captainSetName || 'Aqeeq',
-            price: 1000,
-            isOwner: true
-          }
-        ]
+        acquiredCount: t.captainSetId ? 1 : 0,
+        ownedSetIds: t.captainSetId ? [t.captainSetId] : [],
+        roster: t.captainSetId
+          ? [
+              {
+                playerId: `owner_${t.id}`,
+                name: t.playingOwner,
+                role: 'Playing Owner (Captain)',
+                setId: t.captainSetId,
+                setName: t.captainSetName || 'Stone Set',
+                price: 1000,
+                isOwner: true
+              }
+            ]
+          : []
       }));
       localStorage.setItem(STORAGE_KEYS.TEAMS, JSON.stringify(teams));
     } else {
-      // Ensure existing teams in localStorage have valid credentials
+      // Ensure existing teams in localStorage have valid credentials & updated TBD captain state
       let updated = false;
       teams = teams.map((team) => {
         const canonical = window.ALAMDAR_DATA.INITIAL_TEAMS.find((t) => t.id === team.id);
-        if (canonical && (!team.username || !team.password || !team.color)) {
-          updated = true;
-          return {
-            ...team,
-            username: canonical.username,
-            password: canonical.password,
-            color: canonical.color || team.color || '#3b82f6',
-            ownerName: canonical.ownerName || team.ownerName,
-            playingOwner: canonical.playingOwner || team.playingOwner
-          };
+        if (canonical) {
+          const needsSync =
+            !team.username ||
+            !team.password ||
+            !team.color ||
+            team.name !== canonical.name ||
+            team.ownerName !== canonical.ownerName ||
+            team.playingOwner !== canonical.playingOwner;
+
+          if (needsSync) {
+            updated = true;
+            // If captain is pending / unassigned, remove any old dummy pre-assigned captain roster item
+            let cleanRoster = team.roster || [];
+            let cleanOwnedSets = team.ownedSetIds || [];
+            let remBudget = team.remainingBudget;
+            let acqCount = team.acquiredCount;
+
+            if (!canonical.captainSetId) {
+              const hadDummyCaptain = cleanRoster.some((r) => r.isOwner);
+              if (hadDummyCaptain) {
+                cleanRoster = cleanRoster.filter((r) => !r.isOwner);
+                acqCount = cleanRoster.length;
+                remBudget = 100000 - cleanRoster.reduce((sum, r) => sum + (r.price || 0), 0);
+                cleanOwnedSets = cleanRoster.map((r) => r.setId).filter(Boolean);
+              }
+            }
+
+            return {
+              ...team,
+              name: canonical.name,
+              icon: canonical.icon || team.icon,
+              username: canonical.username,
+              password: canonical.password,
+              color: canonical.color || team.color || '#3b82f6',
+              ownerName: canonical.ownerName || team.ownerName,
+              playingOwner: canonical.playingOwner,
+              captainSetId: canonical.captainSetId,
+              captainSetName: canonical.captainSetName,
+              remainingBudget: remBudget,
+              acquiredCount: acqCount,
+              ownedSetIds: cleanOwnedSets,
+              roster: cleanRoster
+            };
+          }
         }
         return team;
       });
