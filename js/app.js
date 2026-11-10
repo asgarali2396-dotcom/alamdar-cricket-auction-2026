@@ -22,6 +22,27 @@ document.addEventListener('DOMContentLoaded', () => {
   let _renderRaf = null;
   let burstFinishTimeout = null;
 
+  // Background preloader: smoothly caches all tournament player images in browser memory for instant <1ms display
+  let _imagesPreloaded = false;
+  function preloadTournamentImages(playersList) {
+    if (_imagesPreloaded || !Array.isArray(playersList) || playersList.length === 0) return;
+    _imagesPreloaded = true;
+    const preloadNext = (idx) => {
+      if (idx >= playersList.length) return;
+      const ply = playersList[idx];
+      if (ply && ply.photo) {
+        const img = new Image();
+        img.onload = img.onerror = () => {
+          setTimeout(() => preloadNext(idx + 1), 10);
+        };
+        img.src = ply.photo;
+      } else {
+        preloadNext(idx + 1);
+      }
+    };
+    setTimeout(() => preloadNext(0), 400);
+  }
+
   // Register Service Worker for PWA
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js').catch((err) => {
@@ -240,27 +261,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
     });
-  }
-
-  // Background preloader: smoothly caches all tournament player images in browser memory for instant <1ms display
-  let _imagesPreloaded = false;
-  function preloadTournamentImages(playersList) {
-    if (_imagesPreloaded || !Array.isArray(playersList) || playersList.length === 0) return;
-    _imagesPreloaded = true;
-    const preloadNext = (idx) => {
-      if (idx >= playersList.length) return;
-      const ply = playersList[idx];
-      if (ply && ply.photo) {
-        const img = new Image();
-        img.onload = img.onerror = () => {
-          setTimeout(() => preloadNext(idx + 1), 10);
-        };
-        img.src = ply.photo;
-      } else {
-        preloadNext(idx + 1);
-      }
-    };
-    setTimeout(() => preloadNext(0), 400);
   }
 
   // Direct server push hook: immediately updates state when server data is received
