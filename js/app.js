@@ -34,6 +34,9 @@ document.addEventListener('DOMContentLoaded', () => {
   currentAuctionState = initial.state;
   currentTeams = initial.teams;
   currentPlayers = initial.players;
+  if (typeof preloadTournamentImages === 'function') {
+    preloadTournamentImages(currentPlayers);
+  }
 
   // Restore saved active user session (stays saved permanently on device across reloads)
   activeUser = StorageManager.getActiveUser();
@@ -239,6 +242,27 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Background preloader: smoothly caches all tournament player images in browser memory for instant <1ms display
+  let _imagesPreloaded = false;
+  function preloadTournamentImages(playersList) {
+    if (_imagesPreloaded || !Array.isArray(playersList) || playersList.length === 0) return;
+    _imagesPreloaded = true;
+    const preloadNext = (idx) => {
+      if (idx >= playersList.length) return;
+      const ply = playersList[idx];
+      if (ply && ply.photo) {
+        const img = new Image();
+        img.onload = img.onerror = () => {
+          setTimeout(() => preloadNext(idx + 1), 10);
+        };
+        img.src = ply.photo;
+      } else {
+        preloadNext(idx + 1);
+      }
+    };
+    setTimeout(() => preloadNext(0), 400);
+  }
+
   // Direct server push hook: immediately updates state when server data is received
   window.onServerDataReceived = function (data) {
     if (!data) return;
@@ -250,6 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (data.players) {
       currentPlayers = data.players;
+      preloadTournamentImages(currentPlayers);
     }
 
     if (currentAuctionState && currentAuctionState.currentBid > previousBid) {
@@ -1084,10 +1109,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (cardImg && cardSvg) {
       if (hasPlayer && p.photo) {
-        cardImg.src = p.photo;
+        if (cardImg.getAttribute('data-cur-src') !== p.photo) {
+          cardImg.setAttribute('data-cur-src', p.photo);
+          cardImg.onerror = function () {
+            if (p.photoDriveUrl && this.src !== p.photoDriveUrl) {
+              this.src = p.photoDriveUrl;
+            } else {
+              this.style.display = 'none';
+              if (cardSvg) cardSvg.style.display = 'block';
+            }
+          };
+          cardImg.onload = function () {
+            this.style.display = 'block';
+            if (cardSvg) cardSvg.style.display = 'none';
+          };
+          cardImg.src = p.photo;
+        }
         cardImg.style.display = 'block';
         cardSvg.style.display = 'none';
       } else {
+        cardImg.removeAttribute('data-cur-src');
         cardImg.style.display = 'none';
         cardSvg.style.display = 'block';
       }
@@ -1181,10 +1222,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (cardImg && cardSvg) {
       if (hasPlayer && p.photo) {
-        cardImg.src = p.photo;
+        if (cardImg.getAttribute('data-cur-src') !== p.photo) {
+          cardImg.setAttribute('data-cur-src', p.photo);
+          cardImg.onerror = function () {
+            if (p.photoDriveUrl && this.src !== p.photoDriveUrl) {
+              this.src = p.photoDriveUrl;
+            } else {
+              this.style.display = 'none';
+              if (cardSvg) cardSvg.style.display = 'block';
+            }
+          };
+          cardImg.onload = function () {
+            this.style.display = 'block';
+            if (cardSvg) cardSvg.style.display = 'none';
+          };
+          cardImg.src = p.photo;
+        }
         cardImg.style.display = 'block';
         cardSvg.style.display = 'none';
       } else {
+        cardImg.removeAttribute('data-cur-src');
         cardImg.style.display = 'none';
         cardSvg.style.display = 'block';
       }

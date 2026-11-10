@@ -21,6 +21,10 @@ SimpleHTTPRequestHandler.extensions_map.update({
     '.css': 'text/css',
     '.svg': 'image/svg+xml',
     '.ico': 'image/x-icon',
+    '.jpg': 'image/jpeg',
+    '.jpeg': 'image/jpeg',
+    '.png': 'image/png',
+    '.webp': 'image/webp',
     '.webmanifest': 'application/manifest+json'
 })
 
@@ -42,18 +46,18 @@ SET_CONFIG = [
 ]
 
 INITIAL_TEAMS_RAW = [
-  { 'id': 'team_01', 'name': 'Fatemi Falcons', 'icon': '🦅', 'username': 'fatemi', 'password': 'fatemi@2026', 'ownerName': 'Burhanuddin Hussain', 'phone': '9820011111', 'playingOwner': 'TBD (Pending Registration)', 'captainSetId': None, 'captainSetName': 'TBD', 'color': '#3b82f6' },
-  { 'id': 'team_02', 'name': 'Kanchwala Knight Riders', 'icon': '🛡️', 'username': 'kanchwala', 'password': 'kanchwala@2026', 'ownerName': 'Taha Sajid Husain kanchwala', 'phone': '9820022222', 'playingOwner': 'TBD (Pending Registration)', 'captainSetId': None, 'captainSetName': 'TBD', 'color': '#8b5cf6' },
-  { 'id': 'team_03', 'name': 'Telwala Challengers', 'icon': '🦁', 'username': 'telwala', 'password': 'telwala@2026', 'ownerName': 'Abdul Taiyeb Telwala', 'phone': '9820033333', 'playingOwner': 'TBD (Pending Registration)', 'captainSetId': None, 'captainSetName': 'TBD', 'color': '#ef4444' },
-  { 'id': 'team_04', 'name': 'Hussaini Strikers', 'icon': '🏏', 'username': 'hussaini', 'password': 'hussaini@2026', 'ownerName': 'Burhanuddin Husain Rampurawala', 'phone': '9820044444', 'playingOwner': 'TBD (Pending Registration)', 'captainSetId': None, 'captainSetName': 'TBD', 'color': '#10b981' },
-  { 'id': 'team_05', 'name': 'Bagichawala Blasters', 'icon': '⚡', 'username': 'bagichawala', 'password': 'bagichawala@2026', 'ownerName': 'Shabbir bagichawala', 'phone': '9820055555', 'playingOwner': 'TBD (Pending Registration)', 'captainSetId': None, 'captainSetName': 'TBD', 'color': '#f59e0b' },
-  { 'id': 'team_06', 'name': 'Galaxy Titans', 'icon': '⚔️', 'username': 'galaxy', 'password': 'galaxy@2026', 'ownerName': 'Mustafa akolawala/muffadal hussain', 'phone': '9820066666', 'playingOwner': 'TBD (Pending Registration)', 'captainSetId': None, 'captainSetName': 'TBD', 'color': '#6366f1' },
-  { 'id': 'team_07', 'name': 'Ezzy Stars', 'icon': '⭐', 'username': 'ezzy', 'password': 'ezzy@2026', 'ownerName': 'Murtaza ali jamnagarwala', 'phone': '9820077777', 'playingOwner': 'TBD (Pending Registration)', 'captainSetId': None, 'captainSetName': 'TBD', 'color': '#ec4899' },
-  { 'id': 'team_08', 'name': 'Supreme Squad', 'icon': '👑', 'username': 'supreme', 'password': 'supreme@2026', 'ownerName': 'Shabbir murtazapurwala', 'phone': '9820088888', 'playingOwner': 'TBD (Pending Registration)', 'captainSetId': None, 'captainSetName': 'TBD', 'color': '#14b8a6' },
-  { 'id': 'team_09', 'name': 'Raj Strickers', 'icon': '🥊', 'username': 'raj', 'password': 'raj@2026', 'ownerName': 'Ali chandurwala', 'phone': '9820099999', 'playingOwner': 'TBD (Pending Registration)', 'captainSetId': None, 'captainSetName': 'TBD', 'color': '#eab308' },
-  { 'id': 'team_10', 'name': 'Burhanpurwala Dominators', 'icon': '🏆', 'username': 'burhanpur', 'password': 'burhanpur@2026', 'ownerName': 'Zoeb Chappalwala', 'phone': '9820010101', 'playingOwner': 'TBD (Pending Registration)', 'captainSetId': None, 'captainSetName': 'TBD', 'color': '#06b6d4' },
-  { 'id': 'team_11', 'name': 'Choudhary Thunderbolts', 'icon': '🏹', 'username': 'choudhary', 'password': 'choudhary@2026', 'ownerName': 'Altaf chaudhary', 'phone': '9820020202', 'playingOwner': 'TBD (Pending Registration)', 'captainSetId': None, 'captainSetName': 'TBD', 'color': '#f97316' },
-  { 'id': 'team_12', 'name': 'Lucky Legends', 'icon': '🐎', 'username': 'lucky', 'password': 'lucky@2026', 'ownerName': 'Mustufa Bhai Chandurwala', 'phone': '9820030303', 'playingOwner': 'TBD (Pending Registration)', 'captainSetId': None, 'captainSetName': 'TBD', 'color': '#84cc16' }
+  { 'id': 'team_01', 'name': 'Fatemi Falcons', 'icon': '🦅', 'username': 'fatemi', 'password': 'fatemi@2026', 'ownerName': 'Burhanuddin Hussain', 'phone': '9595675756', 'playingOwner': 'Burhanuddin Hussain', 'captainSetId': 'set_aqeeq', 'captainSetName': 'Aqeeq', 'photo': 'images/owners/owner_team_01.jpg', 'color': '#3b82f6' },
+  { 'id': 'team_02', 'name': 'Kanchwala Knight Riders', 'icon': '🛡️', 'username': 'kanchwala', 'password': 'kanchwala@2026', 'ownerName': 'Taha Sajid Husain kanchwala', 'phone': '9028752753', 'playingOwner': 'Taha Sajid Husain kanchwala', 'captainSetId': 'set_yaqoot', 'captainSetName': 'Yaqoot', 'photo': 'images/owners/owner_team_02.jpg', 'color': '#8b5cf6' },
+  { 'id': 'team_03', 'name': 'Telwala Challengers', 'icon': '🦁', 'username': 'telwala', 'password': 'telwala@2026', 'ownerName': 'Abdul Taiyeb Telwala', 'phone': '8767835509', 'playingOwner': 'Abdul Taiyeb Telwala', 'captainSetId': 'set_neelam', 'captainSetName': 'Neelam', 'photo': 'images/owners/owner_team_03.jpg', 'color': '#ef4444' },
+  { 'id': 'team_04', 'name': 'Hussaini Strikers', 'icon': '🏏', 'username': 'hussaini', 'password': 'hussaini@2026', 'ownerName': 'Burhanuddin Husain Rampurawala', 'phone': '8208334865', 'playingOwner': 'Burhanuddin Husain Rampurawala', 'captainSetId': 'set_durenajaf', 'captainSetName': 'Dur-e-Najaf', 'photo': 'images/owners/owner_team_04.jpg', 'color': '#10b981' },
+  { 'id': 'team_05', 'name': 'Bagichawala Blasters', 'icon': '⚡', 'username': 'bagichawala', 'password': 'bagichawala@2026', 'ownerName': 'Shabbir bagichawala', 'phone': '8530039352', 'playingOwner': 'Shabbir bagichawala', 'captainSetId': 'set_pukhraj', 'captainSetName': 'Pukhraj', 'photo': 'images/owners/owner_team_05.jpg', 'color': '#f59e0b' },
+  { 'id': 'team_06', 'name': 'Galaxy Titans', 'icon': '⚔️', 'username': 'galaxy', 'password': 'galaxy@2026', 'ownerName': 'Mustafa akolawala/muffadal hussain', 'phone': '9970044620', 'playingOwner': 'mustafa Akolawala', 'captainSetId': 'set_firoza', 'captainSetName': 'Firoza', 'photo': 'images/owners/owner_team_06.jpg', 'color': '#6366f1' },
+  { 'id': 'team_07', 'name': 'Ezzy Stars', 'icon': '⭐', 'username': 'ezzy', 'password': 'ezzy@2026', 'ownerName': 'Murtaza ali jamnagarwala', 'phone': '9511876609', 'playingOwner': 'Murtaza ali jamnagarwala', 'captainSetId': 'set_marjan', 'captainSetName': 'Marjan', 'photo': 'images/owners/owner_team_07.jpg', 'color': '#ec4899' },
+  { 'id': 'team_08', 'name': 'Supreme Squad', 'icon': '👑', 'username': 'supreme', 'password': 'supreme@2026', 'ownerName': 'Shabbir murtazapurwala', 'phone': '8975797870', 'playingOwner': 'Shabbir murtazapurwala', 'captainSetId': 'set_zumurrud', 'captainSetName': 'Zumurrud', 'photo': 'images/owners/owner_team_08.jpg', 'color': '#14b8a6' },
+  { 'id': 'team_09', 'name': 'Raj Strickers', 'icon': '🥊', 'username': 'raj', 'password': 'raj@2026', 'ownerName': 'Ali chandurwala', 'phone': '8793335457', 'playingOwner': 'Ali chandurwala', 'captainSetId': 'set_neelam', 'captainSetName': 'Neelam', 'photo': 'images/owners/owner_team_09.jpg', 'color': '#eab308' },
+  { 'id': 'team_10', 'name': 'Burhanpurwala Dominators', 'icon': '🏆', 'username': 'burhanpur', 'password': 'burhanpur@2026', 'ownerName': 'Zoeb Chappalwala', 'phone': '7841891212', 'playingOwner': 'Zoeb Chappalwala', 'captainSetId': 'set_zumurrud', 'captainSetName': 'Zumurrud', 'photo': 'images/owners/owner_team_10.jpg', 'color': '#06b6d4' },
+  { 'id': 'team_11', 'name': 'Choudhary Thunderbolts', 'icon': '🏹', 'username': 'choudhary', 'password': 'choudhary@2026', 'ownerName': 'Altaf choudhary', 'phone': '9820020202', 'playingOwner': 'Murtaza Shakirali Saifee', 'captainSetId': 'set_marjan', 'captainSetName': 'Marjan', 'photo': 'images/owners/owner_team_11.jpg', 'color': '#f97316' },
+  { 'id': 'team_12', 'name': 'Lucky Legends', 'icon': '🐎', 'username': 'lucky', 'password': 'lucky@2026', 'ownerName': 'Mustufa Bhai Chandurwala', 'phone': '9820030303', 'playingOwner': 'Abdul qadir kothawala', 'captainSetId': 'set_firoza', 'captainSetName': 'Firoza', 'photo': 'images/owners/owner_team_12.jpg', 'color': '#84cc16' }
 ]
 
 FIRST_NAMES = [
@@ -97,17 +101,28 @@ SPECIALIZATIONS = [
 
 def generate_default_teams():
     teams = []
+    now_ts = int(time.time() * 1000)
     for idx, t in enumerate(INITIAL_TEAMS_RAW):
         team = dict(t)
+        c_set_id = team.get('captainSetId')
+        c_set_name = team.get('captainSetName', 'Stone Set')
+        capt_name = team.get('playingOwner', team.get('ownerName'))
         team.update({
-            'captainSetId': None,
-            'captainSetName': 'TBD',
             'initialBudget': 100000,
             'remainingBudget': 100000,
             'maxAuctionSlots': 8,
-            'acquiredCount': 0,
-            'ownedSetIds': [],
-            'roster': []
+            'acquiredCount': 1 if c_set_id else 0,
+            'ownedSetIds': [c_set_id] if c_set_id else [],
+            'roster': [{
+                'playerId': f"owner_{team['id']}",
+                'name': capt_name,
+                'role': 'Playing Owner (Captain)',
+                'setId': c_set_id,
+                'setName': c_set_name,
+                'price': 0,
+                'isOwner': True,
+                'timestamp': now_ts
+            }] if c_set_id else []
         })
         teams.append(team)
     return teams
@@ -305,14 +320,20 @@ class AuctionSyncHandler(SimpleHTTPRequestHandler):
         super().__init__(*args, directory=BASE_DIR, **kwargs)
 
     def end_headers(self):
-        # Enable CORS and disable caching so every device gets real-time data
+        # Enable CORS and persistent connection
         self.send_header('Access-Control-Allow-Origin', '*')
         self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
         self.send_header('Access-Control-Allow-Headers', 'Content-Type')
-        self.send_header('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0')
-        self.send_header('Pragma', 'no-cache')
-        self.send_header('Expires', '0')
         self.send_header('Connection', 'keep-alive')
+
+        # Fast cache for static images and media (< 1ms load); no-cache for live sync and HTML
+        clean_path = self.path.split('?')[0].lower()
+        if clean_path.startswith('/images/') or clean_path.startswith('/icons/') or clean_path.endswith(('.jpg', '.jpeg', '.png', '.webp', '.svg', '.ico')):
+            self.send_header('Cache-Control', 'public, max-age=86400, immutable')
+        else:
+            self.send_header('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0')
+            self.send_header('Pragma', 'no-cache')
+            self.send_header('Expires', '0')
         super().end_headers()
 
     def do_OPTIONS(self):
