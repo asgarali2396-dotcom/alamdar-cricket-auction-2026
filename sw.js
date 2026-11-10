@@ -1,4 +1,4 @@
-const CACHE_NAME = 'alamdar-auction-v22';
+const CACHE_NAME = 'alamdar-auction-v23';
 const ASSETS = [
   './',
   './index.html',

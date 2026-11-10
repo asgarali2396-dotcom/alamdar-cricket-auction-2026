@@ -757,13 +757,28 @@ document.addEventListener('DOMContentLoaded', () => {
     // Set Selector in Admin View
     const adminSetSelect = document.getElementById('admin-set-select');
     if (adminSetSelect) {
-      adminSetSelect.addEventListener('change', (e) => {
+      adminSetSelect.addEventListener('change', async (e) => {
         const setId = e.target.value;
-        const setName = e.target.options[e.target.selectedIndex].text;
-        const state = StorageManager.get(STORAGE_KEYS.STATE);
+        const opt = e.target.options[e.target.selectedIndex];
+        const rawText = opt ? opt.text : '';
+        const setName = rawText.split(' (')[0].trim();
+
+        if (currentAuctionState) {
+          currentAuctionState.currentSetId = setId;
+          currentAuctionState.currentSetName = setName;
+        }
+
+        const state = StorageManager.get(STORAGE_KEYS.STATE) || {};
         state.currentSetId = setId;
         state.currentSetName = setName;
         StorageManager.set(STORAGE_KEYS.STATE, state);
+
+        if (!StorageManager._syncDisabled && typeof fetch !== 'undefined') {
+          const res = await StorageManager.executeServerAction('change_set', { setId, setName });
+          if (res && res.state) {
+            currentAuctionState = res.state;
+          }
+        }
         renderAdminPlayerQueue();
       });
     }
@@ -869,6 +884,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     renderApp();
   }
+  window.switchView = switchView;
 
   // Master Render Coordinator (Debounced with requestAnimationFrame for smooth 60fps UI)
   function renderApp() {
@@ -1334,11 +1350,15 @@ document.addEventListener('DOMContentLoaded', () => {
   // -------------------------------------------------------------
   function renderAdminDashboard() {
     const adminSetSelect = document.getElementById('admin-set-select');
-    if (adminSetSelect && adminSetSelect.children.length === 0) {
-      adminSetSelect.innerHTML = window.ALAMDAR_DATA.SET_CONFIG.map(
-        (s) => `<option value="${s.id}">${s.name} (${s.meaning})</option>`
-      ).join('');
-      adminSetSelect.value = currentAuctionState.currentSetId;
+    if (adminSetSelect) {
+      if (adminSetSelect.children.length === 0) {
+        adminSetSelect.innerHTML = window.ALAMDAR_DATA.SET_CONFIG.map(
+          (s) => `<option value="${s.id}">${s.name} (${s.meaning})</option>`
+        ).join('');
+      }
+      if (document.activeElement !== adminSetSelect && currentAuctionState?.currentSetId) {
+        adminSetSelect.value = currentAuctionState.currentSetId;
+      }
     }
 
     // Update Live Stage info in Gavel Controls
@@ -1429,8 +1449,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const queueEl = document.getElementById('admin-player-queue-list');
     if (!queueEl) return;
 
-    const currentSetId = currentAuctionState.currentSetId;
-    const setPlayers = currentPlayers.filter((p) => p.setId === currentSetId);
+    const adminSetSelect = document.getElementById('admin-set-select');
+    const activeSetId = (adminSetSelect && adminSetSelect.value) ? adminSetSelect.value : (currentAuctionState?.currentSetId || 'set_aqeeq');
+    const setPlayers = currentPlayers.filter((p) => p.setId === activeSetId);
+
+    if (setPlayers.length === 0) {
+      queueEl.innerHTML = `
+        <div class="col-span-full p-8 text-center text-[#E6F0E9]/60 text-sm font-medium border border-dashed border-[#C8A96A]/30 rounded-2xl bg-[#092520]/50">
+          No players available in this set.
+        </div>
+      `;
+      return;
+    }
 
     queueEl.innerHTML = setPlayers
       .map((p) => {

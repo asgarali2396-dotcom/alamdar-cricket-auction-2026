@@ -532,7 +532,7 @@ class AuctionSyncHandler(SimpleHTTPRequestHandler):
                             server_data['version'] = int(server_data.get('version', 0)) + 1
                             update_cache()
                             trigger_async_save()
-                            result = {"success": True, "version": server_data['version']}
+                            result = {"success": True, "state": state, "version": server_data['version']}
 
                     elif action == 'toggle_lock':
                         state['biddingLocked'] = not state.get('biddingLocked', False)
@@ -540,7 +540,20 @@ class AuctionSyncHandler(SimpleHTTPRequestHandler):
                         server_data['version'] = int(server_data.get('version', 0)) + 1
                         update_cache()
                         trigger_async_save()
-                        result = {"success": True, "biddingLocked": state['biddingLocked'], "version": server_data['version']}
+                        result = {"success": True, "biddingLocked": state['biddingLocked'], "state": state, "version": server_data['version']}
+
+                    elif action == 'change_set':
+                        set_id = data.get('setId')
+                        set_name = data.get('setName')
+                        if set_id:
+                            state['currentSetId'] = set_id
+                        if set_name:
+                            state['currentSetName'] = set_name
+                        state['lastActionTimestamp'] = int(time.time() * 1000)
+                        server_data['version'] = int(server_data.get('version', 0)) + 1
+                        update_cache()
+                        trigger_async_save()
+                        result = {"success": True, "state": state, "currentSetId": state.get('currentSetId'), "version": server_data['version']}
 
                     elif action == 'countdown_tick':
                         count = data.get('count')

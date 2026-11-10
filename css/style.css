@@ -1492,8 +1492,9 @@ select:focus, input:focus {
   }
 
   .owner-photo-frame {
-    max-width: 220px !important;
-    max-height: 190px !important;
+    max-width: 260px !important;
+    max-height: 260px !important;
+    aspect-ratio: 1 / 1 !important;
   }
 }
 
@@ -1544,8 +1545,8 @@ select:focus, input:focus {
   flex-direction: column !important;
   align-items: center !important;
   justify-content: space-between !important;
-  padding: 1.4rem 1.25rem !important;
-  gap: 1rem !important;
+  padding: 1.15rem 1rem !important;
+  gap: 0.65rem !important;
   min-height: 520px !important;
   height: 520px;
   box-sizing: border-box !important;
@@ -1553,12 +1554,12 @@ select:focus, input:focus {
 
 .owner-photo-frame {
   width: 100%;
-  max-width: 195px;
-  min-height: 145px;
-  max-height: 185px;
-  aspect-ratio: 4 / 3;
-  border-radius: 1rem;
-  border: 2px solid rgba(200, 169, 106, 0.65);
+  max-width: 265px;
+  min-height: 220px;
+  max-height: 275px;
+  aspect-ratio: 1 / 1;
+  border-radius: 1.15rem;
+  border: 2.5px solid rgba(200, 169, 106, 0.75);
   overflow: hidden;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(200, 169, 106, 0.2);
   display: flex;
@@ -1566,7 +1567,16 @@ select:focus, input:focus {
   justify-content: center;
   background: #1e293b;
   position: relative;
-  margin: 0.2rem auto;
+  margin: 0.15rem auto;
+  flex: 1;
+}
+
+.owner-photo-frame img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: top center !important;
+  display: block;
 }
 
 .owner-attr-pill {
@@ -1745,12 +1755,12 @@ body.is-fullscreen #view-live .owner-player-spotlight-card h3,
 
 body.is-fullscreen #view-live .owner-photo-frame,
 :fullscreen #view-live .owner-photo-frame {
-  width: 85% !important;
-  max-width: 330px !important;
-  aspect-ratio: 4 / 3 !important;
+  width: 90% !important;
+  max-width: 320px !important;
+  aspect-ratio: 1 / 1 !important;
   height: auto !important;
-  max-height: clamp(200px, 26vh, 280px) !important;
-  min-height: 200px !important;
+  max-height: clamp(220px, 32vh, 320px) !important;
+  min-height: 220px !important;
   border-radius: 1.35rem !important;
   border: 3px solid rgba(200, 169, 106, 0.70) !important;
   box-shadow: 0 14px 35px rgba(0, 0, 0, 0.65), inset 0 0 25px rgba(200, 169, 106, 0.25) !important;
@@ -2128,18 +2138,18 @@ body.is-fullscreen #view-owner .owner-player-spotlight-card h3,
 body.is-fullscreen #view-owner .owner-photo-frame,
 :fullscreen #view-owner .owner-photo-frame {
   flex: 0 0 auto !important;
-  min-height: 145px !important;
-  max-height: 185px !important;
+  min-height: 200px !important;
+  max-height: 260px !important;
   width: 100% !important;
-  max-width: 195px !important;
-  aspect-ratio: 4 / 3 !important;
+  max-width: 260px !important;
+  aspect-ratio: 1 / 1 !important;
   height: auto !important;
   margin-left: auto !important;
   margin-right: auto !important;
-  margin-top: 0.2rem !important;
-  margin-bottom: 0.2rem !important;
-  border-radius: 1rem !important;
-  border: 2px solid rgba(200, 169, 106, 0.65) !important;
+  margin-top: 0.15rem !important;
+  margin-bottom: 0.15rem !important;
+  border-radius: 1.15rem !important;
+  border: 2.5px solid rgba(200, 169, 106, 0.70) !important;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(200, 169, 106, 0.2) !important;
 }
 
