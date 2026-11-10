@@ -19,6 +19,7 @@ COLOR_NAVY = RGBColor(16, 42, 67)              # #102A43
 COLOR_TEXT_DARK = RGBColor(30, 41, 59)         # #1E293B
 COLOR_TEXT_MUTED = RGBColor(100, 116, 139)     # #64748B
 COLOR_WHITE = RGBColor(255, 255, 255)
+COLOR_AMBER_DARK = RGBColor(180, 83, 9)        # #B45309
 
 HEX_EMERALD_DARK = "0F3D34"
 HEX_EMERALD_MED = "134E43"
@@ -27,8 +28,7 @@ HEX_NAVY = "102A43"
 HEX_ZEBRA = "F8FAFC"
 HEX_WHITE = "FFFFFF"
 HEX_BORDER = "CBD5E1"
-HEX_CARD_BG = "F7FBF9"
-HEX_GOLD_LIGHT = "FEF9EF"
+HEX_GOLD_ROW = "FEF9EE"  # Subtle elegant gold highlight for playing captains
 
 # Stone Metadata & Display configuration
 SET_ORDER = [
@@ -37,7 +37,7 @@ SET_ORDER = [
         'meaning': 'Agate',
         'desc': 'Deep Carnelian Red Agate',
         'gem_file': 'aqeeq.png',
-        'banner_hex': '8B0000',    # Deep Ruby/Crimson
+        'banner_hex': '8B0000',
         'border_hex': 'B91C1C'
     },
     {
@@ -45,7 +45,7 @@ SET_ORDER = [
         'meaning': 'Turquoise',
         'desc': 'Vibrant Turquoise Sky Blue',
         'gem_file': 'firoza.png',
-        'banner_hex': '0D7482',    # Deep Turquoise
+        'banner_hex': '0D7482',
         'border_hex': '0E7490'
     },
     {
@@ -53,7 +53,7 @@ SET_ORDER = [
         'meaning': 'Ruby',
         'desc': 'Royal Crimson Red Ruby',
         'gem_file': 'yaqoot.png',
-        'banner_hex': '9F1239',    # Rich Crimson
+        'banner_hex': '9F1239',
         'border_hex': 'BE123C'
     },
     {
@@ -61,7 +61,7 @@ SET_ORDER = [
         'meaning': 'Emerald',
         'desc': 'Colombian Emerald Green',
         'gem_file': 'zumurrud.png',
-        'banner_hex': '065F46',    # Deep Emerald
+        'banner_hex': '065F46',
         'border_hex': '047857'
     },
     {
@@ -69,7 +69,7 @@ SET_ORDER = [
         'meaning': 'Sapphire',
         'desc': 'Royal Blue Sapphire',
         'gem_file': 'neelam.png',
-        'banner_hex': '1E3A8A',    # Royal Navy Blue
+        'banner_hex': '1E3A8A',
         'border_hex': '1D4ED8'
     },
     {
@@ -77,7 +77,7 @@ SET_ORDER = [
         'meaning': 'Yellow Sapphire',
         'desc': 'Imperial Golden Topaz & Yellow Sapphire',
         'gem_file': 'pukhraj.png',
-        'banner_hex': 'B45309',    # Warm Amber Gold
+        'banner_hex': 'B45309',
         'border_hex': 'D97706'
     },
     {
@@ -85,7 +85,7 @@ SET_ORDER = [
         'meaning': 'Quartz',
         'desc': 'Pure Crystalline Diamond Quartz',
         'gem_file': 'dur_e_najaf.png',
-        'banner_hex': '334155',    # Slate Quartz
+        'banner_hex': '334155',
         'border_hex': '475569'
     },
     {
@@ -93,10 +93,42 @@ SET_ORDER = [
         'meaning': 'Coral',
         'desc': 'Radiant Red Coral',
         'gem_file': 'marjan.png',
-        'banner_hex': '9A3412',    # Warm Coral Terracotta
+        'banner_hex': '9A3412',
         'border_hex': 'C2410C'
     }
 ]
+
+# Exact 12 Pre-assigned Playing Captains / Owners
+CAPTAINS_CONFIG = {
+    'Aqeeq': [
+        {'name': 'Burhanuddin Hussain', 'team': 'Fatemi Falcons', 'age': '28', 'bat': 'RHB', 'bowl': 'LHB', 'mob': '9595675756'}
+    ],
+    'Firoza': [
+        {'name': 'Mustafa Akolawala', 'team': 'Galaxy Titans', 'age': '35', 'bat': 'RHB', 'bowl': 'RHB', 'mob': '9970044620'},
+        {'name': 'Abdul Qadir Kothawala', 'team': 'Lucky Legends', 'age': '-', 'bat': 'RHB', 'bowl': 'RHB', 'mob': '-'}
+    ],
+    'Yaqoot': [
+        {'name': 'Taha Sajid Husain Kanchwala', 'team': 'Kanchwala Knight Riders', 'age': '27', 'bat': 'RHB', 'bowl': 'RHB', 'mob': '9028752753'}
+    ],
+    'Zumurrud': [
+        {'name': 'Shabbir Murtazapurwala', 'team': 'Supreme Squad', 'age': '34', 'bat': 'RHB', 'bowl': 'RHB', 'mob': '8975797870'},
+        {'name': 'Zoeb Chappalwala', 'team': 'Burhanpurwala Dominators', 'age': '40', 'bat': 'RHB', 'bowl': 'RHB', 'mob': '7841891212'}
+    ],
+    'Neelam': [
+        {'name': 'Abdul Taiyeb Telwala', 'team': 'Telwala Challengers', 'age': '19', 'bat': 'RHB', 'bowl': 'LHB', 'mob': '8767835509'},
+        {'name': 'Ali Chandurwala', 'team': 'Raj Strikers', 'age': '34', 'bat': 'RHB', 'bowl': 'RHB', 'mob': '8793335457'}
+    ],
+    'Pukhraj': [
+        {'name': 'Shabbir Bagichawala', 'team': 'Bagichawala Blasters', 'age': '18', 'bat': 'RHB', 'bowl': 'RHB', 'mob': '8530039352'}
+    ],
+    'Dur-e-Najaf': [
+        {'name': 'Burhanuddin Husain Rampurawala', 'team': 'Hussaini Strikers', 'age': '27', 'bat': 'RHB', 'bowl': 'RHB', 'mob': '8208334865'}
+    ],
+    'Marjan': [
+        {'name': 'Murtaza Ali Jamnagarwala', 'team': 'Ezzy Stars', 'age': '44', 'bat': 'RHB', 'bowl': 'RHB', 'mob': '9511876609'},
+        {'name': 'Murtaza Shakirali Saifee', 'team': 'Choudhary Thunderbolts', 'age': '48', 'bat': 'RHB', 'bowl': 'RHB', 'mob': '9422159115'}
+    ]
+}
 
 def norm(s):
     return re.sub(r'[^a-z0-9]', '', str(s).lower())
@@ -105,9 +137,7 @@ def clean_phone(phone_str):
     if not phone_str:
         return '-'
     p = str(phone_str).strip()
-    # Remove all spaces, dashes, parentheses, plus
     p = re.sub(r'[\s\(\)\-\+]', '', p)
-    # If 12 digits and starts with 91, strip country code
     if len(p) == 12 and p.startswith('91'):
         p = p[2:]
     return p if p else '-'
@@ -126,7 +156,7 @@ def set_cell_background(cell, fill_hex):
     shd = parse_xml(f'<w:shd {nsdecls("w")} w:fill="{fill_hex}"/>')
     tcPr.append(shd)
 
-def set_cell_margins(cell, top=70, bottom=70, left=100, right=100):
+def set_cell_margins(cell, top=65, bottom=65, left=90, right=90):
     tcPr = cell._tc.get_or_add_tcPr()
     tcMar = parse_xml(
         f'<w:tcMar {nsdecls("w")}>'
@@ -186,7 +216,6 @@ def prevent_row_split(table):
 def load_data():
     tcc_path = r'C:\Users\USER\Desktop\TCC Season 1\Player_registration_final.csv'
     auction_path = os.path.join(BASE_DIR, 'Player_registration_final.csv')
-    owner_path = os.path.join(BASE_DIR, 'owner_detail.csv')
 
     by_photo = {}
     by_name = {}
@@ -199,8 +228,9 @@ def load_data():
                     by_photo[match.group(1)] = r
                 by_name[norm(r.get('PLAYER NAME', ''))] = r
 
-    sets_data = {cfg['key']: {'players': [], 'captains': []} for cfg in SET_ORDER}
+    sets_data = {cfg['key']: {'players': []} for cfg in SET_ORDER}
 
+    # Load 84 registered players (P. No 1 to 84)
     with open(auction_path, mode='r', encoding='utf-8', errors='ignore') as f:
         for r in csv.DictReader(f):
             s_name = r.get('Stone Set', '').strip()
@@ -218,7 +248,6 @@ def load_data():
             elif norm(p_name) in by_name:
                 mob = by_name[norm(p_name)].get('MOBILE NUMBER ', '').strip()
 
-            # Accurate number for Aziz Nagpurwala
             if 'nagpurwala' in p_name.lower():
                 mob = '7276319080'
 
@@ -230,41 +259,36 @@ def load_data():
             if not matched_key:
                 matched_key = s_name
                 if matched_key not in sets_data:
-                    sets_data[matched_key] = {'players': [], 'captains': []}
+                    sets_data[matched_key] = {'players': []}
 
             sets_data[matched_key]['players'].append({
                 'p_no': p_no,
                 'name': p_name.upper().strip(),
                 'age': age,
-                'mob': clean_phone(mob),
                 'bat': bat,
-                'bowl': bowl
+                'bowl': bowl,
+                'mob': clean_phone(mob),
+                'is_captain': False
             })
 
-    if os.path.exists(owner_path):
-        with open(owner_path, mode='r', encoding='utf-8', errors='ignore') as f:
-            for o in csv.DictReader(f):
-                c_set = o.get('Captain Stone Set', '').strip()
-                matched_key = None
-                for cfg in SET_ORDER:
-                    if cfg['key'].lower() in c_set.lower() or c_set.lower() in cfg['key'].lower():
-                        matched_key = cfg['key']
-                        break
-                if matched_key and matched_key in sets_data:
-                    c_name = o.get('Playing caption', '').strip()
-                    t_name = o.get('TEAM NAME', '').strip()
-                    mob = o.get('MOBILE NUMBER ', '').strip()
-                    if not mob and 'saifee' in c_name.lower():
-                        mob = '9422159115'
-                    sets_data[matched_key]['captains'].append({
-                        'captain': c_name,
-                        'owner': o.get('OWNER NAME', '').strip(),
-                        'team': t_name,
-                        'mob': clean_phone(mob),
-                        'age': o.get('OWNER AGE', '').strip(),
-                        'bat': clean_style(o.get('BATTING STYLE', '')),
-                        'bowl': clean_style(o.get('Bowling style', ''))
-                    })
+    # Include the 12 playing captains / owners directly into the table
+    # Numbering continues sequentially after 84 (P. No 85 to 96)
+    captain_pno = 85
+    for cfg in SET_ORDER:
+        s_key = cfg['key']
+        captains_list = CAPTAINS_CONFIG.get(s_key, [])
+        for c in captains_list:
+            sets_data[s_key]['players'].append({
+                'p_no': str(captain_pno),
+                'name': f"{c['name'].upper()} (CAPT - {c['team'].upper()})",
+                'age': c['age'],
+                'bat': c['bat'],
+                'bowl': c['bowl'],
+                'mob': clean_phone(c['mob']),
+                'is_captain': True,
+                'team': c['team']
+            })
+            captain_pno += 1
 
     return sets_data
 
@@ -297,9 +321,8 @@ def build_word_document():
     for idx, cfg in enumerate(SET_ORDER):
         set_key = cfg['key']
         meaning = cfg['meaning']
-        s_data = sets_data.get(set_key, {'players': [], 'captains': []})
+        s_data = sets_data.get(set_key, {'players': []})
         players = s_data['players']
-        captains = s_data['captains']
 
         if idx > 0:
             doc.add_page_break()
@@ -313,7 +336,7 @@ def build_word_document():
 
         col_widths = [Inches(1.4), Inches(4.47), Inches(1.4)]
         row = header_tbl.rows[0]
-        row.height = Pt(70)
+        row.height = Pt(68)
         row.height_rule = WD_ROW_HEIGHT_RULE.EXACTLY
 
         for i, w in enumerate(col_widths):
@@ -385,7 +408,7 @@ def build_word_document():
 
         if os.path.exists(gem_path):
             run_gem = p_gem.add_run()
-            run_gem.add_picture(gem_path, width=Inches(1.22))
+            run_gem.add_picture(gem_path, width=Inches(1.20))
 
         # =====================================================
         # 3. SET BANNER BAR
@@ -396,7 +419,7 @@ def build_word_document():
         banner_cell.width = Inches(7.27)
         banner_cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
         set_cell_background(banner_cell, cfg['banner_hex'])
-        set_cell_margins(banner_cell, top=60, bottom=60, left=100, right=100)
+        set_cell_margins(banner_cell, top=55, bottom=55, left=100, right=100)
 
         tcPr = banner_cell._tc.get_or_add_tcPr()
         b_borders = parse_xml(
@@ -434,10 +457,10 @@ def build_word_document():
         p_space.paragraph_format.line_spacing = 1.0
 
         # =====================================================
-        # 4. PLAYER ROSTER TABLE
+        # 4. PLAYER ROSTER TABLE (NEW ORDER REQUESTED)
+        # Order: P. No | Player Name | Age | Bat Style | Bowl Style | Mob
         # =====================================================
-        # Columns: P. No | Player Name | Age | Mob | Bat Style | Bowl Style
-        tbl_cols = [Inches(0.60), Inches(2.72), Inches(0.55), Inches(1.50), Inches(0.95), Inches(0.95)]
+        tbl_cols = [Inches(0.60), Inches(2.87), Inches(0.55), Inches(0.85), Inches(0.85), Inches(1.55)]
         num_rows = len(players) + 1
 
         roster_tbl = doc.add_table(rows=num_rows, cols=6)
@@ -447,7 +470,7 @@ def build_word_document():
         header_row = roster_tbl.rows[0]
         header_row.height = Pt(22)
         header_row.height_rule = WD_ROW_HEIGHT_RULE.EXACTLY
-        h_titles = ["P. No", "Player Name", "Age", "Mob", "Bat Style", "Bowl Style"]
+        h_titles = ["P. No", "Player Name", "Age", "Bat Style", "Bowl Style", "Mob"]
         h_aligns = [WD_ALIGN_PARAGRAPH.CENTER, WD_ALIGN_PARAGRAPH.LEFT, WD_ALIGN_PARAGRAPH.CENTER,
                     WD_ALIGN_PARAGRAPH.CENTER, WD_ALIGN_PARAGRAPH.CENTER, WD_ALIGN_PARAGRAPH.CENTER]
 
@@ -456,7 +479,7 @@ def build_word_document():
             cell.width = tbl_cols[col_i]
             cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
             set_cell_background(cell, HEX_NAVY)
-            set_cell_margins(cell, top=60, bottom=60, left=80, right=80)
+            set_cell_margins(cell, top=60, bottom=60, left=70, right=70)
 
             p = cell.paragraphs[0]
             p.alignment = h_aligns[col_i]
@@ -479,14 +502,20 @@ def build_word_document():
             row.height = Pt(21)
             row.height_rule = WD_ROW_HEIGHT_RULE.EXACTLY
 
-            bg_color = HEX_ZEBRA if r_i % 2 == 1 else HEX_WHITE
+            is_cap = p_data.get('is_captain', False)
+            if is_cap:
+                bg_color = HEX_GOLD_ROW
+            else:
+                bg_color = HEX_ZEBRA if r_i % 2 == 1 else HEX_WHITE
+
+            # Order: P. No | Player Name | Age | Bat Style | Bowl Style | Mob
             row_vals = [
                 p_data['p_no'],
                 p_data['name'],
                 p_data['age'],
-                p_data['mob'],
                 p_data['bat'],
-                p_data['bowl']
+                p_data['bowl'],
+                p_data['mob']
             ]
 
             for col_i, val in enumerate(row_vals):
@@ -494,7 +523,7 @@ def build_word_document():
                 cell.width = tbl_cols[col_i]
                 cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
                 set_cell_background(cell, bg_color)
-                set_cell_margins(cell, top=50, bottom=50, left=80, right=80)
+                set_cell_margins(cell, top=50, bottom=50, left=70, right=70)
 
                 p = cell.paragraphs[0]
                 p.alignment = h_aligns[col_i]
@@ -508,13 +537,19 @@ def build_word_document():
 
                 if col_i == 0:  # P. No
                     run.font.bold = True
-                    run.font.color.rgb = COLOR_EMERALD_DARK
+                    if is_cap:
+                        run.font.color.rgb = COLOR_AMBER_DARK
+                    else:
+                        run.font.color.rgb = COLOR_EMERALD_DARK
                 elif col_i == 1:  # Player Name
                     run.font.name = 'Arial'
                     run.font.bold = True
-                    run.font.size = Pt(9)
-                    run.font.color.rgb = COLOR_TEXT_DARK
-                elif col_i == 3:  # Mob
+                    run.font.size = Pt(8.5) if is_cap else Pt(9)
+                    if is_cap:
+                        run.font.color.rgb = COLOR_AMBER_DARK
+                    else:
+                        run.font.color.rgb = COLOR_TEXT_DARK
+                elif col_i == 5:  # Mob
                     run.font.name = 'Calibri'
                     run.font.bold = True
                     run.font.color.rgb = COLOR_TEXT_DARK
@@ -524,70 +559,32 @@ def build_word_document():
         prevent_row_split(roster_tbl)
 
         # =====================================================
-        # 5. PRE-ASSIGNED PLAYING CAPTAINS CALLOUT BOX
+        # 5. ELEGANT 1-LINE TOURNAMENT RULE NOTE BELOW TABLE
         # =====================================================
-        p_cap_space = doc.add_paragraph()
-        p_cap_space.paragraph_format.space_before = Pt(3)
-        p_cap_space.paragraph_format.space_after = Pt(1)
-        p_cap_space.paragraph_format.line_spacing = 1.0
+        p_note = doc.add_paragraph()
+        p_note.paragraph_format.space_before = Pt(4)
+        p_note.paragraph_format.space_after = Pt(2)
+        p_note.paragraph_format.line_spacing = 1.05
 
-        cap_tbl = doc.add_table(rows=1, cols=1)
-        cap_tbl.alignment = WD_TABLE_ALIGNMENT.CENTER
-        cap_cell = cap_tbl.cell(0, 0)
-        cap_cell.width = Inches(7.27)
-        cap_cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
-        set_cell_background(cap_cell, HEX_GOLD_LIGHT)
-        set_cell_margins(cap_cell, top=60, bottom=60, left=100, right=100)
+        run_note_star = p_note.add_run("👑 NOTE: ")
+        run_note_star.font.name = 'Arial'
+        run_note_star.font.size = Pt(8.5)
+        run_note_star.font.bold = True
+        run_note_star.font.color.rgb = COLOR_AMBER_DARK
 
-        c_tcPr = cap_cell._tc.get_or_add_tcPr()
-        c_borders = parse_xml(
-            f'<w:tcBorders {nsdecls("w")}>'
-            f'<w:top w:val="single" w:sz="6" w:space="0" w:color="{HEX_GOLD}"/>'
-            f'<w:bottom w:val="single" w:sz="6" w:space="0" w:color="{HEX_GOLD}"/>'
-            f'<w:left w:val="single" w:sz="6" w:space="0" w:color="{HEX_GOLD}"/>'
-            f'<w:right w:val="single" w:sz="6" w:space="0" w:color="{HEX_GOLD}"/>'
-            f'</w:tcBorders>'
+        run_note_body = p_note.add_run(
+            "Players marked (CAPT - TEAM) are pre-acquired Playing Captains (Base Price: ₹0 / 0 PTS). "
+            "That franchise cannot bid on any other player from this stone set."
         )
-        c_tcPr.append(c_borders)
+        run_note_body.font.name = 'Calibri'
+        run_note_body.font.size = Pt(8)
+        run_note_body.font.italic = True
+        run_note_body.font.color.rgb = COLOR_TEXT_MUTED
 
-        p_cap = cap_cell.paragraphs[0]
-        p_cap.paragraph_format.space_before = Pt(0)
-        p_cap.paragraph_format.space_after = Pt(0)
-        p_cap.paragraph_format.line_spacing = 1.05
-
-        run_cap_badge = p_cap.add_run("👑 PRE-ASSIGNED PLAYING CAPTAIN (BASE PRICE: ₹0 / 0 PTS)\n")
-        run_cap_badge.font.name = 'Arial'
-        run_cap_badge.font.size = Pt(9.5)
-        run_cap_badge.font.bold = True
-        run_cap_badge.font.color.rgb = RGBColor(180, 83, 9)
-
-        if captains:
-            for c_i, c in enumerate(captains):
-                sep = "   |   " if c_i > 0 else ""
-                run_c_info = p_cap.add_run(
-                    f"{sep}• {c['captain'].upper()} ({c['team'].upper()})  [Mob: {c['mob']}  •  Bat: {c['bat']}  •  Bowl: {c['bowl']}]\n"
-                )
-                run_c_info.font.name = 'Calibri'
-                run_c_info.font.size = Pt(9)
-                run_c_info.font.bold = True
-                run_c_info.font.color.rgb = COLOR_TEXT_DARK
-        else:
-            run_none = p_cap.add_run("• No playing captain pre-assigned in this set.\n")
-            run_none.font.size = Pt(8.5)
-            run_none.font.italic = True
-
-        run_note = p_cap.add_run(
-            "* Tournament Rule: Playing Captain is pre-acquired by their franchise at ₹0 (Base Price). That franchise cannot bid on any other player from this stone set."
-        )
-        run_note.font.name = 'Calibri'
-        run_note.font.size = Pt(8)
-        run_note.font.italic = True
-        run_note.font.color.rgb = COLOR_TEXT_MUTED
-
-        # Footer space
+        # Footer
         p_foot = doc.add_paragraph()
         p_foot.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-        p_foot.paragraph_format.space_before = Pt(3)
+        p_foot.paragraph_format.space_before = Pt(2)
         p_foot.paragraph_format.space_after = Pt(0)
         run_foot = p_foot.add_run(f"Turf Clash Championship Season 1  •  Alamdar Sports Club  •  Page {idx + 1} of {total_sets}")
         run_foot.font.name = 'Calibri'
@@ -597,11 +594,17 @@ def build_word_document():
     output_docx_primary = os.path.join(BASE_DIR, 'Turf_Clash_Championship_Auction_Sets_2026.docx')
     output_docx_alias = os.path.join(BASE_DIR, 'Alamdar_Box_Cricket_Auction_Sets.docx')
 
-    doc.save(output_docx_primary)
-    doc.save(output_docx_alias)
-    print(f"✅ Generated Word Documents successfully:")
-    print(f"   - {output_docx_primary}")
-    print(f"   - {output_docx_alias}")
+    try:
+        doc.save(output_docx_primary)
+        print(f"✅ Saved: {output_docx_primary}")
+    except PermissionError:
+        print(f"⚠️ Notice: {output_docx_primary} is currently open in Word. Please close Word to update.")
+
+    try:
+        doc.save(output_docx_alias)
+        print(f"✅ Saved: {output_docx_alias}")
+    except PermissionError:
+        print(f"⚠️ Notice: {output_docx_alias} is currently open in Word. Please close Word to update.")
 
 if __name__ == '__main__':
     build_word_document()

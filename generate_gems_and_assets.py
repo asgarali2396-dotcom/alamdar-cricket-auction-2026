@@ -84,3 +84,4 @@ if os.path.exists(t_logo_src):
     print(f'Generated tournament logo: {t_out}')
 
 print('All assets prepared!')
+

@@ -28,9 +28,8 @@ def build_printable_html():
     for idx, cfg in enumerate(SET_ORDER):
         set_key = cfg['key']
         meaning = cfg['meaning']
-        s_data = sets_data.get(set_key, {'players': [], 'captains': []})
+        s_data = sets_data.get(set_key, {'players': []})
         players = s_data['players']
-        captains = s_data['captains']
 
         gem_path = os.path.join(ASSETS_DIR, cfg['gem_file'])
         gem_b64 = img_to_base64(gem_path)
@@ -38,27 +37,27 @@ def build_printable_html():
         # Player rows
         player_rows_html = []
         for r_i, p in enumerate(players):
-            bg = "#f8fafc" if r_i % 2 == 1 else "#ffffff"
+            is_cap = p.get('is_captain', False)
+            if is_cap:
+                bg = "#fef9ee"
+                name_style = "font-weight: 800; color: #b45309;"
+                pno_style = "font-weight: 900; color: #b45309;"
+            else:
+                bg = "#f8fafc" if r_i % 2 == 1 else "#ffffff"
+                name_style = "font-weight: 700; color: #0f172a;"
+                pno_style = "font-weight: 800; color: #0f3d34;"
+
+            # Order: P. No | Player Name | Age | Bat Style | Bowl Style | Mob
             player_rows_html.append(f"""
                 <tr style="background: {bg};">
-                    <td class="col-pno">{p['p_no']}</td>
-                    <td class="col-name">{p['name']}</td>
+                    <td class="col-pno" style="{pno_style}">{p['p_no']}</td>
+                    <td class="col-name" style="{name_style}">{p['name']}</td>
                     <td class="col-age">{p['age']}</td>
-                    <td class="col-mob">{p['mob']}</td>
                     <td class="col-style">{p['bat']}</td>
                     <td class="col-style">{p['bowl']}</td>
+                    <td class="col-mob">{p['mob']}</td>
                 </tr>
             """)
-
-        # Captain callout
-        captain_items_html = []
-        if captains:
-            for c in captains:
-                captain_items_html.append(
-                    f"<div><strong>• {c['captain'].upper()}</strong> ({c['team'].upper()}) &nbsp;•&nbsp; Mob: <strong>{c['mob']}</strong> &nbsp;•&nbsp; Bat: {c['bat']} &nbsp;•&nbsp; Bowl: {c['bowl']}</div>"
-                )
-        else:
-            captain_items_html.append("<div><em>No playing captain pre-assigned in this set.</em></div>")
 
         pages_html.append(f"""
         <div class="sheet-page">
@@ -91,15 +90,16 @@ def build_printable_html():
                 </div>
 
                 <!-- Player Roster Table -->
+                <!-- Order: P. No | Player Name | Age | Bat Style | Bowl Style | Mob -->
                 <table class="roster-table">
                     <thead>
                         <tr>
                             <th class="col-pno">P. No</th>
                             <th class="col-name">Player Name</th>
                             <th class="col-age">Age</th>
-                            <th class="col-mob">Mob</th>
                             <th class="col-style">Bat Style</th>
                             <th class="col-style">Bowl Style</th>
+                            <th class="col-mob">Mob</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -107,15 +107,9 @@ def build_printable_html():
                     </tbody>
                 </table>
 
-                <!-- Pre-Assigned Captain Callout -->
-                <div class="captain-callout-card">
-                    <div class="captain-card-title">👑 PRE-ASSIGNED PLAYING CAPTAIN (BASE PRICE: ₹0 / 0 PTS)</div>
-                    <div class="captain-card-body">
-                        {''.join(captain_items_html)}
-                    </div>
-                    <div class="captain-card-rule">
-                        * Tournament Rule: Playing Captain is pre-acquired by their franchise at ₹0 (Base Price). That franchise cannot bid on any other player from this stone set.
-                    </div>
+                <!-- 1-Line Tournament Rule Note -->
+                <div class="captain-rule-note">
+                    <strong>👑 NOTE:</strong> Players marked <em>(CAPT - TEAM)</em> are pre-acquired Playing Captains (Base Price: ₹0 / 0 PTS). That franchise cannot bid on any other player from this stone set.
                 </div>
 
                 <!-- Footer -->
@@ -276,21 +270,17 @@ def build_printable_html():
         letter-spacing: 0.5px;
     }}
     .roster-table td {{
-        padding: 1.8mm 2mm;
+        padding: 1.7mm 2mm;
         border: 1px solid #cbd5e1;
         line-height: 1.1;
     }}
     .col-pno {{
         width: 7%;
         text-align: center;
-        font-weight: 800;
-        color: #0f3d34;
     }}
     .col-name {{
-        width: 38%;
+        width: 40%;
         text-align: left;
-        font-weight: 700;
-        color: #0f172a;
         padding-left: 3mm !important;
     }}
     .col-age {{
@@ -298,45 +288,31 @@ def build_printable_html():
         text-align: center;
         font-weight: 600;
     }}
+    .col-style {{
+        width: 11%;
+        text-align: center;
+        font-weight: 600;
+        color: #334155;
+    }}
     .col-mob {{
-        width: 22%;
+        width: 24%;
         text-align: center;
         font-weight: 700;
         color: #1e293b;
         letter-spacing: 0.5px;
     }}
-    .col-style {{
-        width: 13%;
-        text-align: center;
-        font-weight: 600;
-        color: #334155;
-    }}
-    .captain-callout-card {{
+    .captain-rule-note {{
         background: #fef9ef;
-        border: 1.5px solid #c8a96a;
+        border: 1px solid #c8a96a;
         border-radius: 4px;
-        padding: 2.5mm 3.5mm;
-        margin-top: 2.5mm;
+        padding: 2mm 3mm;
+        margin-top: 2mm;
+        font-size: 8pt;
+        color: #475569;
+        line-height: 1.3;
     }}
-    .captain-card-title {{
-        font-size: 9pt;
-        font-weight: 800;
+    .captain-rule-note strong {{
         color: #b45309;
-        margin-bottom: 1.5mm;
-        letter-spacing: 0.3px;
-    }}
-    .captain-card-body {{
-        font-size: 8.5pt;
-        color: #1e293b;
-        line-height: 1.35;
-        margin-bottom: 1.5mm;
-    }}
-    .captain-card-rule {{
-        font-size: 7.5pt;
-        font-style: italic;
-        color: #64748b;
-        border-top: 1px dashed #e2e8f0;
-        padding-top: 1mm;
     }}
     .sheet-footer {{
         display: flex;
