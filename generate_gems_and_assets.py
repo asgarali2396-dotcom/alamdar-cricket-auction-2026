@@ -83,5 +83,19 @@ if os.path.exists(t_logo_src):
     cropped.save(t_out, 'PNG')
     print(f'Generated tournament logo: {t_out}')
 
+# Generate Alamdar Sports Club Watermark
+alamdar_logo_src = os.path.join(os.path.dirname(__file__), 'icons', 'logo-crest-transparent.png')
+if not os.path.exists(alamdar_logo_src):
+    alamdar_logo_src = os.path.join(os.path.dirname(__file__), 'icons', 'logo.png')
+
+if os.path.exists(alamdar_logo_src):
+    im_a = Image.open(alamdar_logo_src).convert('RGBA')
+    arr_a = np.array(im_a)
+    arr_a[:, :, 3] = (arr_a[:, :, 3].astype(float) * 0.10).astype(np.uint8)
+    wm_img = Image.fromarray(arr_a, 'RGBA')
+    wm_out = os.path.join(assets_dir, 'alamdar_watermark.png')
+    wm_img.save(wm_out, 'PNG')
+    print(f'Generated Alamdar watermark: {wm_out}')
+
 print('All assets prepared!')
 

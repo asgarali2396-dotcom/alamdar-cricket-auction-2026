@@ -311,6 +311,45 @@ def build_word_document():
     section.right_margin = Inches(0.50)
     add_page_border(section, color=HEX_EMERALD_DARK, sz="12", val="double")
 
+    # Add Watermark to Header (propagates to every page in the section)
+    watermark_path = os.path.join(ASSETS_DIR, 'alamdar_watermark.png')
+    if os.path.exists(watermark_path):
+        header = section.header
+        p_wm = header.paragraphs[0]
+        p_wm.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p_wm.paragraph_format.space_before = Pt(0)
+        p_wm.paragraph_format.space_after = Pt(0)
+        p_wm.paragraph_format.line_spacing = 1.0
+        run_wm = p_wm.add_run()
+        width_in = 5.2
+        height_in = 5.2
+        pic_wm = run_wm.add_picture(watermark_path, width=Inches(width_in), height=Inches(height_in))
+        inline = pic_wm._inline
+        graphic = inline.graphic
+        width_emu = int(width_in * 914400)
+        height_emu = int(height_in * 914400)
+        anchor_xml = f'''
+        <wp:anchor xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
+                   distT="0" distB="0" distL="0" distR="0" simplePos="0" relativeHeight="0"
+                   behindDoc="1" locked="0" layoutInCell="1" allowOverlap="1">
+            <wp:simplePos x="0" y="0"/>
+            <wp:positionH relativeFrom="page">
+                <wp:align>center</wp:align>
+            </wp:positionH>
+            <wp:positionV relativeFrom="page">
+                <wp:align>center</wp:align>
+            </wp:positionV>
+            <wp:extent cx="{width_emu}" cy="{height_emu}"/>
+            <wp:effectExtent l="0" t="0" r="0" b="0"/>
+            <wp:wrapNone/>
+            <wp:docPr id="9999" name="AlamdarWatermark"/>
+            <wp:cNvGraphicFramePr/>
+        </wp:anchor>
+        '''
+        anchor = parse_xml(anchor_xml)
+        anchor.append(graphic)
+        inline.getparent().replace(inline, anchor)
+
     alamdar_logo_path = os.path.join(BASE_DIR, 'icons', 'logo-crest-transparent.png')
     if not os.path.exists(alamdar_logo_path):
         alamdar_logo_path = os.path.join(BASE_DIR, 'icons', 'logo.png')
@@ -522,7 +561,8 @@ def build_word_document():
                 cell = row.cells[col_i]
                 cell.width = tbl_cols[col_i]
                 cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
-                set_cell_background(cell, bg_color)
+                if bg_color:
+                    set_cell_background(cell, bg_color)
                 set_cell_margins(cell, top=50, bottom=50, left=70, right=70)
 
                 p = cell.paragraphs[0]
@@ -558,29 +598,6 @@ def build_word_document():
 
         prevent_row_split(roster_tbl)
 
-        # =====================================================
-        # 5. ELEGANT 1-LINE TOURNAMENT RULE NOTE BELOW TABLE
-        # =====================================================
-        p_note = doc.add_paragraph()
-        p_note.paragraph_format.space_before = Pt(4)
-        p_note.paragraph_format.space_after = Pt(2)
-        p_note.paragraph_format.line_spacing = 1.05
-
-        run_note_star = p_note.add_run("👑 NOTE: ")
-        run_note_star.font.name = 'Arial'
-        run_note_star.font.size = Pt(8.5)
-        run_note_star.font.bold = True
-        run_note_star.font.color.rgb = COLOR_AMBER_DARK
-
-        run_note_body = p_note.add_run(
-            "Players marked (CAPT - TEAM) are pre-acquired Playing Captains (Base Price: ₹0 / 0 PTS). "
-            "That franchise cannot bid on any other player from this stone set."
-        )
-        run_note_body.font.name = 'Calibri'
-        run_note_body.font.size = Pt(8)
-        run_note_body.font.italic = True
-        run_note_body.font.color.rgb = COLOR_TEXT_MUTED
-
         # Footer
         p_foot = doc.add_paragraph()
         p_foot.alignment = WD_ALIGN_PARAGRAPH.RIGHT
@@ -593,18 +610,14 @@ def build_word_document():
 
     output_docx_primary = os.path.join(BASE_DIR, 'Turf_Clash_Championship_Auction_Sets_2026.docx')
     output_docx_alias = os.path.join(BASE_DIR, 'Alamdar_Box_Cricket_Auction_Sets.docx')
+    output_docx_final = os.path.join(BASE_DIR, 'Turf_Clash_Championship_Auction_Sets_Final.docx')
 
-    try:
-        doc.save(output_docx_primary)
-        print(f"✅ Saved: {output_docx_primary}")
-    except PermissionError:
-        print(f"⚠️ Notice: {output_docx_primary} is currently open in Word. Please close Word to update.")
-
-    try:
-        doc.save(output_docx_alias)
-        print(f"✅ Saved: {output_docx_alias}")
-    except PermissionError:
-        print(f"⚠️ Notice: {output_docx_alias} is currently open in Word. Please close Word to update.")
+    for path in [output_docx_primary, output_docx_alias, output_docx_final]:
+        try:
+            doc.save(path)
+            print(f"✅ Saved: {path}")
+        except PermissionError:
+            print(f"⚠️ Notice: {path} is currently open in Word. Please close Word to update.")
 
 if __name__ == '__main__':
     build_word_document()

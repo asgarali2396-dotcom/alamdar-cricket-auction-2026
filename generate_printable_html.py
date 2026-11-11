@@ -18,9 +18,11 @@ def build_printable_html():
     if not os.path.exists(alamdar_logo_path):
         alamdar_logo_path = os.path.join(BASE_DIR, 'icons', 'logo.png')
     tournament_logo_path = os.path.join(ASSETS_DIR, 'tournament_logo.png')
+    watermark_path = os.path.join(ASSETS_DIR, 'alamdar_watermark.png')
 
     alamdar_b64 = img_to_base64(alamdar_logo_path)
     tournament_b64 = img_to_base64(tournament_logo_path)
+    watermark_b64 = img_to_base64(watermark_path)
 
     pages_html = []
     total_sets = len(SET_ORDER)
@@ -39,11 +41,11 @@ def build_printable_html():
         for r_i, p in enumerate(players):
             is_cap = p.get('is_captain', False)
             if is_cap:
-                bg = "#fef9ee"
+                bg = "rgba(254, 249, 238, 0.90)"
                 name_style = "font-weight: 800; color: #b45309;"
                 pno_style = "font-weight: 900; color: #b45309;"
             else:
-                bg = "#f8fafc" if r_i % 2 == 1 else "#ffffff"
+                bg = "rgba(248, 250, 252, 0.50)" if r_i % 2 == 1 else "transparent"
                 name_style = "font-weight: 700; color: #0f172a;"
                 pno_style = "font-weight: 800; color: #0f3d34;"
 
@@ -107,11 +109,6 @@ def build_printable_html():
                     </tbody>
                 </table>
 
-                <!-- 1-Line Tournament Rule Note -->
-                <div class="captain-rule-note">
-                    <strong>👑 NOTE:</strong> Players marked <em>(CAPT - TEAM)</em> are pre-acquired Playing Captains (Base Price: ₹0 / 0 PTS). That franchise cannot bid on any other player from this stone set.
-                </div>
-
                 <!-- Footer -->
                 <div class="sheet-footer">
                     <span>Turf Clash Championship Season 1 &nbsp;•&nbsp; Alamdar Sports Club Amravati</span>
@@ -152,6 +149,22 @@ def build_printable_html():
         box-shadow: 0 4px 15px rgba(0,0,0,0.15);
         page-break-after: always;
         position: relative;
+        overflow: hidden;
+    }}
+    .sheet-page::before {{
+        content: "";
+        position: absolute;
+        top: 54%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 140mm;
+        height: 140mm;
+        background-image: url('{watermark_b64}');
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: contain;
+        pointer-events: none;
+        z-index: 1;
     }}
     @media print {{
         body {{
@@ -172,6 +185,9 @@ def build_printable_html():
         display: flex;
         flex-direction: column;
         justify-content: space-between;
+        position: relative;
+        z-index: 2;
+        background: transparent;
     }}
     .header-table {{
         display: flex;
@@ -300,19 +316,6 @@ def build_printable_html():
         font-weight: 700;
         color: #1e293b;
         letter-spacing: 0.5px;
-    }}
-    .captain-rule-note {{
-        background: #fef9ef;
-        border: 1px solid #c8a96a;
-        border-radius: 4px;
-        padding: 2mm 3mm;
-        margin-top: 2mm;
-        font-size: 8pt;
-        color: #475569;
-        line-height: 1.3;
-    }}
-    .captain-rule-note strong {{
-        color: #b45309;
     }}
     .sheet-footer {{
         display: flex;
