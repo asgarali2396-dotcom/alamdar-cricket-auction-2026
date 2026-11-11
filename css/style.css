@@ -1492,9 +1492,9 @@ select:focus, input:focus {
   }
 
   .owner-photo-frame {
-    max-width: 260px !important;
-    max-height: 260px !important;
-    aspect-ratio: 1 / 1 !important;
+    max-width: 290px !important;
+    max-height: 380px !important;
+    aspect-ratio: 3 / 4 !important;
   }
 }
 
@@ -1554,28 +1554,28 @@ select:focus, input:focus {
 
 .owner-photo-frame {
   width: 100%;
-  max-width: 265px;
-  min-height: 220px;
-  max-height: 275px;
-  aspect-ratio: 1 / 1;
-  border-radius: 1.15rem;
+  max-width: 300px;
+  min-height: 260px;
+  max-height: 380px;
+  aspect-ratio: 3 / 4;
+  border-radius: 1.25rem;
   border: 2.5px solid rgba(200, 169, 106, 0.75);
   overflow: hidden;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(200, 169, 106, 0.2);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55), inset 0 0 20px rgba(200, 169, 106, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #1e293b;
+  background: radial-gradient(circle at center, #134e43 0%, #092520 100%);
   position: relative;
-  margin: 0.15rem auto;
+  margin: 0.2rem auto;
   flex: 1;
 }
 
 .owner-photo-frame img {
   width: 100% !important;
   height: 100% !important;
-  object-fit: cover !important;
-  object-position: top center !important;
+  object-fit: contain !important;
+  object-position: center center !important;
   display: block;
 }
 
@@ -1755,15 +1755,25 @@ body.is-fullscreen #view-live .owner-player-spotlight-card h3,
 
 body.is-fullscreen #view-live .owner-photo-frame,
 :fullscreen #view-live .owner-photo-frame {
-  width: 90% !important;
-  max-width: 320px !important;
-  aspect-ratio: 1 / 1 !important;
+  width: 95% !important;
+  max-width: 340px !important;
+  aspect-ratio: 3 / 4 !important;
   height: auto !important;
-  max-height: clamp(220px, 32vh, 320px) !important;
-  min-height: 220px !important;
+  max-height: clamp(280px, 44vh, 420px) !important;
+  min-height: 280px !important;
   border-radius: 1.35rem !important;
   border: 3px solid rgba(200, 169, 106, 0.70) !important;
   box-shadow: 0 14px 35px rgba(0, 0, 0, 0.65), inset 0 0 25px rgba(200, 169, 106, 0.25) !important;
+  background: radial-gradient(circle at center, #134e43 0%, #092520 100%) !important;
+}
+
+body.is-fullscreen #view-live .owner-photo-frame img,
+:fullscreen #view-live .owner-photo-frame img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  object-position: center center !important;
+  display: block !important;
 }
 
 body.is-fullscreen #view-live .owner-attr-pill,
@@ -2108,24 +2118,6 @@ body.is-fullscreen .owner-photo-col,
   width: 100% !important;
 }
 
-body.is-fullscreen #view-owner .owner-player-spotlight-card,
-:fullscreen #view-owner .owner-player-spotlight-card {
-  height: 100% !important;
-  min-height: clamp(500px, 58vh, 640px) !important;
-  padding: 1.5rem 1.35rem !important;
-  border-radius: 1.25rem !important;
-  border-width: 2px !important;
-  border-color: rgba(200, 169, 106, 0.55) !important;
-  box-shadow: 0 15px 35px -10px rgba(10, 35, 30, 0.65), 0 0 20px rgba(200, 169, 106, 0.1) !important;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: space-between !important;
-  gap: 1rem !important;
-  position: relative !important;
-  overflow: hidden !important;
-  box-sizing: border-box !important;
-}
-
 body.is-fullscreen #view-owner .owner-player-spotlight-card h3,
 :fullscreen #view-owner .owner-player-spotlight-card h3 {
   font-size: 0.95rem !important;
@@ -2135,22 +2127,50 @@ body.is-fullscreen #view-owner .owner-player-spotlight-card h3,
   font-weight: 900 !important;
 }
 
+body.is-fullscreen #view-owner .owner-player-spotlight-card,
+:fullscreen #view-owner .owner-player-spotlight-card {
+  height: 100% !important;
+  min-height: clamp(520px, 60vh, 680px) !important;
+  padding: 1.25rem 1.15rem !important;
+  border-radius: 1.25rem !important;
+  border-width: 2px !important;
+  border-color: rgba(200, 169, 106, 0.55) !important;
+  box-shadow: 0 15px 35px -10px rgba(10, 35, 30, 0.65), 0 0 20px rgba(200, 169, 106, 0.1) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  gap: 0.65rem !important;
+  position: relative !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
 body.is-fullscreen #view-owner .owner-photo-frame,
 :fullscreen #view-owner .owner-photo-frame {
-  flex: 0 0 auto !important;
-  min-height: 200px !important;
-  max-height: 260px !important;
+  flex: 1 1 auto !important;
+  min-height: 280px !important;
+  max-height: clamp(300px, 42vh, 420px) !important;
   width: 100% !important;
-  max-width: 260px !important;
-  aspect-ratio: 1 / 1 !important;
+  max-width: 320px !important;
+  aspect-ratio: 3 / 4 !important;
   height: auto !important;
   margin-left: auto !important;
   margin-right: auto !important;
-  margin-top: 0.15rem !important;
-  margin-bottom: 0.15rem !important;
-  border-radius: 1.15rem !important;
-  border: 2.5px solid rgba(200, 169, 106, 0.70) !important;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(200, 169, 106, 0.2) !important;
+  margin-top: 0.2rem !important;
+  margin-bottom: 0.2rem !important;
+  border-radius: 1.25rem !important;
+  border: 2.5px solid rgba(200, 169, 106, 0.75) !important;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55), inset 0 0 20px rgba(200, 169, 106, 0.2) !important;
+  background: radial-gradient(circle at center, #134e43 0%, #092520 100%) !important;
+}
+
+body.is-fullscreen #view-owner .owner-photo-frame img,
+:fullscreen #view-owner .owner-photo-frame img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  object-position: center center !important;
+  display: block !important;
 }
 
 body.is-fullscreen #view-owner .owner-player-spotlight-card .w-full.space-y-3,
