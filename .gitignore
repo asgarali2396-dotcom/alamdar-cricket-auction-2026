@@ -15,4 +15,6 @@ build/
 __pycache__/
 *.pyc
 ~$*.docx
+cloudflared.exe
 *.docx
+cloudflared.exe

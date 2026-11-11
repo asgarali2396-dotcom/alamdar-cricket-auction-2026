@@ -1,0 +1,20 @@
+# fly.toml configuration for Alamdar Cricket Auction 2026
+# Pre-configured for Mumbai region ("bom") for lowest possible ping in India
+
+app = "alamdar-cricket-auction-2026"
+primary_region = "bom"
+
+[build]
+
+[http_service]
+  internal_port = 3000
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 1
+  processes = ["app"]
+
+[[vm]]
+  memory = "512mb"
+  cpu_kind = "shared"
+  cpus = 1
