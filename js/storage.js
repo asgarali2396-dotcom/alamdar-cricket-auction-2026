@@ -106,7 +106,8 @@ const StorageManager = {
             !team.color ||
             team.name !== canonical.name ||
             team.ownerName !== canonical.ownerName ||
-            team.playingOwner !== canonical.playingOwner;
+            team.playingOwner !== canonical.playingOwner ||
+            team.captainSetId !== canonical.captainSetId;
 
           if (needsSync) {
             updated = true;
@@ -124,6 +125,25 @@ const StorageManager = {
                 remBudget = 100000 - cleanRoster.reduce((sum, r) => sum + (r.isOwner ? 0 : (r.price || 0)), 0);
                 cleanOwnedSets = cleanRoster.map((r) => r.setId).filter(Boolean);
               }
+            } else {
+              const ownerEntryIdx = cleanRoster.findIndex((r) => r.isOwner);
+              if (ownerEntryIdx >= 0) {
+                cleanRoster[ownerEntryIdx].setId = canonical.captainSetId;
+                cleanRoster[ownerEntryIdx].setName = canonical.captainSetName || 'Stone Set';
+                cleanRoster[ownerEntryIdx].name = canonical.playingOwner;
+              } else {
+                cleanRoster.unshift({
+                  playerId: `owner_${team.id}`,
+                  name: canonical.playingOwner,
+                  role: 'Playing Owner (Captain)',
+                  setId: canonical.captainSetId,
+                  setName: canonical.captainSetName || 'Stone Set',
+                  price: 0,
+                  isOwner: true
+                });
+              }
+              cleanOwnedSets = Array.from(new Set(cleanRoster.map((r) => r.setId).filter(Boolean)));
+              acqCount = cleanRoster.length;
             }
 
             return {

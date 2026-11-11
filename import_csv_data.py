@@ -273,7 +273,7 @@ def main():
     # --- Step 3: Write to auction_data.json ---
     first_set = SET_CONFIG[0]
     payload = {
-        'version': 600,
+        'version': 700,
         'state': {
             'status': 'IDLE',
             'currentSetId': first_set['id'],

@@ -1,5 +1,5 @@
 {
-  "version": 600,
+  "version": 700,
   "state": {
     "status": "IDLE",
     "currentSetId": "set_aqeeq",
@@ -17,7 +17,7 @@
     },
     "hammerCountdown": null,
     "roundNumber": 1,
-    "lastActionTimestamp": 1794328520123,
+    "lastActionTimestamp": 1794379996835,
     "version": 1,
     "biddingLocked": false
   },
@@ -52,7 +52,7 @@
           "setName": "Aqeeq",
           "price": 0,
           "isOwner": true,
-          "timestamp": 1794328520123
+          "timestamp": 1794379996835
         }
       ]
     },
@@ -86,7 +86,7 @@
           "setName": "Yaqoot",
           "price": 0,
           "isOwner": true,
-          "timestamp": 1794328520123
+          "timestamp": 1794379996835
         }
       ]
     },
@@ -120,7 +120,7 @@
           "setName": "Neelam",
           "price": 0,
           "isOwner": true,
-          "timestamp": 1794328520123
+          "timestamp": 1794379996835
         }
       ]
     },
@@ -154,7 +154,7 @@
           "setName": "Dur-e-Najaf",
           "price": 0,
           "isOwner": true,
-          "timestamp": 1794328520123
+          "timestamp": 1794379996835
         }
       ]
     },
@@ -188,7 +188,7 @@
           "setName": "Pukhraj",
           "price": 0,
           "isOwner": true,
-          "timestamp": 1794328520123
+          "timestamp": 1794379996835
         }
       ]
     },
@@ -222,7 +222,7 @@
           "setName": "Firoza",
           "price": 0,
           "isOwner": true,
-          "timestamp": 1794328520123
+          "timestamp": 1794379996835
         }
       ]
     },
@@ -256,7 +256,7 @@
           "setName": "Marjan",
           "price": 0,
           "isOwner": true,
-          "timestamp": 1794328520123
+          "timestamp": 1794379996835
         }
       ]
     },
@@ -290,7 +290,7 @@
           "setName": "Zumurrud",
           "price": 0,
           "isOwner": true,
-          "timestamp": 1794328520123
+          "timestamp": 1794379996835
         }
       ]
     },
@@ -303,8 +303,8 @@
       "ownerName": "Ali chandurwala",
       "phone": "8793335457",
       "playingOwner": "Ali chandurwala",
-      "captainSetId": "set_neelam",
-      "captainSetName": "Neelam",
+      "captainSetId": "set_yaqoot",
+      "captainSetName": "Yaqoot",
       "photo": "images/owners/owner_team_09.jpg",
       "photoDriveUrl": "https://lh3.googleusercontent.com/d/1zQkVm9ymaa_rD3OLg1U_CE9MCiNOP3WH",
       "color": "#eab308",
@@ -313,18 +313,18 @@
       "maxAuctionSlots": 8,
       "acquiredCount": 1,
       "ownedSetIds": [
-        "set_neelam"
+        "set_yaqoot"
       ],
       "roster": [
         {
           "playerId": "owner_team_09",
           "name": "Ali chandurwala",
           "role": "Playing Owner (Captain)",
-          "setId": "set_neelam",
-          "setName": "Neelam",
+          "setId": "set_yaqoot",
+          "setName": "Yaqoot",
           "price": 0,
           "isOwner": true,
-          "timestamp": 1794328520123
+          "timestamp": 1794379996835
         }
       ]
     },
@@ -358,7 +358,7 @@
           "setName": "Zumurrud",
           "price": 0,
           "isOwner": true,
-          "timestamp": 1794328520123
+          "timestamp": 1794379996835
         }
       ]
     },
@@ -392,7 +392,7 @@
           "setName": "Marjan",
           "price": 0,
           "isOwner": true,
-          "timestamp": 1794328520123
+          "timestamp": 1794379996835
         }
       ]
     },
@@ -426,7 +426,7 @@
           "setName": "Firoza",
           "price": 0,
           "isOwner": true,
-          "timestamp": 1794328520123
+          "timestamp": 1794379996835
         }
       ]
     }
