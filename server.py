@@ -31,7 +31,8 @@ SimpleHTTPRequestHandler.extensions_map.update({
 PORT = int(os.environ.get('PORT', 3000))
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_FILE = os.path.join(BASE_DIR, 'auction_data.json')
-lock = threading.Lock()
+lock = threading.RLock()
+state_condition = threading.Condition(lock)
 
 # Stone Sets
 SET_CONFIG = [
@@ -194,7 +195,9 @@ _save_timer_lock = threading.Lock()
 
 def update_cache():
     global _cached_bytes
-    _cached_bytes = json.dumps(server_data).encode('utf-8')
+    with lock:
+        _cached_bytes = json.dumps(server_data).encode('utf-8')
+        state_condition.notify_all()
 
 def _do_disk_save():
     try:
@@ -316,14 +319,16 @@ def evaluate_auto_assignment():
 
 
 class AuctionSyncHandler(SimpleHTTPRequestHandler):
+    protocol_version = "HTTP/1.1"
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=BASE_DIR, **kwargs)
 
     def end_headers(self):
-        # Enable CORS and persistent connection
+        # Enable CORS and persistent keep-alive connection
         self.send_header('Access-Control-Allow-Origin', '*')
         self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type, Cache-Control')
         self.send_header('Connection', 'keep-alive')
 
         # Fast cache for static images and media (< 1ms load); no-cache for live sync and HTML
@@ -338,26 +343,35 @@ class AuctionSyncHandler(SimpleHTTPRequestHandler):
 
     def do_OPTIONS(self):
         self.send_response(200)
+        self.send_header('Content-Length', '0')
         self.end_headers()
 
     def do_GET(self):
-        # API: Real-time sync poll endpoint (< 1ms response)
+        # API: Real-time high-efficiency sync endpoint (< 1ms event-driven response)
         if self.path == '/api/sync' or self.path.startswith('/api/sync?'):
-            # Check for version query parameter: /api/sync?v=12
             client_v = None
+            wait_timeout = 0
             if '?' in self.path:
                 try:
                     q = self.path.split('?', 1)[1]
                     for part in q.split('&'):
                         if part.startswith('v='):
                             client_v = int(part.split('=', 1)[1])
-                            break
+                        elif part.startswith('timeout='):
+                            wait_timeout = min(30, max(0, float(part.split('=', 1)[1])))
                 except Exception:
-                    client_v = None
+                    pass
 
-            # If client already has the latest version, return tiny 35-byte response
-            # This reduces 99.9% of network bandwidth and prevents cellular data choke
-            if client_v is not None and client_v == server_data.get('version', 0):
+            # Smart long-polling: If client is up to date and requested timeout, hold until next event
+            if client_v is not None and wait_timeout > 0:
+                with state_condition:
+                    if client_v == server_data.get('version', 0):
+                        # Suspends thread until an action triggers notify_all() or timeout expires
+                        state_condition.wait(timeout=wait_timeout)
+
+            # If still matching after wait (or timeout expired), return tiny 35-byte heartbeat response
+            current_v = server_data.get('version', 0)
+            if client_v is not None and client_v == current_v:
                 up_to_date_bytes = json.dumps({"upToDate": True, "version": client_v}).encode('utf-8')
                 self.send_response(200)
                 self.send_header('Content-Type', 'application/json')
@@ -366,11 +380,14 @@ class AuctionSyncHandler(SimpleHTTPRequestHandler):
                 self.wfile.write(up_to_date_bytes)
                 return
 
+            with lock:
+                body = _cached_bytes
+
             self.send_response(200)
             self.send_header('Content-Type', 'application/json')
-            self.send_header('Content-Length', str(len(_cached_bytes)))
+            self.send_header('Content-Length', str(len(body)))
             self.end_headers()
-            self.wfile.write(_cached_bytes)
+            self.wfile.write(body)
             return
 
         # Serve static files

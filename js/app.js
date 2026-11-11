@@ -898,7 +898,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function _executeRenderApp() {
     renderAuthBar();
 
-    // Default to the logged in team if owner; otherwise default to Husaini Hawks for viewer
+    // Default to the logged in team if owner; otherwise default to first team
     let team = null;
     if (activeUser && activeUser.role === 'owner' && activeUser.teamId) {
       team = currentTeams.find((t) => t.id === activeUser.teamId);
@@ -909,17 +909,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     renderSidebar(team);
 
-    // Active 2-Franchise Battle Ring (Displayed across Live, Owner, and Admin views)
-    renderActiveBiddersRing('live-active-bidders-ring');
-    renderActiveBiddersRing('owner-active-bidders-ring');
-    renderActiveBiddersRing('admin-active-bidders-ring');
-
     if (currentTab === 'live') {
+      renderActiveBiddersRing('live-active-bidders-ring');
       renderLiveDisplay();
     } else if (currentTab === 'owner') {
+      renderActiveBiddersRing('owner-active-bidders-ring');
       renderOwnerDashboard(team);
       renderOwnerSquadRoster(team);
     } else if (currentTab === 'admin') {
+      renderActiveBiddersRing('admin-active-bidders-ring');
       renderAdminDashboard();
     }
   }
@@ -982,12 +980,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (ownerBar) ownerBar.style.width = `${pct}%`;
     if (ownerSlots) ownerSlots.innerText = `${slots} / 8`;
 
-    // Render Sidebar Teams List
+    // Render Sidebar Teams List (Debounced with HTML memoization to prevent DOM reflow lag)
     ['live-sidebar-teams-list', 'owner-sidebar-teams-list'].forEach((containerId) => {
       const container = document.getElementById(containerId);
       if (!container) return;
 
-      container.innerHTML = currentTeams
+      const html = currentTeams
         .map((t) => {
           const isSelected = activeUser && activeUser.teamId === t.id;
           return `
@@ -1008,13 +1006,17 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         })
         .join('');
+
+      if (container._lastHtml === html) return;
+      container._lastHtml = html;
+      container.innerHTML = html;
     });
 
     // Render Bottom 12-Teams Grid in Audience View & Owner Dashboard (4 Columns as in Screenshot 3)
     ['live-bottom-teams-grid', 'owner-bottom-teams-grid'].forEach((gridId) => {
       const bottomGrid = document.getElementById(gridId);
       if (!bottomGrid) return;
-      bottomGrid.innerHTML = currentTeams
+      const html = currentTeams
         .map((t) => `
         <div class="glass-panel p-3.5 space-y-1.5 border border-[#C8A96A]/20 bg-[#134E43]/85 text-[#F7F6F1]">
           <div class="flex justify-between items-center text-xs">
@@ -1030,6 +1032,10 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
       `)
         .join('');
+
+      if (bottomGrid._lastHtml === html) return;
+      bottomGrid._lastHtml = html;
+      bottomGrid.innerHTML = html;
     });
   }
 
@@ -1599,7 +1605,7 @@ document.addEventListener('DOMContentLoaded', () => {
       ? '⚡ 1 SLOT REMAINING: Another franchise can click "Join Bidding Battle" to challenge!'
       : '⚡ BATTLE RING OPEN: Any franchise can click "Join Bidding Battle" to place the opening bid!';
 
-    container.innerHTML = `
+    const html = `
       <div class="p-4 rounded-2xl bg-[#092520] border-2 border-[#C8A96A]/35 shadow-2xl">
         <div class="flex flex-wrap items-center justify-between gap-2 pb-2.5 mb-3 border-b border-[#C8A96A]/20">
           <span class="text-xs font-black uppercase tracking-wider text-[#C8A96A] flex items-center gap-1.5">
@@ -1635,6 +1641,10 @@ document.addEventListener('DOMContentLoaded', () => {
         </p>
       </div>
     `;
+
+    if (container._lastHtml === html) return;
+    container._lastHtml = html;
+    container.innerHTML = html;
   }
 
   // -------------------------------------------------------------

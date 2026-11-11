@@ -382,18 +382,24 @@ const StorageManager = {
       const result = await res.json();
       if (result && result.success) {
         if (result.version) {
-          this._serverVersion = result.version;
+          this._serverVersion = Math.max(this._serverVersion, result.version);
         }
-        if (result.state) localStorage.setItem(STORAGE_KEYS.STATE, JSON.stringify(result.state));
-        if (result.teams) localStorage.setItem(STORAGE_KEYS.TEAMS, JSON.stringify(result.teams));
-        if (result.players) localStorage.setItem(STORAGE_KEYS.PLAYERS, JSON.stringify(result.players));
-        if (result.sessions) localStorage.setItem(STORAGE_KEYS.SESSIONS, JSON.stringify(result.sessions));
 
-        // Directly invoke application render hook so UI reflects changes instantly
+        // Directly invoke application render hook so UI reflects changes instantly (0ms)
         if (typeof window.onServerDataReceived === 'function') {
           window.onServerDataReceived(result);
         }
         bus.emit('DATA_CHANGED', { key: STORAGE_KEYS.STATE, value: result.state });
+
+        // Asynchronously persist to localStorage without blocking render
+        setTimeout(() => {
+          try {
+            if (result.state) localStorage.setItem(STORAGE_KEYS.STATE, JSON.stringify(result.state));
+            if (result.teams) localStorage.setItem(STORAGE_KEYS.TEAMS, JSON.stringify(result.teams));
+            if (result.players) localStorage.setItem(STORAGE_KEYS.PLAYERS, JSON.stringify(result.players));
+            if (result.sessions) localStorage.setItem(STORAGE_KEYS.SESSIONS, JSON.stringify(result.sessions));
+          } catch (e) {}
+        }, 0);
       }
       return result;
     } catch (err) {
@@ -441,68 +447,95 @@ const StorageManager = {
       });
   },
 
-  async pollServer() {
-    if (this._syncDisabled || this._isPolling || typeof fetch === 'undefined') return;
-    this._isPolling = true;
+  // High-performance event-driven long-polling loop with keep-alive
+  async _runSyncLoop() {
+    while (this._pollActive) {
+      if (this._syncDisabled) {
+        await new Promise((r) => setTimeout(r, 2000));
+        continue;
+      }
 
-    try {
-      // Pass ?v=<version> so the server can return a lightweight 35-byte response if nothing changed
-      const res = await fetch('/api/sync?v=' + this._serverVersion + '&t=' + Date.now(), { cache: 'no-store' });
-      if (!res.ok) {
-        if (res.status === 404 && (window.location.protocol === 'file:' || !window.location.origin)) {
-          this._syncDisabled = true;
-          if (this._pollIntervalId) {
-            clearInterval(this._pollIntervalId);
-            this._pollIntervalId = null;
+      try {
+        const timeout = 12; // 12-second long-poll timeout
+        const url = `/api/sync?v=${encodeURIComponent(this._serverVersion)}&timeout=${timeout}&t=${Date.now()}`;
+        const res = await fetch(url, { cache: 'no-store' });
+
+        if (!res.ok) {
+          if (res.status === 404 && (window.location.protocol === 'file:' || !window.location.origin)) {
+            this._syncDisabled = true;
+          }
+          this._setConnectionStatus(false);
+          await new Promise((r) => setTimeout(r, 1500));
+          continue;
+        }
+
+        const data = await res.json();
+        this._setConnectionStatus(true);
+
+        // Heartbeat response: server state unchanged. Immediately loop for next event!
+        if (data && data.upToDate) {
+          continue;
+        }
+
+        if (data && data.version) {
+          const isNewVersion = data.version !== this._serverVersion;
+          const isInitialSync = this._serverVersion === 0 || !localStorage.getItem(STORAGE_KEYS.STATE);
+
+          if (isNewVersion || isInitialSync) {
+            this._serverVersion = data.version;
+
+            // 1. Immediately invoke application render hook (0ms instant response)
+            if (typeof window.onServerDataReceived === 'function') {
+              window.onServerDataReceived(data);
+            }
+
+            // 2. Persist to localStorage asynchronously without blocking main thread
+            setTimeout(() => {
+              try {
+                if (data.state) localStorage.setItem(STORAGE_KEYS.STATE, JSON.stringify(data.state));
+                if (data.teams) localStorage.setItem(STORAGE_KEYS.TEAMS, JSON.stringify(data.teams));
+                if (data.players) localStorage.setItem(STORAGE_KEYS.PLAYERS, JSON.stringify(data.players));
+                if (data.sessions) localStorage.setItem(STORAGE_KEYS.SESSIONS, JSON.stringify(data.sessions));
+              } catch (err) {
+                console.warn('Async localStorage persist note:', err);
+              }
+            }, 0);
           }
         }
+      } catch (err) {
         this._setConnectionStatus(false);
-        this._isPolling = false;
-        return;
+        // Wait 1.5s on network error before retrying to prevent busy-looping
+        await new Promise((r) => setTimeout(r, 1500));
       }
-
-      const data = await res.json();
-      this._setConnectionStatus(true);
-
-      // If server confirms client data is already up-to-date and state exists locally, do nothing!
-      // This completely eliminates UI freezing, JSON parsing lag, and memory churn
-      if (data && data.upToDate && localStorage.getItem(STORAGE_KEYS.STATE)) {
-        this._isPolling = false;
-        return;
-      }
-
-      if (data && data.version) {
-        const isNewVersion = data.version !== this._serverVersion;
-        const isInitialSync = this._serverVersion === 0 || !localStorage.getItem(STORAGE_KEYS.STATE);
-
-        if (isNewVersion || isInitialSync) {
-          this._serverVersion = data.version;
-
-          if (data.state) localStorage.setItem(STORAGE_KEYS.STATE, JSON.stringify(data.state));
-          if (data.teams) localStorage.setItem(STORAGE_KEYS.TEAMS, JSON.stringify(data.teams));
-          if (data.players) localStorage.setItem(STORAGE_KEYS.PLAYERS, JSON.stringify(data.players));
-          if (data.sessions) localStorage.setItem(STORAGE_KEYS.SESSIONS, JSON.stringify(data.sessions));
-
-          // Directly invoke application render hook
-          if (typeof window.onServerDataReceived === 'function') {
-            window.onServerDataReceived(data);
-          }
-        }
-      }
-    } catch (e) {
-      this._setConnectionStatus(false);
-    } finally {
-      this._isPolling = false;
     }
   },
 
   startServerSync() {
     if (typeof fetch === 'undefined') return;
+    if (this._pollActive) return;
+    this._pollActive = true;
 
-    if (this._pollIntervalId) clearInterval(this._pollIntervalId);
-    // 500ms interval with ?v= lightweight check keeps ping super low without flooding the network
-    this._pollIntervalId = setInterval(() => this.pollServer(), 500);
-    this.pollServer();
+    // Wakeup sync when user returns to tab / unlocks phone
+    if (typeof document !== 'undefined' && document.addEventListener) {
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+          // Trigger quick check
+          fetch(`/api/sync?v=${encodeURIComponent(this._serverVersion)}&timeout=0&t=${Date.now()}`, { cache: 'no-store' })
+            .then((r) => r.json())
+            .then((d) => {
+              if (d && d.version && d.version !== this._serverVersion) {
+                this._serverVersion = d.version;
+                if (typeof window.onServerDataReceived === 'function') {
+                  window.onServerDataReceived(d);
+                }
+              }
+            })
+            .catch(() => {});
+        }
+      });
+    }
+
+    this._runSyncLoop();
   }
 };
 
