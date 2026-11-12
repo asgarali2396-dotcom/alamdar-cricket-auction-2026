@@ -35,22 +35,23 @@ const AuctionEngine = {
   canTeamAffordBid(team, proposedBid) {
     if (!team) return { canBid: false, reason: 'Team record not found.' };
 
-    const roster = team.roster || [];
-    const auctionPlayersAcquired = roster.filter((r) => !r.isOwner).length;
-    const remainingAuctionSlotsAfterThis = Math.max(0, 7 - (auctionPlayersAcquired + 1));
+    const totalSlots = team.maxAuctionSlots || 8;
+    const currCount = team.acquiredCount !== undefined ? team.acquiredCount : (team.roster ? team.roster.length : 0);
+    const remainingAuctionSlotsAfterThis = Math.max(0, totalSlots - (currCount + 1));
     const minReserveNeeded = remainingAuctionSlotsAfterThis * 1000;
 
     if (proposedBid > team.remainingBudget) {
       return {
         canBid: false,
-        reason: `Bid (₹${proposedBid.toLocaleString()}) exceeds your purse (₹${team.remainingBudget.toLocaleString()}).`
+        reason: `Insufficient Purse: Bid (₹${proposedBid.toLocaleString()}) exceeds your remaining purse (₹${team.remainingBudget.toLocaleString()}).`
       };
     }
 
     if (team.remainingBudget - proposedBid < minReserveNeeded) {
+      const maxAllowed = Math.max(0, team.remainingBudget - minReserveNeeded);
       return {
         canBid: false,
-        reason: `Reserve Violation: You must retain at least ₹${minReserveNeeded.toLocaleString()} to purchase remaining ${remainingAuctionSlotsAfterThis} auction player slot(s).`
+        reason: `Reserve Violation: Next bid (₹${proposedBid.toLocaleString()}) leaves ₹${(team.remainingBudget - proposedBid).toLocaleString()}, but you must retain at least ₹${minReserveNeeded.toLocaleString()} to purchase remaining ${remainingAuctionSlotsAfterThis} player(s). Max allowable bid: ₹${maxAllowed.toLocaleString()}.`
       };
     }
 
@@ -71,6 +72,19 @@ const AuctionEngine = {
 
   // 3. Two-Player Rule: Join Bidding Battle
   async joinBattle(teamId) {
+    const state = StorageManager.get(STORAGE_KEYS.STATE);
+    const teams = StorageManager.get(STORAGE_KEYS.TEAMS) || [];
+    const team = teams.find((t) => t.id === teamId);
+
+    // Pre-flight check: Can team afford the next required bid?
+    if (state && team) {
+      const nextBid = state.nextMinBid || this.getNextValidBid(state.currentBid || 0, state.basePrice || 1000);
+      const affordCheck = this.canTeamAffordBid(team, nextBid);
+      if (!affordCheck.canBid) {
+        return { success: false, error: affordCheck.reason };
+      }
+    }
+
     if (!StorageManager._syncDisabled && typeof fetch !== 'undefined') {
       const res = await StorageManager.executeServerAction('join_battle', { teamId });
       if (res && res.success) {
@@ -81,10 +95,7 @@ const AuctionEngine = {
     }
 
     // Local Fallback (file:// or standalone offline mode)
-    const state = StorageManager.get(STORAGE_KEYS.STATE);
-    const teams = StorageManager.get(STORAGE_KEYS.TEAMS);
     const players = StorageManager.get(STORAGE_KEYS.PLAYERS);
-    const team = teams.find((t) => t.id === teamId);
 
     if (!state || state.status !== 'BIDDING') {
       return { success: false, error: 'Auction is not actively accepting bids right now.' };
@@ -102,6 +113,13 @@ const AuctionEngine = {
     const eligibility = this.isTeamEligibleForSet(team, state.currentSetId);
     if (!eligibility.eligible) {
       return { success: false, error: eligibility.reason };
+    }
+
+    // Reserve check for local offline fallback
+    const nextBid = state.nextMinBid || this.getNextValidBid(state.currentBid || 0, state.basePrice || 1000);
+    const affordCheck = this.canTeamAffordBid(team, nextBid);
+    if (!affordCheck.canBid) {
+      return { success: false, error: affordCheck.reason };
     }
 
     const { slot1, slot2 } = state.activeBidders || {};

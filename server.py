@@ -479,15 +479,16 @@ class AuctionSyncHandler(SimpleHTTPRequestHandler):
                                     result = {"success": False, "error": "You already hold the leading bid!"}
                                 else:
                                     next_bid = get_next_valid_bid(state.get('currentBid', 0), state.get('basePrice', 1000))
-                                    roster = team.get('roster', [])
-                                    auction_players_count = len([r for r in roster if not r.get('isOwner')])
-                                    remaining_auction_slots = max(0, 7 - (auction_players_count + 1))
-                                    min_reserve = remaining_auction_slots * 1000
+                                    total_slots = team.get('maxAuctionSlots', 8)
+                                    curr_count = team.get('acquiredCount', len(team.get('roster', [])))
+                                    remaining_slots = max(0, total_slots - (curr_count + 1))
+                                    min_reserve = remaining_slots * 1000
 
                                     if next_bid > team.get('remainingBudget', 0):
-                                        result = {"success": False, "error": f"Bid (₹{next_bid:,}) exceeds your purse (₹{team.get('remainingBudget', 0):,})."}
+                                        result = {"success": False, "error": f"Insufficient Purse: Bid (₹{next_bid:,}) exceeds your remaining purse (₹{team.get('remainingBudget', 0):,})."}
                                     elif team.get('remainingBudget', 0) - next_bid < min_reserve:
-                                        result = {"success": False, "error": f"Reserve Violation: You must retain at least ₹{min_reserve:,} for remaining {remaining_auction_slots} auction slot(s)."}
+                                        max_allowed = max(0, team.get('remainingBudget', 0) - min_reserve)
+                                        result = {"success": False, "error": f"Reserve Violation: Next bid (₹{next_bid:,}) leaves ₹{(team.get('remainingBudget', 0) - next_bid):,}, but you must retain at least ₹{min_reserve:,} for remaining {remaining_slots} player(s). Max allowable bid: ₹{max_allowed:,}."}
                                     else:
                                         state['currentBid'] = next_bid
                                         state['nextMinBid'] = get_next_valid_bid(next_bid, state.get('basePrice', 1000))
@@ -521,36 +522,49 @@ class AuctionSyncHandler(SimpleHTTPRequestHandler):
 
                             if (s1 and s1.get('teamId') == team_id) or (s2 and s2.get('teamId') == team_id):
                                 result = {"success": True, "message": "Already in the battle ring."}
-                            elif not s1:
-                                active_bidders['slot1'] = {
-                                    'teamId': team_id,
-                                    'teamName': team.get('name'),
-                                    'ownerName': team.get('ownerName') or team.get('playingOwner'),
-                                    'color': team.get('color', '#C8A96A'),
-                                    'icon': team.get('icon', '🏏'),
-                                    'joinedAt': int(time.time() * 1000)
-                                }
-                                state['lastActionTimestamp'] = int(time.time() * 1000)
-                                server_data['version'] = int(server_data.get('version', 0)) + 1
-                                update_cache()
-                                trigger_async_save()
-                                result = {"success": True, "version": server_data['version']}
-                            elif not s2:
-                                active_bidders['slot2'] = {
-                                    'teamId': team_id,
-                                    'teamName': team.get('name'),
-                                    'ownerName': team.get('ownerName') or team.get('playingOwner'),
-                                    'color': team.get('color', '#C8A96A'),
-                                    'icon': team.get('icon', '🏏'),
-                                    'joinedAt': int(time.time() * 1000)
-                                }
-                                state['lastActionTimestamp'] = int(time.time() * 1000)
-                                server_data['version'] = int(server_data.get('version', 0)) + 1
-                                update_cache()
-                                trigger_async_save()
-                                result = {"success": True, "version": server_data['version']}
-                            else:
+                            elif s1 and s2:
                                 result = {"success": False, "error": "Battle Ring Full! Two teams are already locked in this bidding war."}
+                            else:
+                                # Budget & Reserve Check: Team must be able to afford the next valid bid to enter ring
+                                next_bid = state.get('nextMinBid') or get_next_valid_bid(state.get('currentBid', 0), state.get('basePrice', 1000))
+                                total_slots = team.get('maxAuctionSlots', 8)
+                                curr_count = team.get('acquiredCount', len(team.get('roster', [])))
+                                remaining_slots = max(0, total_slots - (curr_count + 1))
+                                min_reserve = remaining_slots * 1000
+
+                                if next_bid > team.get('remainingBudget', 0):
+                                    result = {"success": False, "error": f"Insufficient Purse: Next bid (₹{next_bid:,}) exceeds your remaining purse (₹{team.get('remainingBudget', 0):,}). Cannot enter bidding ring."}
+                                elif team.get('remainingBudget', 0) - next_bid < min_reserve:
+                                    max_allowed = max(0, team.get('remainingBudget', 0) - min_reserve)
+                                    result = {"success": False, "error": f"Reserve Violation: Next bid (₹{next_bid:,}) leaves only ₹{(team.get('remainingBudget', 0) - next_bid):,}, but you must retain at least ₹{min_reserve:,} to buy remaining {remaining_slots} player(s). Max allowable bid: ₹{max_allowed:,}. Cannot enter bidding ring."}
+                                elif not s1:
+                                    active_bidders['slot1'] = {
+                                        'teamId': team_id,
+                                        'teamName': team.get('name'),
+                                        'ownerName': team.get('ownerName') or team.get('playingOwner'),
+                                        'color': team.get('color', '#C8A96A'),
+                                        'icon': team.get('icon', '🏏'),
+                                        'joinedAt': int(time.time() * 1000)
+                                    }
+                                    state['lastActionTimestamp'] = int(time.time() * 1000)
+                                    server_data['version'] = int(server_data.get('version', 0)) + 1
+                                    update_cache()
+                                    trigger_async_save()
+                                    result = {"success": True, "version": server_data['version']}
+                                elif not s2:
+                                    active_bidders['slot2'] = {
+                                        'teamId': team_id,
+                                        'teamName': team.get('name'),
+                                        'ownerName': team.get('ownerName') or team.get('playingOwner'),
+                                        'color': team.get('color', '#C8A96A'),
+                                        'icon': team.get('icon', '🏏'),
+                                        'joinedAt': int(time.time() * 1000)
+                                    }
+                                    state['lastActionTimestamp'] = int(time.time() * 1000)
+                                    server_data['version'] = int(server_data.get('version', 0)) + 1
+                                    update_cache()
+                                    trigger_async_save()
+                                    result = {"success": True, "version": server_data['version']}
 
                     elif action == 'withdraw':
                         team_id = data.get('teamId')

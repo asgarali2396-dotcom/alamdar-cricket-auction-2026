@@ -687,6 +687,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const isInBattle = isSlot1 || isSlot2;
 
         if (!isInBattle) {
+          const team = currentTeams.find((t) => t.id === teamId);
+          const nextBid = currentAuctionState.nextMinBid || (typeof AuctionEngine !== 'undefined' ? AuctionEngine.getNextValidBid(currentAuctionState.currentBid || 0, currentAuctionState.basePrice || 1000) : 1000);
+          if (team && typeof AuctionEngine !== 'undefined') {
+            const affordCheck = AuctionEngine.canTeamAffordBid(team, nextBid);
+            if (!affordCheck.canBid) {
+              showToast(affordCheck.reason, 'error');
+              return;
+            }
+          }
+
           // Join Battle Ring
           const joinRes = await AuctionEngine.joinBattle(teamId);
           if (joinRes.success) {
@@ -1341,24 +1351,41 @@ document.addEventListener('DOMContentLoaded', () => {
         raiseBtn.className = 'w-full py-4 px-6 rounded-2xl font-black text-sm sm:text-base uppercase tracking-wider bg-[#0a2c25] border-2 border-amber-500/70 text-amber-300 shadow-xl cursor-not-allowed flex items-center justify-center gap-2 select-none';
         raiseBtn.innerHTML = '<span class="animate-pulse text-lg">🔒</span> BIDDING LOCKED — PLAYER INTRO IN PROGRESS';
       } else if (!isInBattle) {
-        raiseBtn.disabled = isBattleFull || !hasPlayer;
-        if (isBattleFull) {
+        const nextRequiredBid = currentAuctionState.nextMinBid || (typeof AuctionEngine !== 'undefined' ? AuctionEngine.getNextValidBid(currentAuctionState.currentBid || 0, currentAuctionState.basePrice || 1000) : 1000);
+        const affordCheck = typeof AuctionEngine !== 'undefined' ? AuctionEngine.canTeamAffordBid(team, nextRequiredBid) : { canBid: true };
+
+        if (hasPlayer && !affordCheck.canBid) {
+          raiseBtn.disabled = true;
+          raiseBtn.className = 'w-full py-4 px-6 rounded-2xl font-bold text-xs sm:text-sm uppercase tracking-wide bg-[#9e2a2b]/40 border-2 border-red-500/60 text-red-200 shadow-xl cursor-not-allowed flex items-center justify-center gap-2 text-center select-none';
+          raiseBtn.title = affordCheck.reason || 'Insufficient purse or reserve';
+          raiseBtn.innerHTML = `⚠️ CANNOT ENTER RING (EXCEEDS PURSE/RESERVE FOR ₹${nextRequiredBid.toLocaleString()})`;
+        } else if (isBattleFull) {
+          raiseBtn.disabled = true;
           raiseBtn.className = 'w-full py-4 px-6 rounded-2xl font-bold text-sm uppercase bg-[#0a2c25] border border-[#C8A96A]/20 text-[#E6F0E9]';
           raiseBtn.innerText = '🔒 BATTLE RING FULL (2 FRANCHISES ACTIVE)';
         } else {
+          raiseBtn.disabled = !hasPlayer;
           raiseBtn.className = 'w-full py-4 px-6 rounded-2xl font-black text-base uppercase bg-[#C8A96A] hover:bg-[#DFC897] text-[#0F3D34] shadow-xl cursor-pointer';
           raiseBtn.innerText = '⚔️ JOIN BIDDING BATTLE';
         }
       } else {
         // Team is in battle
+        const nextRequiredBid = currentAuctionState.nextMinBid || (typeof AuctionEngine !== 'undefined' ? AuctionEngine.getNextValidBid(currentAuctionState.currentBid || 0, currentAuctionState.basePrice || 1000) : 1000);
+        const affordCheck = typeof AuctionEngine !== 'undefined' ? AuctionEngine.canTeamAffordBid(team, nextRequiredBid) : { canBid: true };
+
         if (isLeading) {
           raiseBtn.disabled = true;
           raiseBtn.className = 'w-full py-4 px-6 rounded-2xl font-black text-sm sm:text-base uppercase tracking-wider bg-[#134E43] text-[#F7F6F1] border-2 border-[#C8A96A] shadow-xl';
           raiseBtn.innerText = `YOU HOLD THE HIGHEST BID (₹${currentAuctionState.currentBid.toLocaleString()})`;
+        } else if (hasPlayer && !affordCheck.canBid) {
+          raiseBtn.disabled = true;
+          raiseBtn.className = 'w-full py-4 px-6 rounded-2xl font-bold text-xs sm:text-sm uppercase tracking-wide bg-[#9e2a2b]/40 border-2 border-red-500/60 text-red-200 shadow-xl cursor-not-allowed text-center select-none';
+          raiseBtn.title = affordCheck.reason || 'Insufficient purse or reserve';
+          raiseBtn.innerText = `⚠️ CANNOT RAISE BID TO ₹${nextRequiredBid.toLocaleString()} (RESERVE VIOLATION)`;
         } else {
           raiseBtn.disabled = !hasPlayer;
           raiseBtn.className = 'w-full py-4 px-6 rounded-2xl font-black text-base uppercase bg-[#C8A96A] hover:bg-[#DFC897] text-[#0F3D34] shadow-xl cursor-pointer';
-          raiseBtn.innerText = `🔥 RAISE BID TO ₹${currentAuctionState.nextMinBid.toLocaleString()}`;
+          raiseBtn.innerText = `🔥 RAISE BID TO ₹${nextRequiredBid.toLocaleString()}`;
         }
       }
     }
