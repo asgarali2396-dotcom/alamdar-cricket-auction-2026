@@ -22,25 +22,65 @@ document.addEventListener('DOMContentLoaded', () => {
   let _renderRaf = null;
   let burstFinishTimeout = null;
 
-  // Background preloader: smoothly caches all tournament player images in browser memory for instant <1ms display
-  let _imagesPreloaded = false;
+  // Smart priority image preloader: loads active stone set immediately, defers remaining sets to idle time
+  const _preloadedPhotos = new Set();
+  let _idlePreloadStarted = false;
+
   function preloadTournamentImages(playersList) {
-    if (_imagesPreloaded || !Array.isArray(playersList) || playersList.length === 0) return;
-    _imagesPreloaded = true;
-    const preloadNext = (idx) => {
-      if (idx >= playersList.length) return;
-      const ply = playersList[idx];
-      if (ply && ply.photo) {
-        const img = new Image();
-        img.onload = img.onerror = () => {
-          setTimeout(() => preloadNext(idx + 1), 10);
-        };
-        img.src = ply.photo;
+    if (!Array.isArray(playersList) || playersList.length === 0) return;
+
+    const activeSetId = (currentAuctionState && currentAuctionState.currentSetId) || 'set_aqeeq';
+    const activePlayerId = currentAuctionState && currentAuctionState.currentPlayerId;
+
+    // Separate active set vs inactive sets
+    const immediateList = [];
+    const backgroundList = [];
+
+    playersList.forEach((ply) => {
+      if (!ply || !ply.photo || _preloadedPhotos.has(ply.photo)) return;
+      if (ply.id === activePlayerId || ply.setId === activeSetId) {
+        immediateList.push(ply);
       } else {
-        preloadNext(idx + 1);
+        backgroundList.push(ply);
       }
-    };
-    setTimeout(() => preloadNext(0), 400);
+    });
+
+    // 1. Instantly preload active stone set images
+    immediateList.forEach((ply) => {
+      _preloadedPhotos.add(ply.photo);
+      const img = new Image();
+      img.src = ply.photo;
+    });
+
+    // 2. Schedule non-urgent stone sets during idle time (1 image every 150ms)
+    if (!_idlePreloadStarted && backgroundList.length > 0) {
+      _idlePreloadStarted = true;
+      const startIdleLoading = () => {
+        let bIdx = 0;
+        const loadNextBackground = () => {
+          if (bIdx >= backgroundList.length) {
+            _idlePreloadStarted = false;
+            return;
+          }
+          const ply = backgroundList[bIdx++];
+          if (ply && ply.photo && !_preloadedPhotos.has(ply.photo)) {
+            _preloadedPhotos.add(ply.photo);
+            const img = new Image();
+            img.onload = img.onerror = () => setTimeout(loadNextBackground, 150);
+            img.src = ply.photo;
+          } else {
+            setTimeout(loadNextBackground, 50);
+          }
+        };
+        setTimeout(loadNextBackground, 2000);
+      };
+
+      if (typeof window.requestIdleCallback === 'function') {
+        window.requestIdleCallback(startIdleLoading, { timeout: 5000 });
+      } else {
+        setTimeout(startIdleLoading, 2500);
+      }
+    }
   }
 
   // Register Service Worker for PWA

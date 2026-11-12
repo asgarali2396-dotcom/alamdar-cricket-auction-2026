@@ -1,5 +1,5 @@
-const CACHE_NAME = 'alamdar-auction-v26';
-const ASSETS = [
+const CACHE_NAME = 'alamdar-auction-v27';
+const PRECACHE_ASSETS = [
   './',
   './index.html',
   './favicon.ico',
@@ -23,7 +23,7 @@ const ASSETS = [
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS).catch((err) => console.log('Cache addAll warning:', err));
+      return cache.addAll(PRECACHE_ASSETS).catch((err) => console.log('Cache addAll warning:', err));
     })
   );
   self.skipWaiting();
@@ -44,22 +44,49 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Network-first fetch strategy for assets; BYPASS SERVICE WORKER ENTIRELY FOR ALL API REQUESTS
 self.addEventListener('fetch', (event) => {
+  const url = event.request.url;
+
   // CRITICAL: Live sync and API calls MUST bypass service worker cache completely
-  if (event.request.url.includes('/api/') || event.request.method !== 'GET') {
-    return; // Fall through to standard browser network request
+  if (url.includes('/api/') || event.request.method !== 'GET') {
+    return;
   }
 
+  // 1. External Tailwind CDN & static assets: Cache-First for instant 0ms load
+  const isStaticAsset =
+    url.includes('cdn.tailwindcss.com') ||
+    url.includes('/images/') ||
+    url.includes('/icons/') ||
+    url.match(/\.(css|js|png|jpg|jpeg|webp|svg|ico)(\?.*)?$/i);
+
+  if (isStaticAsset) {
+    event.respondWith(
+      caches.match(event.request).then((cachedResponse) => {
+        if (cachedResponse) {
+          return cachedResponse;
+        }
+        return fetch(event.request).then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const clone = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          }
+          return networkResponse;
+        });
+      })
+    );
+    return;
+  }
+
+  // 2. HTML navigation requests: Network-first with fast cached fallback if network stalls
   event.respondWith(
     fetch(event.request)
       .then((networkResponse) => {
         if (networkResponse && networkResponse.status === 200) {
-          const responseClone = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
+          const clone = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
         }
         return networkResponse;
       })
-      .catch(() => caches.match(event.request))
+      .catch(() => caches.match(event.request).then((cached) => cached || caches.match('./index.html')))
   );
 });

@@ -11,6 +11,7 @@ import json
 import time
 import socket
 import threading
+import gzip
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 
 # Ensure correct MIME types on all OS environments (Render Linux / Windows)
@@ -190,13 +191,17 @@ server_data = {
 }
 
 _cached_bytes = b""
+_cached_gzip = b""
 _save_timer = None
 _save_timer_lock = threading.Lock()
+COMPRESSIBLE_EXTS = ('.html', '.css', '.js', '.mjs', '.json', '.webmanifest', '.svg')
+_static_cache = {}  # clean_path -> (raw_bytes, gzip_bytes, mime_type, mtime)
 
 def update_cache():
-    global _cached_bytes
+    global _cached_bytes, _cached_gzip
     with lock:
         _cached_bytes = json.dumps(server_data).encode('utf-8')
+        _cached_gzip = gzip.compress(_cached_bytes)
         state_condition.notify_all()
 
 def _do_disk_save():
@@ -341,6 +346,24 @@ class AuctionSyncHandler(SimpleHTTPRequestHandler):
             self.send_header('Expires', '0')
         super().end_headers()
 
+    def _send_compressed(self, content_type, raw_bytes, gzip_bytes=None, status=200):
+        accept_encoding = self.headers.get('Accept-Encoding', '')
+        use_gzip = 'gzip' in accept_encoding and len(raw_bytes) > 256
+        if use_gzip:
+            compressed = gzip_bytes if gzip_bytes is not None else gzip.compress(raw_bytes)
+            self.send_response(status)
+            self.send_header('Content-Type', content_type)
+            self.send_header('Content-Encoding', 'gzip')
+            self.send_header('Content-Length', str(len(compressed)))
+            self.end_headers()
+            self.wfile.write(compressed)
+        else:
+            self.send_response(status)
+            self.send_header('Content-Type', content_type)
+            self.send_header('Content-Length', str(len(raw_bytes)))
+            self.end_headers()
+            self.wfile.write(raw_bytes)
+
     def do_OPTIONS(self):
         self.send_response(200)
         self.send_header('Content-Length', '0')
@@ -381,16 +404,37 @@ class AuctionSyncHandler(SimpleHTTPRequestHandler):
                 return
 
             with lock:
-                body = _cached_bytes
+                raw = _cached_bytes
+                gz = _cached_gzip
 
-            self.send_response(200)
-            self.send_header('Content-Type', 'application/json')
-            self.send_header('Content-Length', str(len(body)))
-            self.end_headers()
-            self.wfile.write(body)
+            self._send_compressed('application/json', raw, gz)
             return
 
-        # Serve static files
+        # High-performance in-memory compressed static file serving (< 0.2ms latency)
+        clean_path = self.path.split('?')[0].lstrip('/')
+        if not clean_path:
+            clean_path = 'index.html'
+
+        if clean_path.endswith(COMPRESSIBLE_EXTS):
+            file_path = os.path.join(BASE_DIR, clean_path.replace('/', os.sep))
+            if os.path.isfile(file_path):
+                try:
+                    mtime = os.path.getmtime(file_path)
+                    cached = _static_cache.get(clean_path)
+                    if not cached or cached[3] != mtime:
+                        with open(file_path, 'rb') as f:
+                            raw = f.read()
+                        gz = gzip.compress(raw)
+                        mime = self.guess_type(file_path)
+                        cached = (raw, gz, mime, mtime)
+                        _static_cache[clean_path] = cached
+
+                    self._send_compressed(cached[2], cached[0], cached[1])
+                    return
+                except Exception:
+                    pass
+
+        # Serve static media / images / icons
         super().do_GET()
 
     def do_POST(self):
@@ -682,19 +726,11 @@ class AuctionSyncHandler(SimpleHTTPRequestHandler):
                         result['sessions'] = server_data.get('sessions')
 
                 resp_bytes = json.dumps(result).encode('utf-8')
-                self.send_response(200)
-                self.send_header('Content-Type', 'application/json')
-                self.send_header('Content-Length', str(len(resp_bytes)))
-                self.end_headers()
-                self.wfile.write(resp_bytes)
+                self._send_compressed('application/json', resp_bytes)
                 return
             except Exception as e:
                 err_bytes = json.dumps({"success": False, "error": str(e)}).encode('utf-8')
-                self.send_response(500)
-                self.send_header('Content-Type', 'application/json')
-                self.send_header('Content-Length', str(len(err_bytes)))
-                self.end_headers()
-                self.wfile.write(err_bytes)
+                self._send_compressed('application/json', err_bytes, status=500)
                 return
 
         # API: Real-time state update endpoint (Legacy compatibility)
@@ -720,18 +756,10 @@ class AuctionSyncHandler(SimpleHTTPRequestHandler):
                     trigger_async_save()
 
                 resp_bytes = json.dumps({"success": True, "version": server_data['version']}).encode('utf-8')
-                self.send_response(200)
-                self.send_header('Content-Type', 'application/json')
-                self.send_header('Content-Length', str(len(resp_bytes)))
-                self.end_headers()
-                self.wfile.write(resp_bytes)
+                self._send_compressed('application/json', resp_bytes)
             except Exception as e:
                 err_bytes = json.dumps({"error": str(e)}).encode('utf-8')
-                self.send_response(400)
-                self.send_header('Content-Type', 'application/json')
-                self.send_header('Content-Length', str(len(err_bytes)))
-                self.end_headers()
-                self.wfile.write(err_bytes)
+                self._send_compressed('application/json', err_bytes, status=400)
             return
 
         # API: Reset endpoint
@@ -746,11 +774,7 @@ class AuctionSyncHandler(SimpleHTTPRequestHandler):
                 trigger_async_save()
 
             resp_bytes = json.dumps({"success": True, "version": server_data['version']}).encode('utf-8')
-            self.send_response(200)
-            self.send_header('Content-Type', 'application/json')
-            self.send_header('Content-Length', str(len(resp_bytes)))
-            self.end_headers()
-            self.wfile.write(resp_bytes)
+            self._send_compressed('application/json', resp_bytes)
             return
 
         self.send_response(404)

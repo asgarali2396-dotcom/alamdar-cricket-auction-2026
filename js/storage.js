@@ -456,7 +456,7 @@ const StorageManager = {
       }
 
       try {
-        const timeout = 12; // 12-second long-poll timeout
+        const timeout = 4; // 4-second long-poll timeout (prevents proxy 504 drops & NAT disconnects)
         const url = `/api/sync?v=${encodeURIComponent(this._serverVersion)}&timeout=${timeout}&t=${Date.now()}`;
         const res = await fetch(url, { cache: 'no-store' });
 
@@ -465,7 +465,7 @@ const StorageManager = {
             this._syncDisabled = true;
           }
           this._setConnectionStatus(false);
-          await new Promise((r) => setTimeout(r, 1500));
+          await new Promise((r) => setTimeout(r, 800));
           continue;
         }
 
@@ -504,8 +504,8 @@ const StorageManager = {
         }
       } catch (err) {
         this._setConnectionStatus(false);
-        // Wait 1.5s on network error before retrying to prevent busy-looping
-        await new Promise((r) => setTimeout(r, 1500));
+        // Quick 400ms reconnect retry prevents long stalls during transient carrier hiccups
+        await new Promise((r) => setTimeout(r, 400));
       }
     }
   },
