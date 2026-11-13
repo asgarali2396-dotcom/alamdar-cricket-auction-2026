@@ -272,6 +272,147 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 3500);
   }
 
+  // -------------------------------------------------------------
+  // ULTRA-LIGHTWEIGHT LIVE CONFETTI & SOLD CELEBRATION (OPTION 2)
+  // -------------------------------------------------------------
+  let _lastCelebratedSoldKey = null;
+  let _soldModalDismissTimer = null;
+  let _confettiAnimId = null;
+
+  function triggerSoldConfetti() {
+    const canvas = document.getElementById('sold-confetti-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const colors = ['#C8A96A', '#DFC897', '#10B981', '#34D399', '#3B82F6', '#F59E0B', '#FFFFFF'];
+    const confettiCount = 55;
+    const particles = [];
+
+    for (let i = 0; i < confettiCount; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * (canvas.height * 0.35) - 20,
+        w: Math.random() * 8 + 6,
+        h: Math.random() * 6 + 4,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        vx: (Math.random() - 0.5) * 3.5,
+        vy: Math.random() * 3 + 2,
+        rot: Math.random() * 360,
+        vRot: (Math.random() - 0.5) * 6,
+        opacity: 1
+      });
+    }
+
+    if (_confettiAnimId) cancelAnimationFrame(_confettiAnimId);
+    const startTime = Date.now();
+
+    function renderConfetti() {
+      const elapsed = Date.now() - startTime;
+      if (elapsed > 4000) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        _confettiAnimId = null;
+        return;
+      }
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.rot += p.vRot;
+        if (elapsed > 2500) {
+          p.opacity = Math.max(0, 1 - (elapsed - 2500) / 1500);
+        }
+
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate((p.rot * Math.PI) / 180);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.opacity;
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+        ctx.restore();
+      }
+
+      _confettiAnimId = requestAnimationFrame(renderConfetti);
+    }
+
+    _confettiAnimId = requestAnimationFrame(renderConfetti);
+  }
+
+  function openSoldCelebration(state) {
+    if (!state || !state.currentPlayerId || state.status !== 'SOLD') return;
+    const winningTeamId = state.highestBidderTeamId;
+    const finalPrice = state.currentBid || 1000;
+    const soldKey = `${state.currentPlayerId}_${finalPrice}_${winningTeamId}`;
+    if (_lastCelebratedSoldKey === soldKey) return;
+    _lastCelebratedSoldKey = soldKey;
+
+    const player = (currentPlayers || []).find((p) => p.id === state.currentPlayerId) || state.currentPlayer;
+    const team = (currentTeams || []).find((t) => t.id === winningTeamId) || (currentTeams || [])[0];
+    if (!player || !team) return;
+
+    const modal = document.getElementById('sold-celebration-modal');
+    if (!modal) return;
+
+    const imgEl = document.getElementById('sold-modal-player-photo');
+    const nameEl = document.getElementById('sold-modal-player-name');
+    const metaEl = document.getElementById('sold-modal-player-meta');
+    const teamEl = document.getElementById('sold-modal-team-name');
+    const priceEl = document.getElementById('sold-modal-price');
+    const whatsappBtn = document.getElementById('sold-modal-whatsapp-btn');
+
+    if (imgEl) imgEl.src = player.photo || './icons/logo.png';
+    if (nameEl) nameEl.innerText = player.name;
+    if (metaEl) {
+      metaEl.innerText = `${player.setName || 'Stone Set'} • ${player.specialization || 'All-Rounder'} • Age: ${player.age || 25}`;
+    }
+    if (teamEl) {
+      teamEl.innerHTML = `<span style="color:${team.color || '#C8A96A'}">${team.icon || '🏏'} ${team.name}</span>`;
+    }
+    if (priceEl) {
+      priceEl.innerText = `₹${finalPrice.toLocaleString()}`;
+    }
+    if (whatsappBtn) {
+      whatsappBtn.onclick = () => window.sharePlayerCard(player.id);
+    }
+
+    modal.style.display = 'flex';
+    triggerSoldConfetti();
+    if (window.soundManager && typeof window.soundManager.playSoldFanfare === 'function') {
+      window.soundManager.playSoldFanfare();
+    }
+
+    // Auto-dismiss after 6.5 seconds
+    if (_soldModalDismissTimer) clearTimeout(_soldModalDismissTimer);
+    _soldModalDismissTimer = setTimeout(() => {
+      closeSoldCelebration();
+    }, 6500);
+  }
+
+  function closeSoldCelebration() {
+    const modal = document.getElementById('sold-celebration-modal');
+    if (modal) modal.style.display = 'none';
+    if (_soldModalDismissTimer) {
+      clearTimeout(_soldModalDismissTimer);
+      _soldModalDismissTimer = null;
+    }
+    const canvas = document.getElementById('sold-confetti-canvas');
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+    if (_confettiAnimId) {
+      cancelAnimationFrame(_confettiAnimId);
+      _confettiAnimId = null;
+    }
+  }
+
+  window.openSoldCelebration = openSoldCelebration;
+  window.closeSoldCelebration = closeSoldCelebration;
+
   // Single-Active-Session Validator (Detects conflicting logins on other devices)
   function checkSingleSessionHealth() {
     if (!activeUser || !activeUser.userId || activeUser.role === 'audience') return;
@@ -324,6 +465,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (currentAuctionState) {
       previousBid = currentAuctionState.currentBid || 0;
       previousBidder = currentAuctionState.highestBidderTeamId || null;
+
+      if (currentAuctionState.status === 'SOLD' && currentAuctionState.currentPlayerId) {
+        const lastActionTime = currentAuctionState.lastActionTimestamp || 0;
+        // Trigger live celebration if sold within last 15 seconds
+        if (Date.now() - lastActionTime < 15000) {
+          openSoldCelebration(currentAuctionState);
+        }
+      }
     }
 
     if (data.sessions) {
@@ -753,6 +902,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const res = await AuctionEngine.confirmSale();
         if (res.success) {
           showToast(`🔨 SOLD! ${res.soldPlayer.name} to ${res.winningTeam.name} for ₹${res.finalPrice.toLocaleString()}`, 'success');
+          openSoldCelebration(currentAuctionState);
           if (res.autoAssigned && res.autoAssigned.triggered) {
             setTimeout(() => {
               alert(`⚡ AUTO-ASSIGNMENT TRIGGERED!\n\n${res.autoAssigned.player.name} has been automatically assigned to ${res.autoAssigned.team.name} at Base Price (₹1,000) because only 1 player and 1 team remained in set "${res.autoAssigned.player.setName}".`);
@@ -881,6 +1031,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const res = await AuctionEngine.confirmSale();
         if (res.success) {
           showToast(`🔨 Hammer fell! ${res.soldPlayer.name} SOLD to ${res.winningTeam.name}!`, 'success');
+          openSoldCelebration(currentAuctionState);
         } else {
           showToast(res.error, 'error');
         }
@@ -1788,7 +1939,9 @@ document.addEventListener('DOMContentLoaded', () => {
           <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider" style="background:${captainColor}25; color:${captainColor}; border:1px solid ${captainColor}60">
             💎 ${captainSetName} (Assigned Set)
           </span>
-          <span class="text-emerald-400 font-bold font-mono-num">Slot #1 Acquired</span>
+          <button onclick="sharePlayerCard('${captainItem.playerId || 'captain_' + team.id}')" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-black text-[10px] uppercase tracking-wider flex items-center gap-1 shadow cursor-pointer transition">
+            <span>📲</span> WhatsApp
+          </button>
         </div>
       </div>
     ` : `
@@ -1842,7 +1995,9 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
             <div class="pt-2 border-t border-[#C8A96A]/15 flex items-center justify-between text-[11px]">
               <span class="text-[#E6F0E9] font-medium font-mono-num">Slot #${i + 2}</span>
-              <span class="text-emerald-400 font-bold">Acquired</span>
+              <button onclick="sharePlayerCard('${pItem.playerId}')" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-black text-[10px] uppercase tracking-wider flex items-center gap-1 shadow cursor-pointer transition">
+                <span>📲</span> WhatsApp
+              </button>
             </div>
           </div>
         `);
@@ -1870,6 +2025,312 @@ document.addEventListener('DOMContentLoaded', () => {
 
     gridEl.innerHTML = [captainCard, ...auctionCards].join('');
   }
+
+  // -------------------------------------------------------------
+  // ONE-CLICK WHATSAPP SIGNING POSTER GENERATOR (OPTION 3)
+  // -------------------------------------------------------------
+  window.sharePlayerCard = async function (playerId) {
+    if (!playerId) return;
+
+    // 1. Locate player and team
+    let player = (currentPlayers || []).find((p) => p.id === playerId);
+    let winningTeam = null;
+    let soldPrice = 0;
+
+    if (player && player.soldToTeamId) {
+      winningTeam = (currentTeams || []).find((t) => t.id === player.soldToTeamId);
+      soldPrice = player.soldPrice || 0;
+    }
+
+    if (!winningTeam) {
+      // Check team rosters (e.g. captain or already acquired)
+      for (const t of currentTeams || []) {
+        const rItem = (t.roster || []).find((r) => r.playerId === playerId || r.name === player?.name);
+        if (rItem) {
+          winningTeam = t;
+          soldPrice = rItem.price || 0;
+          if (!player) {
+            player = {
+              id: playerId,
+              name: rItem.name,
+              photo: t.photo || './icons/logo.png',
+              setName: rItem.setName,
+              specialization: rItem.role || 'Playing Captain',
+              batsmanType: 'Right Hand',
+              bowlerType: 'Right Arm',
+              age: 30
+            };
+          }
+          break;
+        }
+      }
+    }
+
+    if (!player) {
+      showToast('Player information not found.', 'error');
+      return;
+    }
+    if (!winningTeam) {
+      winningTeam = { name: 'Alamdar Sports Club', icon: '🏏', color: '#C8A96A', ownerName: 'Amravati' };
+    }
+
+    showToast('Generating official WhatsApp card...', 'info');
+
+    // 2. Load Images (Player Photo & Club Crest)
+    const logoImg = await new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => resolve(null);
+      img.src = './icons/logo.png';
+    });
+
+    const playerImg = await new Promise((resolve) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => resolve(img);
+      img.onerror = () => resolve(null);
+      img.src = player.photo || './icons/logo.png';
+    });
+
+    // 3. Create 1000 x 1000 square canvas
+    const canvas = document.createElement('canvas');
+    canvas.width = 1000;
+    canvas.height = 1000;
+    const ctx = canvas.getContext('2d');
+
+    // Helper: Rounded Rectangle
+    function drawRoundedRect(x, y, w, h, radius) {
+      ctx.beginPath();
+      ctx.moveTo(x + radius, y);
+      ctx.lineTo(x + w - radius, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
+      ctx.lineTo(x + w, y + h - radius);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+      ctx.lineTo(x + radius, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
+      ctx.lineTo(x, y + radius);
+      ctx.quadraticCurveTo(x, y, x + radius, y);
+      ctx.closePath();
+    }
+
+    // A. Background Gradient
+    const bgGrad = ctx.createLinearGradient(0, 0, 0, 1000);
+    bgGrad.addColorStop(0, '#0A2A22');
+    bgGrad.addColorStop(0.5, '#061D17');
+    bgGrad.addColorStop(1, '#020C0A');
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, 1000, 1000);
+
+    // B. Double Gold Border
+    ctx.strokeStyle = '#C8A96A';
+    ctx.lineWidth = 4;
+    ctx.strokeRect(25, 25, 950, 950);
+    ctx.strokeStyle = 'rgba(200, 169, 106, 0.35)';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(35, 35, 930, 930);
+
+    // Corner Ornaments
+    const cornerSize = 25;
+    ctx.fillStyle = '#C8A96A';
+    [[25, 25], [975 - cornerSize, 25], [25, 975 - cornerSize], [975 - cornerSize, 975 - cornerSize]].forEach(([cx, cy]) => {
+      ctx.fillRect(cx, cy, cornerSize, 4);
+      ctx.fillRect(cx, cy, 4, cornerSize);
+    });
+
+    // C. Header Branding
+    if (logoImg) {
+      [90, 910].forEach((cx) => {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(cx, 85, 32, 0, Math.PI * 2);
+        ctx.clip();
+        ctx.drawImage(logoImg, cx - 32, 85 - 32, 64, 64);
+        ctx.restore();
+        ctx.strokeStyle = '#C8A96A';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(cx, 85, 32, 0, Math.PI * 2);
+        ctx.stroke();
+      });
+    }
+
+    ctx.fillStyle = '#C8A96A';
+    ctx.font = '900 22px "Segoe UI", Inter, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('ALAMDAR SPORTS CLUB • AMRAVATI', 500, 75);
+
+    ctx.fillStyle = '#E6F0E9';
+    ctx.font = '700 13px "Segoe UI", Inter, sans-serif';
+    ctx.fillText('BOX CRICKET LEAGUE 2026 • OFFICIAL PLAYER SIGNING', 500, 102);
+
+    // Divider Line
+    ctx.strokeStyle = 'rgba(200, 169, 106, 0.4)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(150, 118);
+    ctx.lineTo(850, 118);
+    ctx.stroke();
+
+    // D. Stone Set Pill Badge
+    const stoneName = player.setName || 'Stone Set';
+    const stoneSet = window.ALAMDAR_DATA.SET_CONFIG.find((s) => s.id === player.setId || s.name.toLowerCase() === stoneName.toLowerCase());
+    const stoneColor = stoneSet?.color || '#C8A96A';
+
+    ctx.save();
+    drawRoundedRect(350, 132, 300, 32, 16);
+    ctx.fillStyle = 'rgba(15, 61, 52, 0.9)';
+    ctx.fill();
+    ctx.strokeStyle = stoneColor;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.fillStyle = stoneColor;
+    ctx.font = '900 13px "Segoe UI", Inter, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(`💎 SET : ${stoneName.toUpperCase()}`, 500, 153);
+    ctx.restore();
+
+    // E. Center Player Photo (3:4 Portrait with Shadow & Frame)
+    const photoX = 350;
+    const photoY = 178;
+    const photoW = 300;
+    const photoH = 400;
+
+    // Photo shadow
+    ctx.save();
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+    ctx.shadowBlur = 20;
+    ctx.shadowOffsetY = 8;
+    drawRoundedRect(photoX, photoY, photoW, photoH, 20);
+    ctx.fillStyle = '#061F1A';
+    ctx.fill();
+    ctx.restore();
+
+    // Draw Image clipped
+    if (playerImg) {
+      ctx.save();
+      drawRoundedRect(photoX, photoY, photoW, photoH, 20);
+      ctx.clip();
+      ctx.drawImage(playerImg, photoX, photoY, photoW, photoH);
+      ctx.restore();
+    }
+
+    // Photo Border
+    drawRoundedRect(photoX, photoY, photoW, photoH, 20);
+    ctx.strokeStyle = '#C8A96A';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    // F. Player Name & Stats
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = '900 32px "Segoe UI", Inter, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(player.name.toUpperCase(), 500, 622);
+
+    ctx.fillStyle = '#DFC897';
+    ctx.font = '700 16px "Segoe UI", Inter, sans-serif';
+    const roleText = player.specialization || 'All-Rounder';
+    const styleText = `Age: ${player.age || 25} • Bat: ${player.batsmanType?.split(' ')[0] || 'RHB'} • Bowl: ${player.bowlerType?.split(' ')[0] || 'Fast'}`;
+    ctx.fillText(`${roleText} • ${styleText}`, 500, 652);
+
+    // G. Bottom Banner: Officially Acquired by Franchise
+    const bannerY = 680;
+    const bannerH = 265;
+    const teamColor = winningTeam.color || '#C8A96A';
+
+    ctx.save();
+    drawRoundedRect(60, bannerY, 880, bannerH, 24);
+    const bannerGrad = ctx.createLinearGradient(60, bannerY, 940, bannerY + bannerH);
+    bannerGrad.addColorStop(0, '#06201A');
+    bannerGrad.addColorStop(1, '#03120E');
+    ctx.fillStyle = bannerGrad;
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(200, 169, 106, 0.5)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.restore();
+
+    // "OFFICIALLY SIGNED BY"
+    ctx.fillStyle = '#E6F0E9';
+    ctx.font = '900 13px "Segoe UI", Inter, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('OFFICIALLY ACQUIRED BY', 500, bannerY + 38);
+
+    // Franchise Name & Icon
+    ctx.fillStyle = teamColor;
+    ctx.font = '900 32px "Segoe UI", Inter, sans-serif';
+    ctx.fillText(`${winningTeam.icon || '🏏'} ${winningTeam.name.toUpperCase()}`, 500, bannerY + 80);
+
+    ctx.fillStyle = '#E6F0E9';
+    ctx.font = '600 14px "Segoe UI", Inter, sans-serif';
+    ctx.fillText(`Franchise Owner: ${winningTeam.ownerName || winningTeam.name}`, 500, bannerY + 110);
+
+    // Price Gold Badge
+    const priceY = bannerY + 135;
+    drawRoundedRect(250, priceY, 500, 65, 32);
+    ctx.fillStyle = '#C8A96A';
+    ctx.fill();
+    ctx.strokeStyle = '#DFC897';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    ctx.fillStyle = '#0F3D34';
+    ctx.font = '900 28px "Segoe UI", Inter, sans-serif';
+    const priceDisplay = soldPrice > 0 ? `HAMMER PRICE : ₹${soldPrice.toLocaleString()}` : 'PLAYING CAPTAIN (SLOT #1)';
+    ctx.fillText(priceDisplay, 500, priceY + 43);
+
+    // Footer note
+    ctx.fillStyle = 'rgba(230, 240, 233, 0.5)';
+    ctx.font = '500 11px "Segoe UI", Inter, sans-serif';
+    ctx.fillText('Official League Signing Certificate • Powered by Alamdar Sports Club', 500, bannerY + 235);
+
+    // 4. Output: Web Share API or Direct Download
+    const cleanPlayerName = player.name.replace(/[^a-zA-Z0-9]/g, '_');
+    const cleanTeamName = winningTeam.name.replace(/[^a-zA-Z0-9]/g, '_');
+    const fileName = `${cleanPlayerName}_${cleanTeamName}_Official_Signing.png`;
+    const caption = `🏏 *Official Signing!* ${player.name} has been acquired by *${winningTeam.name}* for ₹${soldPrice.toLocaleString()} in the Alamdar Box Cricket League 2026! 🏆🔥`;
+
+    canvas.toBlob(async (blob) => {
+      if (!blob) {
+        showToast('Could not generate poster.', 'error');
+        return;
+      }
+
+      const file = new File([blob], fileName, { type: 'image/png' });
+
+      // If mobile browser supports sharing files (WhatsApp, Telegram, etc.)
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({
+            files: [file],
+            title: `${player.name} - ${winningTeam.name}`,
+            text: caption
+          });
+          showToast('Shared successfully!', 'success');
+          return;
+        } catch (err) {
+          if (err.name !== 'AbortError') {
+            console.log('Share error:', err);
+          }
+        }
+      }
+
+      // Fallback: Direct Download + copy caption
+      const link = document.createElement('a');
+      link.download = fileName;
+      link.href = URL.createObjectURL(blob);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(link.href);
+
+      try {
+        await navigator.clipboard.writeText(caption);
+        showToast(`🏆 Downloaded poster & copied WhatsApp caption!`, 'success');
+      } catch (e) {
+        showToast(`🏆 Downloaded ${player.name} Official Poster!`, 'success');
+      }
+    }, 'image/png');
+  };
 
   // -------------------------------------------------------------
   // HTML5 CANVAS HIGH-RES TEAM POSTER GENERATOR & DOWNLOADER
