@@ -2023,7 +2023,10 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    gridEl.innerHTML = [captainCard, ...auctionCards].join('');
+    const fullRosterHtml = [captainCard, ...auctionCards].join('');
+    if (gridEl._lastHtml === fullRosterHtml) return;
+    gridEl._lastHtml = fullRosterHtml;
+    gridEl.innerHTML = fullRosterHtml;
   }
 
   // -------------------------------------------------------------

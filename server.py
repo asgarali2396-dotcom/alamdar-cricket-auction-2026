@@ -326,6 +326,14 @@ def evaluate_auto_assignment():
 class AuctionSyncHandler(SimpleHTTPRequestHandler):
     protocol_version = "HTTP/1.1"
 
+    def setup(self):
+        super().setup()
+        try:
+            # Disable Nagle's algorithm for sub-millisecond real-time bidding packets
+            self.connection.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+        except Exception:
+            pass
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=BASE_DIR, **kwargs)
 
@@ -333,7 +341,7 @@ class AuctionSyncHandler(SimpleHTTPRequestHandler):
         # Enable CORS and persistent keep-alive connection
         self.send_header('Access-Control-Allow-Origin', '*')
         self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-        self.send_header('Access-Control-Allow-Headers', 'Content-Type, Cache-Control')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type, Cache-Control, If-None-Match')
         self.send_header('Connection', 'keep-alive')
 
         # Fast cache for static images and media (< 1ms load); no-cache for live sync and HTML
@@ -346,7 +354,7 @@ class AuctionSyncHandler(SimpleHTTPRequestHandler):
             self.send_header('Expires', '0')
         super().end_headers()
 
-    def _send_compressed(self, content_type, raw_bytes, gzip_bytes=None, status=200):
+    def _send_compressed(self, content_type, raw_bytes, gzip_bytes=None, status=200, etag=None):
         accept_encoding = self.headers.get('Accept-Encoding', '')
         use_gzip = 'gzip' in accept_encoding and len(raw_bytes) > 256
         if use_gzip:
@@ -355,12 +363,16 @@ class AuctionSyncHandler(SimpleHTTPRequestHandler):
             self.send_header('Content-Type', content_type)
             self.send_header('Content-Encoding', 'gzip')
             self.send_header('Content-Length', str(len(compressed)))
+            if etag:
+                self.send_header('ETag', etag)
             self.end_headers()
             self.wfile.write(compressed)
         else:
             self.send_response(status)
             self.send_header('Content-Type', content_type)
             self.send_header('Content-Length', str(len(raw_bytes)))
+            if etag:
+                self.send_header('ETag', etag)
             self.end_headers()
             self.wfile.write(raw_bytes)
 
@@ -420,16 +432,23 @@ class AuctionSyncHandler(SimpleHTTPRequestHandler):
             if os.path.isfile(file_path):
                 try:
                     mtime = os.path.getmtime(file_path)
+                    etag = f'"{int(mtime)}-{os.path.getsize(file_path)}"'
+                    if self.headers.get('If-None-Match') == etag:
+                        self.send_response(304)
+                        self.send_header('ETag', etag)
+                        self.end_headers()
+                        return
+
                     cached = _static_cache.get(clean_path)
                     if not cached or cached[3] != mtime:
                         with open(file_path, 'rb') as f:
                             raw = f.read()
                         gz = gzip.compress(raw)
                         mime = self.guess_type(file_path)
-                        cached = (raw, gz, mime, mtime)
+                        cached = (raw, gz, mime, mtime, etag)
                         _static_cache[clean_path] = cached
 
-                    self._send_compressed(cached[2], cached[0], cached[1])
+                    self._send_compressed(cached[2], cached[0], cached[1], etag=cached[4])
                     return
                 except Exception:
                     pass
