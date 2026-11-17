@@ -1,3 +1,9 @@
+# Python & Cache
+__pycache__/
+*.py[cod]
+*$py.class
+.cache/
+
 # Operating System & IDE Files
 .DS_Store
 Thumbs.db
@@ -7,14 +13,8 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Node / Build artifacts (if extending later)
-node_modules/
-dist/
-build/
-.cache/
-__pycache__/
-*.pyc
-~$*.docx
+# Binaries & Temporary files
 cloudflared.exe
+*.exe
 *.docx
-cloudflared.exe
+~$*.docx
