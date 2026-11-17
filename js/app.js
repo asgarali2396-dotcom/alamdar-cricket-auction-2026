@@ -1343,26 +1343,61 @@ document.addEventListener('DOMContentLoaded', () => {
       if (hasPlayer && p.photo) {
         if (cardImg.getAttribute('data-cur-src') !== p.photo) {
           cardImg.setAttribute('data-cur-src', p.photo);
+          cardImg.style.setProperty('display', 'none', 'important');
+          cardImg.classList.add('hidden');
+          cardSvg.style.removeProperty('display');
+          cardSvg.style.setProperty('display', 'block', 'important');
+          cardSvg.classList.remove('hidden');
+
           cardImg.onerror = function () {
             if (p.photoDriveUrl && this.src !== p.photoDriveUrl) {
               this.src = p.photoDriveUrl;
             } else {
-              this.style.display = 'none';
-              if (cardSvg) cardSvg.style.display = 'block';
+              this.removeAttribute('src');
+              this.style.setProperty('display', 'none', 'important');
+              this.classList.add('hidden');
+              if (cardSvg) {
+                cardSvg.style.removeProperty('display');
+                cardSvg.style.setProperty('display', 'block', 'important');
+                cardSvg.classList.remove('hidden');
+              }
             }
           };
           cardImg.onload = function () {
-            this.style.display = 'block';
-            if (cardSvg) cardSvg.style.display = 'none';
+            if (this.naturalWidth > 0) {
+              this.style.removeProperty('display');
+              this.style.setProperty('display', 'block', 'important');
+              this.classList.remove('hidden');
+              if (cardSvg) {
+                cardSvg.style.setProperty('display', 'none', 'important');
+                cardSvg.classList.add('hidden');
+              }
+            }
           };
           cardImg.src = p.photo;
+        } else {
+          if (cardImg.complete && cardImg.naturalWidth > 0) {
+            cardImg.style.removeProperty('display');
+            cardImg.style.setProperty('display', 'block', 'important');
+            cardImg.classList.remove('hidden');
+            cardSvg.style.setProperty('display', 'none', 'important');
+            cardSvg.classList.add('hidden');
+          } else if (cardImg.complete && cardImg.naturalWidth === 0) {
+            cardImg.style.setProperty('display', 'none', 'important');
+            cardImg.classList.add('hidden');
+            cardSvg.style.removeProperty('display');
+            cardSvg.style.setProperty('display', 'block', 'important');
+            cardSvg.classList.remove('hidden');
+          }
         }
-        cardImg.style.display = 'block';
-        cardSvg.style.display = 'none';
       } else {
         cardImg.removeAttribute('data-cur-src');
-        cardImg.style.display = 'none';
-        cardSvg.style.display = 'block';
+        cardImg.removeAttribute('src');
+        cardImg.style.setProperty('display', 'none', 'important');
+        cardImg.classList.add('hidden');
+        cardSvg.style.removeProperty('display');
+        cardSvg.style.setProperty('display', 'block', 'important');
+        cardSvg.classList.remove('hidden');
       }
     }
   }
@@ -1456,26 +1491,61 @@ document.addEventListener('DOMContentLoaded', () => {
       if (hasPlayer && p.photo) {
         if (cardImg.getAttribute('data-cur-src') !== p.photo) {
           cardImg.setAttribute('data-cur-src', p.photo);
+          cardImg.style.setProperty('display', 'none', 'important');
+          cardImg.classList.add('hidden');
+          cardSvg.style.removeProperty('display');
+          cardSvg.style.setProperty('display', 'block', 'important');
+          cardSvg.classList.remove('hidden');
+
           cardImg.onerror = function () {
             if (p.photoDriveUrl && this.src !== p.photoDriveUrl) {
               this.src = p.photoDriveUrl;
             } else {
-              this.style.display = 'none';
-              if (cardSvg) cardSvg.style.display = 'block';
+              this.removeAttribute('src');
+              this.style.setProperty('display', 'none', 'important');
+              this.classList.add('hidden');
+              if (cardSvg) {
+                cardSvg.style.removeProperty('display');
+                cardSvg.style.setProperty('display', 'block', 'important');
+                cardSvg.classList.remove('hidden');
+              }
             }
           };
           cardImg.onload = function () {
-            this.style.display = 'block';
-            if (cardSvg) cardSvg.style.display = 'none';
+            if (this.naturalWidth > 0) {
+              this.style.removeProperty('display');
+              this.style.setProperty('display', 'block', 'important');
+              this.classList.remove('hidden');
+              if (cardSvg) {
+                cardSvg.style.setProperty('display', 'none', 'important');
+                cardSvg.classList.add('hidden');
+              }
+            }
           };
           cardImg.src = p.photo;
+        } else {
+          if (cardImg.complete && cardImg.naturalWidth > 0) {
+            cardImg.style.removeProperty('display');
+            cardImg.style.setProperty('display', 'block', 'important');
+            cardImg.classList.remove('hidden');
+            cardSvg.style.setProperty('display', 'none', 'important');
+            cardSvg.classList.add('hidden');
+          } else if (cardImg.complete && cardImg.naturalWidth === 0) {
+            cardImg.style.setProperty('display', 'none', 'important');
+            cardImg.classList.add('hidden');
+            cardSvg.style.removeProperty('display');
+            cardSvg.style.setProperty('display', 'block', 'important');
+            cardSvg.classList.remove('hidden');
+          }
         }
-        cardImg.style.display = 'block';
-        cardSvg.style.display = 'none';
       } else {
         cardImg.removeAttribute('data-cur-src');
-        cardImg.style.display = 'none';
-        cardSvg.style.display = 'block';
+        cardImg.removeAttribute('src');
+        cardImg.style.setProperty('display', 'none', 'important');
+        cardImg.classList.add('hidden');
+        cardSvg.style.removeProperty('display');
+        cardSvg.style.setProperty('display', 'block', 'important');
+        cardSvg.classList.remove('hidden');
       }
     }
 

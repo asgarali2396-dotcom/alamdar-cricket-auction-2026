@@ -1562,21 +1562,31 @@ select:focus, input:focus {
   border: 2.5px solid rgba(200, 169, 106, 0.75);
   overflow: hidden;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55), inset 0 0 20px rgba(200, 169, 106, 0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: radial-gradient(circle at center, #134e43 0%, #092520 100%);
   position: relative;
   margin: 0.2rem auto;
   flex: 1;
+  background: radial-gradient(circle at center, #134e43 0%, #092520 100%);
 }
 
-.owner-photo-frame img {
+.owner-photo-frame img,
+.owner-photo-frame svg {
+  position: absolute;
+  inset: 0;
   width: 100% !important;
   height: 100% !important;
   object-fit: contain !important;
   object-position: center center !important;
-  display: block;
+  margin: auto;
+}
+
+/* Ensure hidden elements are NEVER forced visible by fullscreen overrides */
+.owner-photo-frame img[style*="display: none"],
+.owner-photo-frame img[style*="display:none"],
+.owner-photo-frame img.hidden,
+.owner-photo-frame svg[style*="display: none"],
+.owner-photo-frame svg[style*="display:none"],
+.owner-photo-frame svg.hidden {
+  display: none !important;
 }
 
 .owner-attr-pill {
@@ -1767,13 +1777,17 @@ body.is-fullscreen #view-live .owner-photo-frame,
   background: radial-gradient(circle at center, #134e43 0%, #092520 100%) !important;
 }
 
-body.is-fullscreen #view-live .owner-photo-frame img,
-:fullscreen #view-live .owner-photo-frame img {
+body.is-fullscreen #view-live .owner-photo-frame img:not([style*="display: none"]):not([style*="display:none"]):not(.hidden),
+:fullscreen #view-live .owner-photo-frame img:not([style*="display: none"]):not([style*="display:none"]):not(.hidden),
+body.is-fullscreen #view-live .owner-photo-frame svg:not([style*="display: none"]):not([style*="display:none"]):not(.hidden),
+:fullscreen #view-live .owner-photo-frame svg:not([style*="display: none"]):not([style*="display:none"]):not(.hidden) {
+  position: absolute !important;
+  inset: 0 !important;
   width: 100% !important;
   height: 100% !important;
   object-fit: contain !important;
   object-position: center center !important;
-  display: block !important;
+  margin: auto !important;
 }
 
 body.is-fullscreen #view-live .owner-attr-pill,
@@ -2164,13 +2178,17 @@ body.is-fullscreen #view-owner .owner-photo-frame,
   background: radial-gradient(circle at center, #134e43 0%, #092520 100%) !important;
 }
 
-body.is-fullscreen #view-owner .owner-photo-frame img,
-:fullscreen #view-owner .owner-photo-frame img {
+body.is-fullscreen #view-owner .owner-photo-frame img:not([style*="display: none"]):not([style*="display:none"]):not(.hidden),
+:fullscreen #view-owner .owner-photo-frame img:not([style*="display: none"]):not([style*="display:none"]):not(.hidden),
+body.is-fullscreen #view-owner .owner-photo-frame svg:not([style*="display: none"]):not([style*="display:none"]):not(.hidden),
+:fullscreen #view-owner .owner-photo-frame svg:not([style*="display: none"]):not([style*="display:none"]):not(.hidden) {
+  position: absolute !important;
+  inset: 0 !important;
   width: 100% !important;
   height: 100% !important;
   object-fit: contain !important;
   object-position: center center !important;
-  display: block !important;
+  margin: auto !important;
 }
 
 body.is-fullscreen #view-owner .owner-player-spotlight-card .w-full.space-y-3,

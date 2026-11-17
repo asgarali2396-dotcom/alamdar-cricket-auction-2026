@@ -47,7 +47,7 @@
   </script>
 
   <!-- Custom Stylesheet (with cache-bust) -->
-  <link rel="stylesheet" href="./css/style.css?v=2026.50">
+  <link rel="stylesheet" href="./css/style.css?v=2026.51">
 </head>
 
 <body class="bg-[#0F3D34] text-[#F7F6F1] min-h-screen flex flex-col">
@@ -229,35 +229,42 @@
 
           <!-- Photo Frame with Dynamic Photo or Silhouette -->
           <div class="owner-photo-frame">
-            <img id="live-card-player-img" src="" alt="Player Photo" class="w-full h-full object-cover"
-              loading="eager" decoding="async" style="display:none;">
-            <svg id="live-card-player-svg" viewBox="0 0 200 200" class="w-full h-full" fill="none"
-              xmlns="http://www.w3.org/2000/svg">
+            <img id="live-card-player-img" alt="" class="w-full h-full object-cover hidden"
+              loading="eager" decoding="async" style="display:none !important;">
+            <svg id="live-card-player-svg" viewBox="0 0 300 400" class="w-full h-full" fill="none"
+              xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
               <defs>
-                <radialGradient id="liveAudiencePlayerBgGrad" cx="50%" cy="38%" r="65%">
-                  <stop offset="0%" stop-color="#E2E8F0" stop-opacity="0.95" />
-                  <stop offset="45%" stop-color="#94A3B8" stop-opacity="0.75" />
-                  <stop offset="100%" stop-color="#475569" stop-opacity="0.95" />
+                <radialGradient id="livePlayerSilhouetteGlow" cx="50%" cy="38%" r="48%">
+                  <stop offset="0%" stop-color="#C8A96A" stop-opacity="0.35" />
+                  <stop offset="55%" stop-color="#C8A96A" stop-opacity="0.1" />
+                  <stop offset="100%" stop-color="#C8A96A" stop-opacity="0" />
                 </radialGradient>
-                <linearGradient id="liveAudienceSilhouetteGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stop-color="#334155" />
-                  <stop offset="50%" stop-color="#1E293B" />
-                  <stop offset="100%" stop-color="#0F172A" />
+                <linearGradient id="livePlayerSilhouetteBody" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#144d41" />
+                  <stop offset="40%" stop-color="#0a2a23" />
+                  <stop offset="100%" stop-color="#051613" />
                 </linearGradient>
-                <linearGradient id="liveAudienceCollarGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stop-color="#CBD5E1" />
-                  <stop offset="100%" stop-color="#64748B" />
+                <linearGradient id="livePlayerGoldAccent" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#DFC897" />
+                  <stop offset="50%" stop-color="#C8A96A" />
+                  <stop offset="100%" stop-color="#8E6E34" />
                 </linearGradient>
               </defs>
-              <rect width="200" height="200" fill="url(#liveAudiencePlayerBgGrad)" />
-              <circle cx="100" cy="70" r="30" fill="url(#liveAudienceSilhouetteGrad)" />
-              <rect x="88" y="94" width="24" height="24" rx="5" fill="url(#liveAudienceSilhouetteGrad)" />
-              <path d="M36 186 C36 138 66 120 84 116 L94 130 L106 130 L116 116 C134 120 164 138 164 186 Z"
-                fill="url(#liveAudienceSilhouetteGrad)" />
-              <path d="M84 116 L100 138 L116 116" stroke="url(#liveAudienceCollarGrad)" stroke-width="3"
-                stroke-linecap="round" stroke-linejoin="round" />
-              <line x1="100" y1="138" x2="100" y2="158" stroke="url(#liveAudienceCollarGrad)" stroke-width="2"
-                stroke-linecap="round" />
+              <!-- Ambient Halo Glow behind Silhouette -->
+              <ellipse cx="150" cy="180" rx="115" ry="125" fill="url(#livePlayerSilhouetteGlow)" />
+              <!-- Cricket Jersey / Shoulders -->
+              <path d="M 45 370 C 48 260 92 215 126 208 L 138 230 L 162 230 L 174 208 C 208 215 252 260 255 370 Z"
+                fill="url(#livePlayerSilhouetteBody)" stroke="url(#livePlayerGoldAccent)" stroke-width="1.5" stroke-opacity="0.75" />
+              <!-- Neck -->
+              <rect x="135" y="174" width="30" height="34" rx="6" fill="url(#livePlayerSilhouetteBody)" stroke="url(#livePlayerGoldAccent)" stroke-width="1.2" stroke-opacity="0.6" />
+              <!-- Head Silhouette -->
+              <circle cx="150" cy="132" r="44" fill="url(#livePlayerSilhouetteBody)" stroke="url(#livePlayerGoldAccent)" stroke-width="1.5" stroke-opacity="0.8" />
+              <!-- Cricket Collar V-Neck -->
+              <path d="M 126 208 L 150 242 L 174 208" stroke="url(#livePlayerGoldAccent)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+              <!-- Placket Stitch -->
+              <line x1="150" y1="242" x2="150" y2="285" stroke="url(#livePlayerGoldAccent)" stroke-width="2" stroke-linecap="round" stroke-dasharray="3 3" />
+              <!-- Cricket Star Motif -->
+              <polygon points="150,296 152,302 158,302 153,306 155,312 150,308 145,312 147,306 142,302 148,302" fill="url(#livePlayerGoldAccent)" opacity="0.6" />
             </svg>
           </div>
 
@@ -435,35 +442,42 @@
 
           <!-- Photo Frame with Dynamic Photo or Silhouette -->
           <div class="owner-photo-frame">
-            <img id="owner-card-player-img" src="" alt="Player Photo" class="w-full h-full object-cover"
-              loading="eager" decoding="async" style="display:none;">
-            <svg id="owner-card-player-svg" viewBox="0 0 200 200" class="w-full h-full" fill="none"
-              xmlns="http://www.w3.org/2000/svg">
+            <img id="owner-card-player-img" alt="" class="w-full h-full object-cover hidden"
+              loading="eager" decoding="async" style="display:none !important;">
+            <svg id="owner-card-player-svg" viewBox="0 0 300 400" class="w-full h-full" fill="none"
+              xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
               <defs>
-                <radialGradient id="ownerPlayerBgGrad" cx="50%" cy="38%" r="65%">
-                  <stop offset="0%" stop-color="#E2E8F0" stop-opacity="0.95" />
-                  <stop offset="45%" stop-color="#94A3B8" stop-opacity="0.75" />
-                  <stop offset="100%" stop-color="#475569" stop-opacity="0.95" />
+                <radialGradient id="ownerPlayerSilhouetteGlow" cx="50%" cy="38%" r="48%">
+                  <stop offset="0%" stop-color="#C8A96A" stop-opacity="0.35" />
+                  <stop offset="55%" stop-color="#C8A96A" stop-opacity="0.1" />
+                  <stop offset="100%" stop-color="#C8A96A" stop-opacity="0" />
                 </radialGradient>
-                <linearGradient id="ownerSilhouetteGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stop-color="#334155" />
-                  <stop offset="50%" stop-color="#1E293B" />
-                  <stop offset="100%" stop-color="#0F172A" />
+                <linearGradient id="ownerPlayerSilhouetteBody" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#144d41" />
+                  <stop offset="40%" stop-color="#0a2a23" />
+                  <stop offset="100%" stop-color="#051613" />
                 </linearGradient>
-                <linearGradient id="ownerCollarGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stop-color="#CBD5E1" />
-                  <stop offset="100%" stop-color="#64748B" />
+                <linearGradient id="ownerPlayerGoldAccent" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#DFC897" />
+                  <stop offset="50%" stop-color="#C8A96A" />
+                  <stop offset="100%" stop-color="#8E6E34" />
                 </linearGradient>
               </defs>
-              <rect width="200" height="200" fill="url(#ownerPlayerBgGrad)" />
-              <circle cx="100" cy="70" r="30" fill="url(#ownerSilhouetteGrad)" />
-              <rect x="88" y="94" width="24" height="24" rx="5" fill="url(#ownerSilhouetteGrad)" />
-              <path d="M36 186 C36 138 66 120 84 116 L94 130 L106 130 L116 116 C134 120 164 138 164 186 Z"
-                fill="url(#ownerSilhouetteGrad)" />
-              <path d="M84 116 L100 138 L116 116" stroke="url(#ownerCollarGrad)" stroke-width="3" stroke-linecap="round"
-                stroke-linejoin="round" />
-              <line x1="100" y1="138" x2="100" y2="158" stroke="url(#ownerCollarGrad)" stroke-width="2"
-                stroke-linecap="round" />
+              <!-- Ambient Halo Glow behind Silhouette -->
+              <ellipse cx="150" cy="180" rx="115" ry="125" fill="url(#ownerPlayerSilhouetteGlow)" />
+              <!-- Cricket Jersey / Shoulders -->
+              <path d="M 45 370 C 48 260 92 215 126 208 L 138 230 L 162 230 L 174 208 C 208 215 252 260 255 370 Z"
+                fill="url(#ownerPlayerSilhouetteBody)" stroke="url(#ownerPlayerGoldAccent)" stroke-width="1.5" stroke-opacity="0.75" />
+              <!-- Neck -->
+              <rect x="135" y="174" width="30" height="34" rx="6" fill="url(#ownerPlayerSilhouetteBody)" stroke="url(#ownerPlayerGoldAccent)" stroke-width="1.2" stroke-opacity="0.6" />
+              <!-- Head Silhouette -->
+              <circle cx="150" cy="132" r="44" fill="url(#ownerPlayerSilhouetteBody)" stroke="url(#ownerPlayerGoldAccent)" stroke-width="1.5" stroke-opacity="0.8" />
+              <!-- Cricket Collar V-Neck -->
+              <path d="M 126 208 L 150 242 L 174 208" stroke="url(#ownerPlayerGoldAccent)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+              <!-- Placket Stitch -->
+              <line x1="150" y1="242" x2="150" y2="285" stroke="url(#ownerPlayerGoldAccent)" stroke-width="2" stroke-linecap="round" stroke-dasharray="3 3" />
+              <!-- Cricket Star Motif -->
+              <polygon points="150,296 152,302 158,302 153,306 155,312 150,308 145,312 147,306 142,302 148,302" fill="url(#ownerPlayerGoldAccent)" opacity="0.6" />
             </svg>
           </div>
 
@@ -1039,11 +1053,11 @@
   <div id="toast-container"></div>
 
   <!-- Scripts -->
-  <script src="./js/data.js?v=2026.50"></script>
-  <script src="./js/storage.js?v=2026.50"></script>
-  <script src="./js/sound.js?v=2026.50"></script>
-  <script src="./js/auction-engine.js?v=2026.50"></script>
-  <script src="./js/app.js?v=2026.50"></script>
+  <script src="./js/data.js?v=2026.51"></script>
+  <script src="./js/storage.js?v=2026.51"></script>
+  <script src="./js/sound.js?v=2026.51"></script>
+  <script src="./js/auction-engine.js?v=2026.51"></script>
+  <script src="./js/app.js?v=2026.51"></script>
 </body>
 
 </html>
