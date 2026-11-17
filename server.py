@@ -49,7 +49,7 @@ SET_CONFIG = [
 
 INITIAL_TEAMS_RAW = [
   { 'id': 'team_01', 'name': 'Fatemi Falcons', 'icon': '🦅', 'username': 'fatemi', 'password': 'fatemi@2026', 'ownerName': 'Burhanuddin Hussain', 'phone': '9595675756', 'playingOwner': 'Burhanuddin Hussain', 'captainSetId': 'set_aqeeq', 'captainSetName': 'Aqeeq', 'photo': 'images/owners/owner_team_01.jpg', 'color': '#3b82f6' },
-  { 'id': 'team_02', 'name': 'Kanchwala Knight Riders', 'icon': '🛡️', 'username': 'kanchwala', 'password': 'kanchwala@2026', 'ownerName': 'Taha Sajid Husain kanchwala', 'phone': '9028752753', 'playingOwner': 'Taha Sajid Husain kanchwala', 'captainSetId': 'set_yaqoot', 'captainSetName': 'Yaqoot', 'photo': 'images/owners/owner_team_02.jpg', 'color': '#8b5cf6' },
+  { 'id': 'team_02', 'name': 'Kanchwala Knight Riders', 'icon': '🛡️', 'username': 'kanchwala', 'password': 'kanchwala@2026', 'ownerName': 'Taha Sajid Husain kanchwala', 'phone': '9028752753', 'playingOwner': 'Taha Sajid Husain kanchwala', 'captainSetId': 'set_durenajaf', 'captainSetName': 'Dur-e-Najaf', 'photo': 'images/owners/owner_team_02.jpg', 'color': '#8b5cf6' },
   { 'id': 'team_03', 'name': 'Telwala Challengers', 'icon': '🦁', 'username': 'telwala', 'password': 'telwala@2026', 'ownerName': 'Abdul Taiyeb Telwala', 'phone': '8767835509', 'playingOwner': 'Abdul Taiyeb Telwala', 'captainSetId': 'set_neelam', 'captainSetName': 'Neelam', 'photo': 'images/owners/owner_team_03.jpg', 'color': '#ef4444' },
   { 'id': 'team_04', 'name': 'Hussaini Strikers', 'icon': '🏏', 'username': 'hussaini', 'password': 'hussaini@2026', 'ownerName': 'Burhanuddin Husain Rampurawala', 'phone': '8208334865', 'playingOwner': 'Burhanuddin Husain Rampurawala', 'captainSetId': 'set_durenajaf', 'captainSetName': 'Dur-e-Najaf', 'photo': 'images/owners/owner_team_04.jpg', 'color': '#10b981' },
   { 'id': 'team_05', 'name': 'Bagichawala Blasters', 'icon': '⚡', 'username': 'bagichawala', 'password': 'bagichawala@2026', 'ownerName': 'Shabbir bagichawala', 'phone': '8530039352', 'playingOwner': 'Shabbir bagichawala', 'captainSetId': 'set_pukhraj', 'captainSetName': 'Pukhraj', 'photo': 'images/owners/owner_team_05.jpg', 'color': '#f59e0b' },
@@ -264,6 +264,10 @@ def reset_tournament_data():
         t['remainingPurse'] = 100000
         t['spent'] = 0
         t['acquiredCount'] = 1
+        canonical = next((raw for raw in INITIAL_TEAMS_RAW if raw['id'] == t.get('id')), None)
+        if canonical:
+            t['captainSetId'] = canonical.get('captainSetId')
+            t['captainSetName'] = canonical.get('captainSetName')
         c_set_id = t.get('captainSetId')
         t['ownedSetIds'] = [c_set_id] if c_set_id else []
         # Keep only the playing owner / captain in the roster at ₹0
@@ -273,6 +277,9 @@ def reset_tournament_data():
         ]
         for r in t['roster']:
             r['price'] = 0
+            if c_set_id:
+                r['setId'] = c_set_id
+                r['setName'] = t.get('captainSetName', 'Stone Set')
 
     # 3. Reset auction state
     first_set = SET_CONFIG[0]

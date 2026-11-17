@@ -751,6 +751,9 @@ document.addEventListener('DOMContentLoaded', () => {
       try {
         if (!isFullscreenActive()) {
           const docEl = document.documentElement;
+          document.body.classList.add('is-fullscreen');
+          document.documentElement.classList.add('is-fullscreen');
+          updateFullscreenUI();
           if (docEl.requestFullscreen) {
             await docEl.requestFullscreen();
           } else if (docEl.webkitRequestFullscreen) {
@@ -760,12 +763,19 @@ document.addEventListener('DOMContentLoaded', () => {
           }
           showToast('🖥️ Fullscreen Mode Active (Press F or Esc to exit)', 'gold');
         } else {
+          // Ultra-fast instant minimize / restore down without blocking delay
+          document.body.classList.remove('is-fullscreen');
+          document.documentElement.classList.remove('is-fullscreen');
+          updateFullscreenUI();
+          if (typeof syncOwnerCardHeights === 'function') {
+            syncOwnerCardHeights();
+          }
           if (document.exitFullscreen) {
-            await document.exitFullscreen();
+            document.exitFullscreen().catch(() => {});
           } else if (document.webkitExitFullscreen) {
-            await document.webkitExitFullscreen();
+            document.webkitExitFullscreen().catch(() => {});
           } else if (document.msExitFullscreen) {
-            await document.msExitFullscreen();
+            document.msExitFullscreen().catch(() => {});
           }
           showToast('Exited Fullscreen Mode', 'info');
         }

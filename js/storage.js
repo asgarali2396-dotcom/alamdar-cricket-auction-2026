@@ -240,6 +240,22 @@ const StorageManager = {
       });
 
       players.forEach((p) => {
+        const canonical = window.ALAMDAR_DATA && window.ALAMDAR_DATA.INITIAL_PLAYERS && window.ALAMDAR_DATA.INITIAL_PLAYERS.find((cp) => cp.id === p.id);
+        if (canonical) {
+          if (p.name !== canonical.name || p.setId !== canonical.setId || p.setName !== canonical.setName || p.age !== canonical.age || p.photo !== canonical.photo) {
+            p.name = canonical.name;
+            p.setId = canonical.setId;
+            p.setName = canonical.setName;
+            p.age = canonical.age;
+            p.batsmanType = canonical.batsmanType;
+            p.bowlerType = canonical.bowlerType;
+            p.specialization = canonical.specialization;
+            p.photo = canonical.photo;
+            p.photoDriveUrl = canonical.photoDriveUrl;
+            playersDirty = true;
+          }
+        }
+
         const ownerTeam = teams.find((t) => t.roster && t.roster.some((r) => r.playerId === p.id && !r.isOwner));
         if (ownerTeam) {
           const rItem = ownerTeam.roster.find((r) => r.playerId === p.id);

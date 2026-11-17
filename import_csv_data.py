@@ -160,8 +160,14 @@ def main():
             # Owner Photo
             raw_photo = find_column(row, ['owner photo with topi/cap', 'photo', 'photo url', 'image']).strip()
             drive_lh3 = get_drive_lh3_url(raw_photo)
-            local_photo = f"images/owners/owner_team_{team_num:02d}.jpg"
-            photo_path = local_photo if os.path.exists(os.path.join(BASE_DIR, local_photo)) else (drive_lh3 or '')
+            photo_path = ''
+            for ext in ['.jpg', '.jpeg', '.png', '.webp']:
+                cand = f"images/owners/owner_team_{team_num:02d}{ext}"
+                if os.path.exists(os.path.join(BASE_DIR, cand)):
+                    photo_path = cand
+                    break
+            if not photo_path:
+                photo_path = drive_lh3 or ''
 
             team_obj = {
                 'id': team_id,
@@ -238,8 +244,14 @@ def main():
 
             raw_photo = find_column(row, ['player photo with topi/cap', 'photo', 'photo url', 'image', 'picture', 'drive link']).strip()
             drive_lh3 = get_drive_lh3_url(raw_photo)
-            local_photo = f"images/players/ply_{p_num:03d}.jpg"
-            photo_path = local_photo if os.path.exists(os.path.join(BASE_DIR, local_photo)) else (drive_lh3 or '')
+            photo_path = ''
+            for ext in ['.jpg', '.jpeg', '.png', '.webp']:
+                cand = f"images/players/ply_{p_num:03d}{ext}"
+                if os.path.exists(os.path.join(BASE_DIR, cand)):
+                    photo_path = cand
+                    break
+            if not photo_path:
+                photo_path = drive_lh3 or ''
 
             player_obj = {
                 'id': p_id,
