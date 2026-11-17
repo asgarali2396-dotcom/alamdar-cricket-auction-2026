@@ -805,11 +805,20 @@ document.addEventListener('DOMContentLoaded', () => {
     // Reset Tournament Button
     const resetBtn = document.getElementById('admin-reset-btn');
     if (resetBtn) {
-      resetBtn.addEventListener('click', () => {
-        if (confirm('CRITICAL ACTION: Reset all 96 players, 12 team squads, and budgets back to initial 1,00,000 coins?')) {
-          StorageManager.resetTournament();
-          showToast('Tournament has been fully reset to initial state!', 'error');
-          window.location.reload();
+      resetBtn.addEventListener('click', async () => {
+        if (!activeUser || activeUser.role !== 'admin') {
+          showToast('Security Violation: Only Master Admin can reset the tournament.', 'error');
+          return;
+        }
+
+        if (confirm('CRITICAL ACTION: Reset all 84 players to UNSOLD and restore all 12 teams to ₹100,000 budget?\n\n(Note: Real player names, photos and details will NOT be removed).')) {
+          resetBtn.disabled = true;
+          resetBtn.innerText = 'Resetting...';
+          await StorageManager.resetTournament();
+          showToast('Tournament reset: All 84 players are UNSOLD and team budgets restored to ₹100,000!', 'success');
+          setTimeout(() => {
+            window.location.reload();
+          }, 400);
         }
       });
     }

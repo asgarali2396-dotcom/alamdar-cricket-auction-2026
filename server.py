@@ -130,36 +130,29 @@ def generate_default_teams():
     return teams
 
 def generate_default_players():
-    players = []
-    count = 1
-    for stone_set in SET_CONFIG:
-        for i in range(1, 13):
-            f_name = FIRST_NAMES[(count * 3 + i * 5) % len(FIRST_NAMES)]
-            l_name = LAST_NAMES[(count * 7 + i * 2) % len(LAST_NAMES)]
-            age = 19 + ((count * 4 + i) % 18)
-            bat_type = BATSMAN_TYPES[(count + i) % len(BATSMAN_TYPES)]
-            bowl_type = BOWLER_TYPES[(count * 2 + i) % len(BOWLER_TYPES)]
-            spec = SPECIALIZATIONS[(count * 3 + i) % len(SPECIALIZATIONS)]
+    # Load from auction_data.json if present
+    if os.path.exists(DATA_FILE):
+        try:
+            with open(DATA_FILE, 'r', encoding='utf-8') as f:
+                saved = json.load(f)
+                if saved.get('players'):
+                    return saved['players']
+        except Exception:
+            pass
 
-            players.append({
-                'id': f"ply_{count:03d}",
-                'name': f"{f_name} {l_name}",
-                'age': age,
-                'setId': stone_set['id'],
-                'setName': stone_set['name'],
-                'batsmanType': bat_type,
-                'bowlerType': bowl_type,
-                'specialization': spec,
-                'basePrice': 1000,
-                'status': 'AVAILABLE',
-                'soldPrice': None,
-                'soldToTeamId': None,
-                'soldToTeamName': None,
-                'roundNumber': 1,
-                'autoAssigned': False
-            })
-            count += 1
-    return players
+    # Try import_csv_data
+    try:
+        import import_csv_data
+        import_csv_data.main()
+        if os.path.exists(DATA_FILE):
+            with open(DATA_FILE, 'r', encoding='utf-8') as f:
+                saved = json.load(f)
+                if saved.get('players'):
+                    return saved['players']
+    except Exception as e:
+        print("[Server] Could not import CSV data:", e)
+
+    return []
 
 def generate_default_state():
     return {
@@ -243,6 +236,69 @@ if os.path.exists(DATA_FILE):
         print("[Server] Could not restore saved data, using defaults:", err)
 
 update_cache()
+
+def reset_tournament_data():
+    """
+    Resets tournament auction progress WITHOUT erasing real player names, photos or details!
+    - Every real player becomes AVAILABLE (unsold)
+    - Every team's budget is restored to ₹100,000
+    - Team rosters keep only the Playing Captain (at ₹0 cost)
+    - Auction state resets to IDLE
+    """
+    if not server_data.get('players'):
+        server_data['players'] = generate_default_players()
+
+    # 1. Reset all real players to AVAILABLE (keeps all names, photos, ages, styles intact)
+    for p in server_data.get('players', []):
+        p['status'] = 'AVAILABLE'
+        p['soldPrice'] = None
+        p['soldToTeamId'] = None
+        p['soldToTeamName'] = None
+        p['roundNumber'] = 1
+        p['autoAssigned'] = False
+
+    # 2. Reset all teams back to ₹100,000 budget & clear auction acquisitions
+    for t in server_data.get('teams', []):
+        t['initialBudget'] = 100000
+        t['remainingBudget'] = 100000
+        t['remainingPurse'] = 100000
+        t['spent'] = 0
+        t['acquiredCount'] = 1
+        c_set_id = t.get('captainSetId')
+        t['ownedSetIds'] = [c_set_id] if c_set_id else []
+        # Keep only the playing owner / captain in the roster at ₹0
+        t['roster'] = [
+            r for r in t.get('roster', [])
+            if r.get('isOwner') or 'Captain' in r.get('role', '')
+        ]
+        for r in t['roster']:
+            r['price'] = 0
+
+    # 3. Reset auction state
+    first_set = SET_CONFIG[0]
+    server_data['state'] = {
+        'status': 'IDLE',
+        'currentSetId': first_set['id'],
+        'currentSetName': first_set['name'],
+        'currentPlayerId': None,
+        'currentPlayer': None,
+        'basePrice': 1000,
+        'currentBid': 0,
+        'nextMinBid': 1000,
+        'highestBidderTeamId': None,
+        'highestBidderTeamName': None,
+        'activeBidders': {'slot1': None, 'slot2': None},
+        'hammerCountdown': None,
+        'roundNumber': 1,
+        'lastActionTimestamp': int(time.time() * 1000),
+        'version': 1,
+        'biddingLocked': False
+    }
+    server_data['sessions'] = {}
+    server_data['version'] = int(server_data.get('version', 0)) + 1
+    update_cache()
+    _do_disk_save()
+    return server_data['version']
 
 
 def calculate_increment(current_bid):
@@ -748,6 +804,10 @@ class AuctionSyncHandler(SimpleHTTPRequestHandler):
                             trigger_async_save()
                         result = {"success": True, "version": server_data['version']}
 
+                    elif action == 'reset_tournament':
+                        reset_tournament_data()
+                        result = {"success": True, "version": server_data['version']}
+
                     else:
                         result = {"success": False, "error": f"Unknown action '{action}'"}
 
@@ -798,15 +858,11 @@ class AuctionSyncHandler(SimpleHTTPRequestHandler):
         # API: Reset endpoint
         if self.path == '/api/reset':
             with lock:
-                server_data['state'] = generate_default_state()
-                server_data['teams'] = generate_default_teams()
-                server_data['players'] = generate_default_players()
-                server_data['sessions'] = {}
-                server_data['version'] = int(server_data.get('version', 0)) + 1
-                update_cache()
-                trigger_async_save()
+                reset_tournament_data()
 
             resp_bytes = json.dumps({"success": True, "version": server_data['version']}).encode('utf-8')
+            self._send_compressed('application/json', resp_bytes)
+            return
             self._send_compressed('application/json', resp_bytes)
             return
 

@@ -172,8 +172,8 @@ const StorageManager = {
     }
 
     let players = this.get(STORAGE_KEYS.PLAYERS);
-    if (!players || players.length === 0) {
-      players = window.ALAMDAR_DATA.generate96Players();
+    if (!players || players.length === 0 || players.length === 96 || (players[0] && players[0].name === 'Shabbir Attarwala')) {
+      players = window.ALAMDAR_DATA.INITIAL_PLAYERS || window.ALAMDAR_DATA.generate96Players();
       localStorage.setItem(STORAGE_KEYS.PLAYERS, JSON.stringify(players));
     }
 
@@ -328,14 +328,75 @@ const StorageManager = {
     }
   },
 
-  resetTournament() {
-    localStorage.removeItem(STORAGE_KEYS.TEAMS);
-    localStorage.removeItem(STORAGE_KEYS.PLAYERS);
-    localStorage.removeItem(STORAGE_KEYS.STATE);
-    localStorage.removeItem(STORAGE_KEYS.SESSIONS);
-    this.clearActiveUser();
-    this.executeServerAction('reset_tournament');
-    return this.initializeDefaults();
+  async resetTournament() {
+    // 1. Keep all 84 real players, reset auction fields to AVAILABLE
+    let players = this.get(STORAGE_KEYS.PLAYERS);
+    if (!players || players.length === 0 || players.length === 96 || (players[0] && players[0].name === 'Shabbir Attarwala')) {
+      players = window.ALAMDAR_DATA.INITIAL_PLAYERS || window.ALAMDAR_DATA.generate96Players();
+    }
+    const resetPlayers = players.map((p) => ({
+      ...p,
+      status: 'AVAILABLE',
+      soldPrice: null,
+      soldToTeamId: null,
+      soldToTeamName: null,
+      roundNumber: 1,
+      autoAssigned: false
+    }));
+    this.set(STORAGE_KEYS.PLAYERS, resetPlayers);
+
+    // 2. Reset teams: ₹100,000 budget, keep only Playing Captain in roster at ₹0
+    const teams = this.get(STORAGE_KEYS.TEAMS) || window.ALAMDAR_DATA.INITIAL_TEAMS || [];
+    const resetTeams = teams.map((t) => {
+      const captainRoster = (t.roster || []).filter((r) => r.isOwner || (r.role && r.role.includes('Captain')));
+      captainRoster.forEach((r) => { r.price = 0; });
+      return {
+        ...t,
+        initialBudget: 100000,
+        remainingBudget: 100000,
+        remainingPurse: 100000,
+        spent: 0,
+        acquiredCount: captainRoster.length,
+        ownedSetIds: t.captainSetId ? [t.captainSetId] : [],
+        roster: captainRoster
+      };
+    });
+    this.set(STORAGE_KEYS.TEAMS, resetTeams);
+
+    // 3. Reset auction state to IDLE
+    const defaultState = {
+      status: 'IDLE',
+      currentSetId: 'set_aqeeq',
+      currentSetName: 'Aqeeq',
+      currentPlayerId: null,
+      currentPlayer: null,
+      basePrice: 1000,
+      currentBid: 0,
+      nextMinBid: 1000,
+      highestBidderTeamId: null,
+      highestBidderTeamName: null,
+      activeBidders: { slot1: null, slot2: null },
+      hammerCountdown: null,
+      roundNumber: 1,
+      lastActionTimestamp: Date.now(),
+      version: 1,
+      biddingLocked: false
+    };
+    this.set(STORAGE_KEYS.STATE, defaultState);
+
+    // 4. Notify server to reset auction state & save without deleting real players
+    if (!this._syncDisabled && typeof fetch !== 'undefined') {
+      try {
+        await this.executeServerAction('reset_tournament');
+      } catch (e) {
+        console.warn('Server reset action error:', e);
+      }
+      try {
+        await fetch('/api/reset', { method: 'POST' });
+      } catch (e) {
+        console.warn('/api/reset call error:', e);
+      }
+    }
   },
 
   // Multi-Device Real-Time Wi-Fi & Cloud Sync (Render / Local)
