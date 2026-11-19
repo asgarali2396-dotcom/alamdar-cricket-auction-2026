@@ -2130,8 +2130,39 @@ document.addEventListener('DOMContentLoaded', () => {
   window.sharePlayerCard = async function (playerId) {
     if (!playerId) return;
 
+    // Master Captain Reference (Profiles, Real Ages, Batting/Bowling styles & Owner Photos)
+    const CAPTAIN_PROFILES = {
+      team_01: { name: 'Burhanuddin Hussain', age: 28, bat: 'Right Hand', bowl: 'Left Hand', photo: 'images/owners/owner_team_01.jpg', setId: 'set_aqeeq', setName: 'Aqeeq' },
+      team_02: { name: 'Taha Sajid Husain kanchwala', age: 27, bat: 'Right Hand', bowl: 'Right Hand', photo: 'images/owners/owner_team_02.jpg', setId: 'set_durenajaf', setName: 'Dur-e-Najaf' },
+      team_03: { name: 'Abdul Taiyeb Telwala', age: 19, bat: 'Right Hand', bowl: 'Left Hand', photo: 'images/owners/owner_team_03.jpg', setId: 'set_neelam', setName: 'Neelam' },
+      team_04: { name: 'Burhanuddin Husain Rampurawala', age: 27, bat: 'Right Hand', bowl: 'Right Hand', photo: 'images/owners/owner_team_04.jpg', setId: 'set_durenajaf', setName: 'Dur-e-Najaf' },
+      team_05: { name: 'Shabbir bagichawala', age: 18, bat: 'Right Hand', bowl: 'Right Hand', photo: 'images/owners/owner_team_05.jpg', setId: 'set_pukhraj', setName: 'Pukhraj' },
+      team_06: { name: 'mustafa Akolawala', age: 35, bat: 'Right Hand', bowl: 'Right Hand', photo: 'images/owners/owner_team_06.jpg', setId: 'set_firoza', setName: 'Firoza' },
+      team_07: { name: 'Murtaza ali jamnagarwala', age: 44, bat: 'Right Hand', bowl: 'Right Hand', photo: 'images/owners/owner_team_07.jpg', setId: 'set_marjan', setName: 'Marjan' },
+      team_08: { name: 'Shabbir murtazapurwala', age: 34, bat: 'Right Hand', bowl: 'Right Hand', photo: 'images/owners/owner_team_08.jpg', setId: 'set_zumurrud', setName: 'Zumurrud' },
+      team_09: { name: 'Ali chandurwala', age: 34, bat: 'Right Hand', bowl: 'Right Hand', photo: 'images/owners/owner_team_09.jpg', setId: 'set_yaqoot', setName: 'Yaqoot' },
+      team_10: { name: 'Zoeb Chappalwala', age: 40, bat: 'Right Hand', bowl: 'Right Hand', photo: 'images/owners/owner_team_10.jpg', setId: 'set_zumurrud', setName: 'Zumurrud' },
+      team_11: { name: 'Murtaza Shakirali Saifee', age: 28, bat: 'Right Hand', bowl: 'Right Hand', photo: 'images/owners/owner_team_11.jpg', setId: 'set_marjan', setName: 'Marjan' },
+      team_12: { name: 'Abdul qadir kothawala', age: 29, bat: 'Right Hand', bowl: 'Right Hand', photo: 'images/owners/owner_team_12.jpg', setId: 'set_firoza', setName: 'Firoza' }
+    };
+
     // 1. Locate player and team
     let player = (currentPlayers || []).find((p) => p.id === playerId);
+    if (!player && window.ALAMDAR_DATA && Array.isArray(window.ALAMDAR_DATA.INITIAL_PLAYERS)) {
+      const baseP = window.ALAMDAR_DATA.INITIAL_PLAYERS.find((p) => p.id === playerId);
+      if (baseP) player = { ...baseP };
+    }
+    if (player && window.ALAMDAR_DATA && Array.isArray(window.ALAMDAR_DATA.INITIAL_PLAYERS)) {
+      const baseP = window.ALAMDAR_DATA.INITIAL_PLAYERS.find((p) => p.id === player.id);
+      if (baseP) {
+        if (!player.age && baseP.age) player.age = baseP.age;
+        if (!player.batsmanType && baseP.batsmanType) player.batsmanType = baseP.batsmanType;
+        if (!player.bowlerType && baseP.bowlerType) player.bowlerType = baseP.bowlerType;
+        if (!player.specialization && baseP.specialization) player.specialization = baseP.specialization;
+        if (!player.photo && baseP.photo) player.photo = baseP.photo;
+      }
+    }
+
     let winningTeam = null;
     let soldPrice = 0;
 
@@ -2140,23 +2171,50 @@ document.addEventListener('DOMContentLoaded', () => {
       soldPrice = player.soldPrice || 0;
     }
 
+    // Check if playerId is a captain or playing owner identifier
+    const captainTeamMatch = (currentTeams || []).find(t =>
+      t.id === playerId ||
+      `owner_${t.id}` === playerId ||
+      `captain_${t.id}` === playerId
+    );
+
+    if (captainTeamMatch && !player) {
+      const cProf = CAPTAIN_PROFILES[captainTeamMatch.id] || {};
+      winningTeam = captainTeamMatch;
+      soldPrice = 0;
+      const rItem = (captainTeamMatch.roster || []).find(r => r.isOwner) || {};
+      player = {
+        id: playerId,
+        name: rItem.name || cProf.name || captainTeamMatch.playingOwner || captainTeamMatch.ownerName,
+        photo: cProf.photo || captainTeamMatch.photo || `images/owners/owner_${captainTeamMatch.id}.jpg`,
+        setId: rItem.setId || cProf.setId || captainTeamMatch.captainSetId,
+        setName: rItem.setName || cProf.setName || captainTeamMatch.captainSetName,
+        specialization: rItem.role || 'Playing Owner (Captain)',
+        batsmanType: rItem.batsmanType || cProf.bat || 'Right Hand',
+        bowlerType: rItem.bowlerType || cProf.bowl || 'Right Hand',
+        age: rItem.age || cProf.age || 28
+      };
+    }
+
     if (!winningTeam) {
       // Check team rosters (e.g. captain or already acquired)
       for (const t of currentTeams || []) {
-        const rItem = (t.roster || []).find((r) => r.playerId === playerId || r.name === player?.name);
+        const rItem = (t.roster || []).find((r) => r.playerId === playerId || (player && r.name === player.name));
         if (rItem) {
           winningTeam = t;
           soldPrice = rItem.price || 0;
           if (!player) {
+            const cProf = CAPTAIN_PROFILES[t.id] || {};
             player = {
               id: playerId,
-              name: rItem.name,
-              photo: t.photo || './icons/logo.png',
-              setName: rItem.setName,
-              specialization: rItem.role || 'Playing Captain',
-              batsmanType: 'Right Hand',
-              bowlerType: 'Right Arm',
-              age: 30
+              name: rItem.name || (rItem.isOwner ? cProf.name : 'Team Player'),
+              photo: (rItem.isOwner ? (cProf.photo || t.photo || `images/owners/owner_${t.id}.jpg`) : (rItem.photo || './icons/logo.png')),
+              setId: rItem.setId || (rItem.isOwner ? (cProf.setId || t.captainSetId) : 'set_aqeeq'),
+              setName: rItem.setName || (rItem.isOwner ? (cProf.setName || t.captainSetName) : 'Aqeeq'),
+              specialization: rItem.role || (rItem.isOwner ? 'Playing Owner (Captain)' : 'Player'),
+              batsmanType: rItem.batsmanType || (rItem.isOwner ? cProf.bat : 'Right Hand'),
+              bowlerType: rItem.bowlerType || (rItem.isOwner ? cProf.bowl : 'Right Arm'),
+              age: rItem.age || (rItem.isOwner ? cProf.age : 25)
             };
           }
           break;
@@ -2179,7 +2237,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const img = new Image();
       img.onload = () => resolve(img);
       img.onerror = () => resolve(null);
-      img.src = './icons/logo.png';
+      img.src = './icons/logo.png?v=2026.70';
     });
 
     const playerImg = await new Promise((resolve) => {
@@ -2187,7 +2245,8 @@ document.addEventListener('DOMContentLoaded', () => {
       img.crossOrigin = 'anonymous';
       img.onload = () => resolve(img);
       img.onerror = () => resolve(null);
-      img.src = player.photo || './icons/logo.png';
+      const rawSrc = player.photo || './icons/logo.png';
+      img.src = rawSrc + (rawSrc.includes('?') ? '&' : '?') + 'v=2026.70';
     });
 
     // 3. Create 1000 x 1000 square canvas
@@ -2303,12 +2362,28 @@ document.addEventListener('DOMContentLoaded', () => {
     ctx.fill();
     ctx.restore();
 
-    // Draw Image clipped
+    // Draw Image clipped (Center-cropped aspect-cover to avoid distortion)
     if (playerImg) {
       ctx.save();
       drawRoundedRect(photoX, photoY, photoW, photoH, 20);
       ctx.clip();
-      ctx.drawImage(playerImg, photoX, photoY, photoW, photoH);
+      const imgW = playerImg.naturalWidth || playerImg.width || photoW;
+      const imgH = playerImg.naturalHeight || playerImg.height || photoH;
+      const targetRatio = photoW / photoH;
+      const imgRatio = imgW / imgH;
+      let sWidth, sHeight, sx, sy;
+      if (imgRatio > targetRatio) {
+        sHeight = imgH;
+        sWidth = imgH * targetRatio;
+        sx = (imgW - sWidth) / 2;
+        sy = 0;
+      } else {
+        sWidth = imgW;
+        sHeight = imgW / targetRatio;
+        sx = 0;
+        sy = (imgH - sHeight) / 2;
+      }
+      ctx.drawImage(playerImg, sx, sy, sWidth, sHeight, photoX, photoY, photoW, photoH);
       ctx.restore();
     }
 
@@ -2327,7 +2402,9 @@ document.addEventListener('DOMContentLoaded', () => {
     ctx.fillStyle = '#DFC897';
     ctx.font = '700 16px "Segoe UI", Inter, sans-serif';
     const roleText = player.specialization || 'All-Rounder';
-    const styleText = `Age: ${player.age || 25} • Bat: ${player.batsmanType?.split(' ')[0] || 'RHB'} • Bowl: ${player.bowlerType?.split(' ')[0] || 'Fast'}`;
+    const cleanBat = (player.batsmanType || 'Right Hand').split(' ')[0];
+    const cleanBowl = (player.bowlerType || 'Right Hand').split(' ')[0];
+    const styleText = `Age: ${player.age || 25} • Bat: ${cleanBat} • Bowl: ${cleanBowl}`;
     ctx.fillText(`${roleText} • ${styleText}`, 500, 652);
 
     // G. Bottom Banner: Officially Acquired by Franchise

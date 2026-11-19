@@ -47,7 +47,7 @@ DEFAULT_CREDENTIALS = {
     'team_08': ('supreme', 'supreme@2026', '👑', '#14b8a6'),
     'team_09': ('raj', 'raj@2026', '🥊', '#eab308'),
     'team_10': ('burhanpur', 'burhanpur@2026', '🏆', '#06b6d4'),
-    'team_11': ('choudhary', 'choudhary@2026', '🏹', '#f97316'),
+    'team_11': ('choudhari', 'choudhari@2026', '🏹', '#f97316'),
     'team_12': ('lucky', 'lucky@2026', '🐎', '#84cc16')
 }
 

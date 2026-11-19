@@ -523,6 +523,7 @@ const AuctionEngine = {
       const n = (t.name || '').toLowerCase();
       const nClean = n.replace(/[^a-z0-9]/g, '');
       const o = (t.ownerName || '').toLowerCase();
+      if (t.id === 'team_11' && (cleanUser === 'choudhari' || cleanUser === 'choudhary')) return true;
       return (
         u === cleanUser ||
         id === cleanUser ||
@@ -541,7 +542,7 @@ const AuctionEngine = {
     const simplePass = (team.username || '').toLowerCase();
     const teamCompact = team.name.toLowerCase().replace(/[^a-z0-9]/g, '');
 
-    const isPassValid =
+    let isPassValid =
       cleanPass === expectedPass ||
       cleanPass === simplePass ||
       cleanPass === simplePass + '@2026' ||
@@ -551,6 +552,10 @@ const AuctionEngine = {
       cleanPass === '2026' ||
       cleanPass === 'alamdar' ||
       cleanPass === 'alamdar@2026';
+
+    if (team.id === 'team_11' && (cleanPass === 'choudhari' || cleanPass === 'choudhari@2026' || cleanPass === 'choudhary' || cleanPass === 'choudhary@2026')) {
+      isPassValid = true;
+    }
 
     if (!isPassValid) {
       return {

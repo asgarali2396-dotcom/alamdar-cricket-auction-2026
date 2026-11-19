@@ -58,9 +58,24 @@ INITIAL_TEAMS_RAW = [
   { 'id': 'team_08', 'name': 'Supreme Squad', 'icon': '👑', 'username': 'supreme', 'password': 'supreme@2026', 'ownerName': 'Shabbir murtazapurwala', 'phone': '8975797870', 'playingOwner': 'Shabbir murtazapurwala', 'captainSetId': 'set_zumurrud', 'captainSetName': 'Zumurrud', 'photo': 'images/owners/owner_team_08.jpg', 'color': '#14b8a6' },
   { 'id': 'team_09', 'name': 'Raj Strickers', 'icon': '🥊', 'username': 'raj', 'password': 'raj@2026', 'ownerName': 'Ali chandurwala', 'phone': '8793335457', 'playingOwner': 'Ali chandurwala', 'captainSetId': 'set_yaqoot', 'captainSetName': 'Yaqoot', 'photo': 'images/owners/owner_team_09.jpg', 'color': '#eab308' },
   { 'id': 'team_10', 'name': 'Burhanpurwala Dominators', 'icon': '🏆', 'username': 'burhanpur', 'password': 'burhanpur@2026', 'ownerName': 'Zoeb Chappalwala', 'phone': '7841891212', 'playingOwner': 'Zoeb Chappalwala', 'captainSetId': 'set_zumurrud', 'captainSetName': 'Zumurrud', 'photo': 'images/owners/owner_team_10.jpg', 'color': '#06b6d4' },
-  { 'id': 'team_11', 'name': 'choudhari Thunderbolts', 'icon': '🏹', 'username': 'choudhary', 'password': 'choudhary@2026', 'ownerName': 'Altaf choudhari', 'phone': '9820020202', 'playingOwner': 'Murtaza Shakirali Saifee', 'captainSetId': 'set_marjan', 'captainSetName': 'Marjan', 'photo': 'images/owners/owner_team_11.jpg', 'color': '#f97316' },
+  { 'id': 'team_11', 'name': 'choudhari Thunderbolts', 'icon': '🏹', 'username': 'choudhari', 'password': 'choudhari@2026', 'ownerName': 'Altaf choudhari', 'phone': '9820020202', 'playingOwner': 'Murtaza Shakirali Saifee', 'captainSetId': 'set_marjan', 'captainSetName': 'Marjan', 'photo': 'images/owners/owner_team_11.jpg', 'color': '#f97316' },
   { 'id': 'team_12', 'name': 'Lucky Legends', 'icon': '🐎', 'username': 'lucky', 'password': 'lucky@2026', 'ownerName': 'Mustufa Bhai Chandurwala', 'phone': '9820030303', 'playingOwner': 'Abdul qadir kothawala', 'captainSetId': 'set_firoza', 'captainSetName': 'Firoza', 'photo': 'images/owners/owner_team_12.jpg', 'color': '#84cc16' }
 ]
+
+CAPTAIN_STATS = {
+    'team_01': {'age': 28, 'bat': 'Right Hand', 'bowl': 'Left Hand'},
+    'team_02': {'age': 27, 'bat': 'Right Hand', 'bowl': 'Right Hand'},
+    'team_03': {'age': 19, 'bat': 'Right Hand', 'bowl': 'Left Hand'},
+    'team_04': {'age': 27, 'bat': 'Right Hand', 'bowl': 'Right Hand'},
+    'team_05': {'age': 18, 'bat': 'Right Hand', 'bowl': 'Right Hand'},
+    'team_06': {'age': 35, 'bat': 'Right Hand', 'bowl': 'Right Hand'},
+    'team_07': {'age': 44, 'bat': 'Right Hand', 'bowl': 'Right Hand'},
+    'team_08': {'age': 34, 'bat': 'Right Hand', 'bowl': 'Right Hand'},
+    'team_09': {'age': 34, 'bat': 'Right Hand', 'bowl': 'Right Hand'},
+    'team_10': {'age': 40, 'bat': 'Right Hand', 'bowl': 'Right Hand'},
+    'team_11': {'age': 28, 'bat': 'Right Hand', 'bowl': 'Right Hand'},
+    'team_12': {'age': 29, 'bat': 'Right Hand', 'bowl': 'Right Hand'}
+}
 
 FIRST_NAMES = [
   'Husain', 'Ali Asger', 'Taha', 'Burhanuddin', 'Mustafa', 'Abbas', 'Taher', 'Murtaza',
@@ -123,7 +138,11 @@ def generate_default_teams():
                 'setName': c_set_name,
                 'price': 0,
                 'isOwner': True,
-                'timestamp': now_ts
+                'timestamp': now_ts,
+                'age': CAPTAIN_STATS.get(team['id'], {}).get('age', 25),
+                'batsmanType': CAPTAIN_STATS.get(team['id'], {}).get('bat', 'Right Hand'),
+                'bowlerType': CAPTAIN_STATS.get(team['id'], {}).get('bowl', 'Right Hand'),
+                'photo': team.get('photo', f"images/owners/owner_{team['id']}.jpg")
             }] if c_set_id else []
         })
         teams.append(team)
