@@ -555,7 +555,7 @@ const AuctionEngine = {
     if (!isPassValid) {
       return {
         success: false,
-        error: `Incorrect password for ${team.name}. Default is: ${team.username}@2026 (or simply ${team.username})`
+        error: `Incorrect password for ${team.name}.`
       };
     }
 
@@ -599,7 +599,7 @@ const AuctionEngine = {
     if (!isPassValid) {
       return {
         success: false,
-        error: 'Incorrect Master Admin password. Default is: alamdar@admin2026 (or admin2026)'
+        error: 'Incorrect Master Admin password.'
       };
     }
 

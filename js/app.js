@@ -118,6 +118,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (errOwner) errOwner.style.display = 'none';
     if (errAdmin) errAdmin.style.display = 'none';
 
+    // Clear password fields so user enters them manually
+    const pAdmin = document.getElementById('login-admin-password');
+    if (pAdmin) pAdmin.value = '';
+    const pOwner = document.getElementById('login-team-password');
+    if (pOwner) pOwner.value = '';
+
     setAuthSliderMode(mode);
     if (modal) {
       modal.classList.add('open');
