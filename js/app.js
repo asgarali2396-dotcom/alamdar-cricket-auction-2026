@@ -2237,7 +2237,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const img = new Image();
       img.onload = () => resolve(img);
       img.onerror = () => resolve(null);
-      img.src = './icons/logo.png?v=2026.70';
+      img.src = './icons/logo.png?v=2026.75';
     });
 
     const playerImg = await new Promise((resolve) => {
@@ -2246,7 +2246,7 @@ document.addEventListener('DOMContentLoaded', () => {
       img.onload = () => resolve(img);
       img.onerror = () => resolve(null);
       const rawSrc = player.photo || './icons/logo.png';
-      img.src = rawSrc + (rawSrc.includes('?') ? '&' : '?') + 'v=2026.70';
+      img.src = rawSrc + (rawSrc.includes('?') ? '&' : '?') + 'v=2026.75';
     });
 
     // 3. Create 1000 x 1000 square canvas
