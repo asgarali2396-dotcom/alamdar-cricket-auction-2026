@@ -569,39 +569,65 @@ class AuctionSyncHandler(SimpleHTTPRequestHandler):
                             curr_ply = next((p for p in players if p['id'] == state.get('currentPlayerId')), None)
                             if not curr_ply or curr_ply.get('status') == 'SOLD':
                                 result = {"success": False, "error": "Player is already SOLD."}
+                            elif team.get('acquiredCount', 0) >= team.get('maxAuctionSlots', 8):
+                                result = {"success": False, "error": f"Roster Full: Your team already has {team.get('maxAuctionSlots', 8)} players."}
+                            elif state.get('currentSetId') in team.get('ownedSetIds', []):
+                                result = {"success": False, "error": f"Set Constraint: Your team already owns a player from set \"{state.get('currentSetName')}\"."}
+                            elif state.get('highestBidderTeamId') == team_id:
+                                result = {"success": False, "error": "You already hold the leading bid!"}
                             else:
-                                slot1 = state.get('activeBidders', {}).get('slot1')
-                                slot2 = state.get('activeBidders', {}).get('slot2')
-                                is_slot1 = slot1 and slot1.get('teamId') == team_id
-                                is_slot2 = slot2 and slot2.get('teamId') == team_id
-                                if not is_slot1 and not is_slot2:
-                                    result = {"success": False, "error": "You must join the 2-player battle ring first."}
-                                elif state.get('highestBidderTeamId') == team_id:
-                                    result = {"success": False, "error": "You already hold the leading bid!"}
-                                else:
-                                    next_bid = get_next_valid_bid(state.get('currentBid', 0), state.get('basePrice', 1000))
-                                    total_slots = team.get('maxAuctionSlots', 8)
-                                    curr_count = team.get('acquiredCount', len(team.get('roster', [])))
-                                    remaining_slots = max(0, total_slots - (curr_count + 1))
-                                    min_reserve = remaining_slots * 1000
+                                next_bid = get_next_valid_bid(state.get('currentBid', 0), state.get('basePrice', 1000))
+                                total_slots = team.get('maxAuctionSlots', 8)
+                                curr_count = team.get('acquiredCount', len(team.get('roster', [])))
+                                remaining_slots = max(0, total_slots - (curr_count + 1))
+                                min_reserve = remaining_slots * 1000
 
-                                    if next_bid > team.get('remainingBudget', 0):
-                                        result = {"success": False, "error": f"Insufficient Purse: Bid (₹{next_bid:,}) exceeds your remaining purse (₹{team.get('remainingBudget', 0):,})."}
-                                    elif team.get('remainingBudget', 0) - next_bid < min_reserve:
-                                        max_allowed = max(0, team.get('remainingBudget', 0) - min_reserve)
-                                        result = {"success": False, "error": f"Reserve Violation: Next bid (₹{next_bid:,}) leaves ₹{(team.get('remainingBudget', 0) - next_bid):,}, but you must retain at least ₹{min_reserve:,} for remaining {remaining_slots} player(s). Max allowable bid: ₹{max_allowed:,}."}
+                                if next_bid > team.get('remainingBudget', 0):
+                                    result = {"success": False, "error": f"Insufficient Purse: Bid (₹{next_bid:,}) exceeds your remaining purse (₹{team.get('remainingBudget', 0):,})."}
+                                elif team.get('remainingBudget', 0) - next_bid < min_reserve:
+                                    max_allowed = max(0, team.get('remainingBudget', 0) - min_reserve)
+                                    result = {"success": False, "error": f"Reserve Violation: Next bid (₹{next_bid:,}) leaves ₹{(team.get('remainingBudget', 0) - next_bid):,}, but you must retain at least ₹{min_reserve:,} for remaining {remaining_slots} player(s). Max allowable bid: ₹{max_allowed:,}."}
+                                else:
+                                    # Auto-enroll bidder into active battle duel ring seamlessly (1-tap fast bidding)
+                                    active_bidders = state.setdefault('activeBidders', {'slot1': None, 'slot2': None})
+                                    s1 = active_bidders.get('slot1')
+                                    s2 = active_bidders.get('slot2')
+                                    prev_leader_id = state.get('highestBidderTeamId')
+                                    new_bidder_entry = {
+                                        'teamId': team_id,
+                                        'teamName': team.get('name'),
+                                        'ownerName': team.get('ownerName') or team.get('playingOwner'),
+                                        'color': team.get('color', '#C8A96A'),
+                                        'icon': team.get('icon', '🏏'),
+                                        'joinedAt': int(time.time() * 1000)
+                                    }
+
+                                    if s1 and s1.get('teamId') == team_id:
+                                        active_bidders['slot1'] = new_bidder_entry
+                                    elif s2 and s2.get('teamId') == team_id:
+                                        active_bidders['slot2'] = new_bidder_entry
+                                    elif not s1:
+                                        active_bidders['slot1'] = new_bidder_entry
+                                    elif not s2:
+                                        active_bidders['slot2'] = new_bidder_entry
                                     else:
-                                        state['currentBid'] = next_bid
-                                        state['nextMinBid'] = get_next_valid_bid(next_bid, state.get('basePrice', 1000))
-                                        state['highestBidderTeamId'] = team_id
-                                        state['highestBidderTeamName'] = team.get('name', 'Franchise')
-                                        state['hammerCountdown'] = None
-                                        state['status'] = 'BIDDING'  # Reset countdown if active
-                                        state['lastActionTimestamp'] = int(time.time() * 1000)
-                                        server_data['version'] = int(server_data.get('version', 0)) + 1
-                                        update_cache()
-                                        trigger_async_save()
-                                        result = {"success": True, "newBid": next_bid, "version": server_data['version']}
+                                        # Keep the previous highest bidder in one slot and place the new challenger in the other
+                                        if s1 and s1.get('teamId') == prev_leader_id:
+                                            active_bidders['slot2'] = new_bidder_entry
+                                        else:
+                                            active_bidders['slot1'] = new_bidder_entry
+
+                                    state['currentBid'] = next_bid
+                                    state['nextMinBid'] = get_next_valid_bid(next_bid, state.get('basePrice', 1000))
+                                    state['highestBidderTeamId'] = team_id
+                                    state['highestBidderTeamName'] = team.get('name', 'Franchise')
+                                    state['hammerCountdown'] = None
+                                    state['status'] = 'BIDDING'  # Reset countdown if active
+                                    state['lastActionTimestamp'] = int(time.time() * 1000)
+                                    server_data['version'] = int(server_data.get('version', 0)) + 1
+                                    update_cache()
+                                    trigger_async_save()
+                                    result = {"success": True, "newBid": next_bid, "version": server_data['version']}
 
                     elif action == 'join_battle':
                         team_id = data.get('teamId')
@@ -623,8 +649,6 @@ class AuctionSyncHandler(SimpleHTTPRequestHandler):
 
                             if (s1 and s1.get('teamId') == team_id) or (s2 and s2.get('teamId') == team_id):
                                 result = {"success": True, "message": "Already in the battle ring."}
-                            elif s1 and s2:
-                                result = {"success": False, "error": "Battle Ring Full! Two teams are already locked in this bidding war."}
                             else:
                                 # Budget & Reserve Check: Team must be able to afford the next valid bid to enter ring
                                 next_bid = state.get('nextMinBid') or get_next_valid_bid(state.get('currentBid', 0), state.get('basePrice', 1000))
@@ -638,8 +662,8 @@ class AuctionSyncHandler(SimpleHTTPRequestHandler):
                                 elif team.get('remainingBudget', 0) - next_bid < min_reserve:
                                     max_allowed = max(0, team.get('remainingBudget', 0) - min_reserve)
                                     result = {"success": False, "error": f"Reserve Violation: Next bid (₹{next_bid:,}) leaves only ₹{(team.get('remainingBudget', 0) - next_bid):,}, but you must retain at least ₹{min_reserve:,} to buy remaining {remaining_slots} player(s). Max allowable bid: ₹{max_allowed:,}. Cannot enter bidding ring."}
-                                elif not s1:
-                                    active_bidders['slot1'] = {
+                                else:
+                                    new_join_entry = {
                                         'teamId': team_id,
                                         'teamName': team.get('name'),
                                         'ownerName': team.get('ownerName') or team.get('playingOwner'),
@@ -647,20 +671,19 @@ class AuctionSyncHandler(SimpleHTTPRequestHandler):
                                         'icon': team.get('icon', '🏏'),
                                         'joinedAt': int(time.time() * 1000)
                                     }
-                                    state['lastActionTimestamp'] = int(time.time() * 1000)
-                                    server_data['version'] = int(server_data.get('version', 0)) + 1
-                                    update_cache()
-                                    trigger_async_save()
-                                    result = {"success": True, "version": server_data['version']}
-                                elif not s2:
-                                    active_bidders['slot2'] = {
-                                        'teamId': team_id,
-                                        'teamName': team.get('name'),
-                                        'ownerName': team.get('ownerName') or team.get('playingOwner'),
-                                        'color': team.get('color', '#C8A96A'),
-                                        'icon': team.get('icon', '🏏'),
-                                        'joinedAt': int(time.time() * 1000)
-                                    }
+                                    prev_leader = state.get('highestBidderTeamId')
+
+                                    if not s1:
+                                        active_bidders['slot1'] = new_join_entry
+                                    elif not s2:
+                                        active_bidders['slot2'] = new_join_entry
+                                    else:
+                                        # When both slots full, keep the highest bidder and replace the challenger
+                                        if s1.get('teamId') == prev_leader:
+                                            active_bidders['slot2'] = new_join_entry
+                                        else:
+                                            active_bidders['slot1'] = new_join_entry
+
                                     state['lastActionTimestamp'] = int(time.time() * 1000)
                                     server_data['version'] = int(server_data.get('version', 0)) + 1
                                     update_cache()
