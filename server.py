@@ -12,6 +12,7 @@ import time
 import socket
 import threading
 import gzip
+import shutil
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 
 # Ensure correct MIME types on all OS environments (Render Linux / Windows)
@@ -220,8 +221,22 @@ def _do_disk_save():
     try:
         with lock:
             data_to_write = json.dumps(server_data)
-        with open(DATA_FILE, 'w', encoding='utf-8') as f:
+
+        # 1. Atomic write to temporary file first (guarantees zero partial file corruption)
+        tmp_file = DATA_FILE + '.tmp'
+        bak_file = DATA_FILE + '.bak'
+        with open(tmp_file, 'w', encoding='utf-8') as f:
             f.write(data_to_write)
+
+        # 2. Keep previous valid backup before replacing
+        if os.path.exists(DATA_FILE):
+            try:
+                shutil.copy2(DATA_FILE, bak_file)
+            except Exception:
+                pass
+
+        # 3. Atomic replace on disk (POSIX & Windows atomic rename)
+        os.replace(tmp_file, DATA_FILE)
     except Exception as e:
         print("[Server] Background disk save error:", e)
 
@@ -234,25 +249,27 @@ def trigger_async_save():
         _save_timer.daemon = True
         _save_timer.start()
 
-# Restore previously saved data if valid
-if os.path.exists(DATA_FILE):
-    try:
-        with open(DATA_FILE, 'r', encoding='utf-8') as f:
-            saved = json.load(f)
-            if isinstance(saved, dict):
-                if saved.get('teams'):
+# Restore previously saved data if valid (with automatic fallback to .bak if primary is corrupted)
+_restored = False
+for _candidate in (DATA_FILE, DATA_FILE + '.bak'):
+    if os.path.exists(_candidate):
+        try:
+            with open(_candidate, 'r', encoding='utf-8') as f:
+                saved = json.load(f)
+                if isinstance(saved, dict) and saved.get('teams') and saved.get('players'):
                     server_data['teams'] = saved['teams']
-                if saved.get('players'):
                     server_data['players'] = saved['players']
-                if saved.get('state'):
-                    server_data['state'] = saved['state']
-                if saved.get('sessions'):
-                    server_data['sessions'] = saved['sessions']
-                if saved.get('version'):
-                    server_data['version'] = saved['version']
-                print(f"[Server] Restored tournament data from {DATA_FILE} (Version {server_data['version']})")
-    except Exception as err:
-        print("[Server] Could not restore saved data, using defaults:", err)
+                    if saved.get('state'):
+                        server_data['state'] = saved['state']
+                    if saved.get('sessions'):
+                        server_data['sessions'] = saved['sessions']
+                    if saved.get('version'):
+                        server_data['version'] = saved['version']
+                    print(f"[Server] Restored tournament data from {_candidate} (Version {server_data['version']})")
+                    _restored = True
+                    break
+        except Exception as err:
+            print(f"[Server] Could not restore saved data from {_candidate}: {err}")
 
 update_cache()
 
