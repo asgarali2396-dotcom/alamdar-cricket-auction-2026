@@ -1,4 +1,4 @@
-const CACHE_NAME = 'alamdar-auction-v40';
+const CACHE_NAME = 'alamdar-auction-v41';
 const PRECACHE_ASSETS = [
   './',
   './index.html',

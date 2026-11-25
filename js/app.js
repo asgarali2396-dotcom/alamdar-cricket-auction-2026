@@ -385,6 +385,15 @@ document.addEventListener('DOMContentLoaded', () => {
       whatsappBtn.onclick = () => window.sharePlayerCard(player.id);
     }
 
+    const soldModalUndoBtn = document.getElementById('sold-modal-undo-btn');
+    if (soldModalUndoBtn) {
+      if (activeUser && activeUser.role === 'admin') {
+        soldModalUndoBtn.style.display = 'flex';
+      } else {
+        soldModalUndoBtn.style.display = 'none';
+      }
+    }
+
     modal.style.display = 'flex';
     triggerSoldConfetti();
     if (window.soundManager && typeof window.soundManager.playSoldFanfare === 'function') {
@@ -969,6 +978,41 @@ document.addEventListener('DOMContentLoaded', () => {
           showToast(res.error, 'error');
         }
       });
+    }
+
+    // Admin Undo Sold Player Button (Re-opens bidding at last bid)
+    const handleUndoAction = async () => {
+      if (!activeUser || activeUser.role !== 'admin') {
+        showToast('Security Violation: Only Master Admin can undo a player sale.', 'error');
+        return;
+      }
+
+      const confirmUndo = confirm('⚠️ Undo the last player sale and re-open bidding at the previous highest bid?');
+      if (!confirmUndo) return;
+
+      if (window._activeCountdownTimer) {
+        clearInterval(window._activeCountdownTimer);
+        window._activeCountdownTimer = null;
+      }
+
+      const res = await AuctionEngine.undoSale();
+      if (res.success) {
+        closeSoldCelebration();
+        showToast(`↩️ Sale undone! Bidding re-opened for ${res.undonePlayer?.name || 'player'} at last bid ₹${(res.lastBid || 0).toLocaleString()}!`, 'gold');
+        renderApp();
+      } else {
+        showToast(res.error || 'Failed to undo sale.', 'error');
+      }
+    };
+
+    const adminUndoBtn = document.getElementById('admin-undo-sold-btn');
+    if (adminUndoBtn) {
+      adminUndoBtn.addEventListener('click', handleUndoAction);
+    }
+
+    const soldModalUndoBtn = document.getElementById('sold-modal-undo-btn');
+    if (soldModalUndoBtn) {
+      soldModalUndoBtn.addEventListener('click', handleUndoAction);
     }
 
     const adminCountdownBtn = document.getElementById('admin-countdown-btn');
@@ -1700,6 +1744,23 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         gavelLabel.innerText = 'No player currently on stage';
         gavelLabel.className = 'font-bold text-[#E6F0E9]/60';
+      }
+    }
+
+    // Update Undo Sold Player Button State in Admin Controls
+    const adminUndoBtn = document.getElementById('admin-undo-sold-btn');
+    if (adminUndoBtn) {
+      const hasSaleToUndo = Boolean(
+        currentAuctionState.lastSoldTransaction ||
+        (currentAuctionState.status === 'SOLD' && currentAuctionState.currentPlayerId)
+      );
+      adminUndoBtn.disabled = !hasSaleToUndo;
+      if (hasSaleToUndo) {
+        adminUndoBtn.className = 'font-black py-4 rounded-xl text-sm shadow-xl transition-all cursor-pointer bg-amber-500/20 hover:bg-amber-500/35 border-2 border-amber-400 text-amber-300 flex items-center justify-center gap-1.5 active:scale-95';
+        adminUndoBtn.title = 'Undo the last player sale and re-open bidding at the previous highest bid';
+      } else {
+        adminUndoBtn.className = 'font-black py-4 rounded-xl text-sm shadow-xl transition-all cursor-not-allowed bg-amber-500/5 border-2 border-amber-400/20 text-amber-300/40 opacity-40 flex items-center justify-center gap-1.5';
+        adminUndoBtn.title = 'No recent sale to undo';
       }
     }
 

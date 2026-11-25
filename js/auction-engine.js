@@ -339,12 +339,128 @@ const AuctionEngine = {
 
     const autoAssignResult = this.evaluateAutoAssignment(state.currentSetId);
 
+    state.lastSoldTransaction = {
+      playerId: soldPlayer.id,
+      teamId: winningTeam.id,
+      price: finalPrice,
+      setId: state.currentSetId,
+      autoAssignedPlayerId: autoAssignResult?.player?.id,
+      autoAssignedTeamId: autoAssignResult?.team?.id,
+      autoAssignedPrice: autoAssignResult?.price || 1000
+    };
+    StorageManager.set(STORAGE_KEYS.STATE, state);
+
     return {
       success: true,
       soldPlayer,
       winningTeam,
       finalPrice,
       autoAssigned: autoAssignResult
+    };
+  },
+
+  // 6b. Undo Last Sale & Re-open Bidding at Last Bid (Admin Gavel Control)
+  async undoSale() {
+    if (!StorageManager._syncDisabled && typeof fetch !== 'undefined') {
+      const res = await StorageManager.executeServerAction('undo_sale');
+      if (res && res.success) {
+        if (window.soundManager) window.soundManager.playBidChime();
+        return res;
+      }
+      if (res && res.error) return res;
+    }
+
+    // Local Fallback (standalone/offline)
+    const state = StorageManager.get(STORAGE_KEYS.STATE);
+    const teams = StorageManager.get(STORAGE_KEYS.TEAMS) || [];
+    const players = StorageManager.get(STORAGE_KEYS.PLAYERS) || [];
+
+    const lastTx = state?.lastSoldTransaction;
+    const targetPlayerId = lastTx?.playerId || (state?.status === 'SOLD' && state?.currentPlayerId);
+    if (!targetPlayerId) {
+      return { success: false, error: 'No recent player sale found to undo.' };
+    }
+
+    const soldPly = players.find((p) => p.id === targetPlayerId);
+    if (!soldPly) {
+      return { success: false, error: 'Sold player not found.' };
+    }
+
+    const winTeamId = lastTx?.teamId || soldPly.soldToTeamId;
+    const winTeam = teams.find((t) => t.id === winTeamId);
+    const finalPrice = lastTx?.price || soldPly.soldPrice || state.currentBid || 1000;
+
+    // Undo auto-assignment if triggered
+    if (lastTx?.autoAssignedPlayerId && lastTx?.autoAssignedTeamId) {
+      const autoP = players.find((p) => p.id === lastTx.autoAssignedPlayerId);
+      const autoT = teams.find((t) => t.id === lastTx.autoAssignedTeamId);
+      const autoPr = lastTx.autoAssignedPrice || 1000;
+      if (autoP && autoT) {
+        autoP.status = 'AVAILABLE';
+        autoP.soldPrice = null;
+        autoP.soldToTeamId = null;
+        autoP.soldToTeamName = null;
+        delete autoP.autoAssigned;
+
+        autoT.remainingBudget = (autoT.remainingBudget || 0) + autoPr;
+        autoT.acquiredCount = Math.max(1, (autoT.acquiredCount || 1) - 1);
+        autoT.roster = (autoT.roster || []).filter((r) => r.playerId !== autoP.id);
+        autoT.ownedSetIds = Array.from(new Set((autoT.roster || []).map((r) => r.setId).filter(Boolean)));
+      }
+    }
+
+    // Revert sold player
+    soldPly.status = 'AVAILABLE';
+    soldPly.soldPrice = null;
+    soldPly.soldToTeamId = null;
+    soldPly.soldToTeamName = null;
+    delete soldPly.autoAssigned;
+
+    // Refund winning team
+    if (winTeam) {
+      winTeam.remainingBudget = (winTeam.remainingBudget || 0) + finalPrice;
+      winTeam.acquiredCount = Math.max(1, (winTeam.acquiredCount || 1) - 1);
+      winTeam.roster = (winTeam.roster || []).filter((r) => r.playerId !== soldPly.id);
+      winTeam.ownedSetIds = Array.from(new Set((winTeam.roster || []).map((r) => r.setId).filter(Boolean)));
+    }
+
+    // Restore state to last bid
+    state.status = 'BIDDING';
+    state.currentPlayerId = soldPly.id;
+    state.currentPlayer = soldPly;
+    state.currentSetId = soldPly.setId;
+    state.currentSetName = soldPly.setName || '';
+    state.currentBid = finalPrice;
+    state.nextMinBid = this.getNextValidBid(finalPrice, state.basePrice || 1000);
+    state.highestBidderTeamId = winTeam ? winTeam.id : null;
+    state.highestBidderTeamName = winTeam ? winTeam.name : 'Franchise';
+    state.hammerCountdown = null;
+    state.biddingLocked = false;
+    state.activeBidders = {
+      slot1: winTeam ? {
+        teamId: winTeam.id,
+        teamName: winTeam.name,
+        ownerName: winTeam.ownerName || winTeam.playingOwner,
+        color: winTeam.color || '#C8A96A',
+        icon: winTeam.icon || '🏏',
+        joinedAt: Date.now()
+      } : null,
+      slot2: null
+    };
+    state.lastSoldTransaction = null;
+    state.lastActionTimestamp = Date.now();
+
+    StorageManager.set(STORAGE_KEYS.TEAMS, teams);
+    StorageManager.set(STORAGE_KEYS.PLAYERS, players);
+    StorageManager.set(STORAGE_KEYS.STATE, state);
+
+    if (window.soundManager) window.soundManager.playBidChime();
+
+    return {
+      success: true,
+      undonePlayer: soldPly,
+      winningTeam: winTeam,
+      lastBid: finalPrice
     };
   },
 

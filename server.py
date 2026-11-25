@@ -787,6 +787,16 @@ class AuctionSyncHandler(SimpleHTTPRequestHandler):
 
                                 auto_res = evaluate_auto_assignment()
 
+                                state['lastSoldTransaction'] = {
+                                    'playerId': sold_player['id'],
+                                    'teamId': winner_team['id'],
+                                    'price': final_price,
+                                    'setId': state['currentSetId'],
+                                    'autoAssignedPlayerId': auto_res.get('player', {}).get('id') if (auto_res and auto_res.get('triggered')) else None,
+                                    'autoAssignedTeamId': auto_res.get('team', {}).get('id') if (auto_res and auto_res.get('triggered')) else None,
+                                    'autoAssignedPrice': auto_res.get('price', 1000) if (auto_res and auto_res.get('triggered')) else None
+                                }
+
                                 server_data['version'] = int(server_data.get('version', 0)) + 1
                                 update_cache()
                                 trigger_async_save()
@@ -796,6 +806,90 @@ class AuctionSyncHandler(SimpleHTTPRequestHandler):
                                     "winningTeam": winner_team,
                                     "finalPrice": final_price,
                                     "autoAssigned": auto_res,
+                                    "version": server_data['version']
+                                }
+
+                    elif action == 'undo_sale':
+                        last_tx = state.get('lastSoldTransaction')
+                        target_player_id = (last_tx and last_tx.get('playerId')) or (state.get('status') == 'SOLD' and state.get('currentPlayerId'))
+
+                        if not target_player_id:
+                            result = {"success": False, "error": "No recent player sale found to undo."}
+                        else:
+                            sold_ply = next((p for p in players if p['id'] == target_player_id), None)
+                            if not sold_ply:
+                                result = {"success": False, "error": "Sold player not found."}
+                            else:
+                                win_team_id = (last_tx and last_tx.get('teamId')) or sold_ply.get('soldToTeamId')
+                                win_team = next((t for t in teams if t['id'] == win_team_id), None)
+                                final_price = (last_tx and last_tx.get('price')) or sold_ply.get('soldPrice') or state.get('currentBid', 1000)
+
+                                # 1. Undo auto-assignment if one was triggered by this sale
+                                if last_tx and last_tx.get('autoAssignedPlayerId') and last_tx.get('autoAssignedTeamId'):
+                                    auto_p = next((p for p in players if p['id'] == last_tx['autoAssignedPlayerId']), None)
+                                    auto_t = next((t for t in teams if t['id'] == last_tx['autoAssignedTeamId']), None)
+                                    auto_pr = last_tx.get('autoAssignedPrice', 1000)
+                                    if auto_p and auto_t:
+                                        auto_p['status'] = 'AVAILABLE'
+                                        auto_p['soldPrice'] = None
+                                        auto_p['soldToTeamId'] = None
+                                        auto_p['soldToTeamName'] = None
+                                        auto_p.pop('autoAssigned', None)
+
+                                        auto_t['remainingBudget'] = auto_t.get('remainingBudget', 0) + auto_pr
+                                        auto_t['acquiredCount'] = max(1, auto_t.get('acquiredCount', 1) - 1)
+                                        auto_t['roster'] = [r for r in auto_t.get('roster', []) if r.get('playerId') != auto_p['id']]
+                                        auto_t['ownedSetIds'] = list(set([r.get('setId') for r in auto_t.get('roster', []) if r.get('setId')]))
+
+                                # 2. Undo sold player
+                                sold_ply['status'] = 'AVAILABLE'
+                                sold_ply['soldPrice'] = None
+                                sold_ply['soldToTeamId'] = None
+                                sold_ply['soldToTeamName'] = None
+                                sold_ply.pop('autoAssigned', None)
+
+                                # 3. Refund winning team
+                                if win_team:
+                                    win_team['remainingBudget'] = win_team.get('remainingBudget', 0) + final_price
+                                    win_team['acquiredCount'] = max(1, win_team.get('acquiredCount', 1) - 1)
+                                    win_team['roster'] = [r for r in win_team.get('roster', []) if r.get('playerId') != sold_ply['id']]
+                                    win_team['ownedSetIds'] = list(set([r.get('setId') for r in win_team.get('roster', []) if r.get('setId')]))
+
+                                # 4. Restore state to last bid
+                                state['status'] = 'BIDDING'
+                                state['currentPlayerId'] = sold_ply['id']
+                                state['currentPlayer'] = sold_ply
+                                state['currentSetId'] = sold_ply['setId']
+                                state['currentSetName'] = sold_ply.get('setName', '')
+                                state['currentBid'] = final_price
+                                state['nextMinBid'] = get_next_valid_bid(final_price, state.get('basePrice', 1000))
+                                state['highestBidderTeamId'] = win_team['id'] if win_team else None
+                                state['highestBidderTeamName'] = win_team['name'] if win_team else 'Franchise'
+                                state['hammerCountdown'] = None
+                                state['biddingLocked'] = False
+                                state['activeBidders'] = {
+                                    'slot1': {
+                                        'teamId': win_team['id'],
+                                        'teamName': win_team['name'],
+                                        'ownerName': win_team.get('ownerName') or win_team.get('playingOwner'),
+                                        'color': win_team.get('color', '#C8A96A'),
+                                        'icon': win_team.get('icon', '🏏'),
+                                        'joinedAt': int(time.time() * 1000)
+                                    } if win_team else None,
+                                    'slot2': None
+                                }
+                                state['lastSoldTransaction'] = None
+                                state['lastActionTimestamp'] = int(time.time() * 1000)
+
+                                server_data['version'] = int(server_data.get('version', 0)) + 1
+                                update_cache()
+                                trigger_async_save()
+                                result = {
+                                    "success": True,
+                                    "message": f"Sale undone! Bidding re-opened for {sold_ply['name']} at last bid ₹{final_price:,}.",
+                                    "undonePlayer": sold_ply,
+                                    "winningTeam": win_team,
+                                    "lastBid": final_price,
                                     "version": server_data['version']
                                 }
 
