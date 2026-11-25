@@ -848,91 +848,104 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
+    // Global handlers for both inline onclick and addEventListener
+    window.handleOwnerRaiseBid = async function () {
+      const raiseBtn = document.getElementById('owner-raise-bid-btn');
+      const user = activeUser || StorageManager.getActiveUser();
+      if (!user || !user.teamId) {
+        showToast('Please sign in as a franchise owner first.', 'error');
+        openLoginModal('owner');
+        return;
+      }
+
+      const state = currentAuctionState || StorageManager.get(STORAGE_KEYS.STATE);
+      if (state && state.biddingLocked) {
+        showToast('🔒 Bidding is locked! The auctioneer is introducing this player. Please wait until bidding is unlocked.', 'error');
+        return;
+      }
+
+      const teamId = user.teamId;
+      const { slot1, slot2 } = (state && state.activeBidders) || {};
+      const isSlot1 = slot1?.teamId === teamId;
+      const isSlot2 = slot2?.teamId === teamId;
+      const isInBattle = isSlot1 || isSlot2;
+
+      if (!isInBattle) {
+        const teams = currentTeams.length ? currentTeams : (StorageManager.get(STORAGE_KEYS.TEAMS) || []);
+        const team = teams.find((t) => t.id === teamId);
+        const nextBid = (state && state.nextMinBid) || (typeof AuctionEngine !== 'undefined' ? AuctionEngine.getNextValidBid(state?.currentBid || 0, state?.basePrice || 1000) : 1000);
+        if (team && typeof AuctionEngine !== 'undefined') {
+          const affordCheck = AuctionEngine.canTeamAffordBid(team, nextBid);
+          if (!affordCheck.canBid) {
+            showToast(affordCheck.reason, 'error');
+            return;
+          }
+        }
+
+        // Visual instant feedback on tap
+        if (raiseBtn) {
+          raiseBtn.disabled = true;
+          raiseBtn.innerHTML = '<span class="animate-pulse">⚔️ ENTERING BATTLE RING...</span>';
+        }
+
+        try {
+          const joinRes = await AuctionEngine.joinBattle(teamId);
+          if (joinRes && joinRes.success) {
+            showToast('Entered the Bidding Ring!', 'success');
+          } else {
+            showToast((joinRes && joinRes.error) || 'Failed to enter ring.', 'error');
+          }
+        } catch (err) {
+          console.error('Error joining battle:', err);
+          showToast('Connection error while entering ring.', 'error');
+        } finally {
+          renderApp();
+        }
+      } else {
+        // In Battle: Raise Bid
+        if (raiseBtn) {
+          raiseBtn.disabled = true;
+          raiseBtn.innerHTML = '<span class="animate-pulse">⏳ RAISING BID...</span>';
+        }
+
+        try {
+          const res = await AuctionEngine.placeBid(teamId);
+          if (res && res.success) {
+            showToast(`Bid raised to ₹${(res.newBid || 0).toLocaleString()}!`, 'gold');
+          } else {
+            showToast((res && res.error) || 'Failed to place bid.', 'error');
+          }
+        } catch (err) {
+          console.error('Error placing bid:', err);
+          showToast('Connection error while raising bid.', 'error');
+        } finally {
+          renderApp();
+        }
+      }
+    };
+
+    window.handleOwnerWithdraw = async function () {
+      const user = activeUser || StorageManager.getActiveUser();
+      if (!user || !user.teamId) return;
+      const res = await AuctionEngine.withdrawFromBattle(user.teamId);
+      if (res && res.success) {
+        showToast('Withdrew from battle ring.', 'info');
+      } else {
+        showToast((res && res.error) || 'Could not withdraw.', 'error');
+      }
+      renderApp();
+    };
+
     // Owner Bidding Button (Giant Button in Owner Dashboard)
     const raiseBidBtn = document.getElementById('owner-raise-bid-btn');
     if (raiseBidBtn) {
-      raiseBidBtn.addEventListener('click', async () => {
-        const raiseBtn = raiseBidBtn;
-        if (!activeUser || !activeUser.teamId) {
-          showToast('Please sign in as a franchise owner first.', 'error');
-          openLoginModal('owner');
-          return;
-        }
-
-        if (currentAuctionState.biddingLocked) {
-          showToast('🔒 Bidding is locked! The auctioneer is introducing this player. Please wait until bidding is unlocked.', 'error');
-          return;
-        }
-
-        const teamId = activeUser.teamId;
-        const { slot1, slot2 } = currentAuctionState.activeBidders || {};
-        const isSlot1 = slot1?.teamId === teamId;
-        const isSlot2 = slot2?.teamId === teamId;
-        const isInBattle = isSlot1 || isSlot2;
-
-        if (!isInBattle) {
-          const team = currentTeams.find((t) => t.id === teamId);
-          const nextBid = currentAuctionState.nextMinBid || (typeof AuctionEngine !== 'undefined' ? AuctionEngine.getNextValidBid(currentAuctionState.currentBid || 0, currentAuctionState.basePrice || 1000) : 1000);
-          if (team && typeof AuctionEngine !== 'undefined') {
-            const affordCheck = AuctionEngine.canTeamAffordBid(team, nextBid);
-            if (!affordCheck.canBid) {
-              showToast(affordCheck.reason, 'error');
-              return;
-            }
-          }
-
-          // Visual instant feedback on tap
-          raiseBtn.disabled = true;
-          raiseBtn.innerHTML = '<span class="animate-pulse">⚔️ ENTERING BATTLE RING...</span>';
-
-          try {
-            // Join Battle Ring
-            const joinRes = await AuctionEngine.joinBattle(teamId);
-            if (joinRes && joinRes.success) {
-              showToast('Entered the Bidding Ring!', 'success');
-            } else {
-              showToast((joinRes && joinRes.error) || 'Failed to enter ring.', 'error');
-            }
-          } catch (err) {
-            console.error('Error joining battle:', err);
-            showToast('Connection error while entering ring.', 'error');
-          } finally {
-            renderLiveAuctionView();
-          }
-        } else {
-          // In Battle: Raise Bid
-          raiseBtn.disabled = true;
-          raiseBtn.innerHTML = '<span class="animate-pulse">⏳ RAISING BID...</span>';
-
-          try {
-            const res = await AuctionEngine.placeBid(teamId);
-            if (res && res.success) {
-              showToast(`Bid raised to ₹${(res.newBid || 0).toLocaleString()}!`, 'gold');
-            } else {
-              showToast((res && res.error) || 'Failed to place bid.', 'error');
-            }
-          } catch (err) {
-            console.error('Error placing bid:', err);
-            showToast('Connection error while raising bid.', 'error');
-          } finally {
-            renderLiveAuctionView();
-          }
-        }
-      });
+      raiseBidBtn.addEventListener('click', window.handleOwnerRaiseBid);
     }
 
     // Owner Withdraw Button
     const withdrawBtn = document.getElementById('owner-withdraw-btn');
     if (withdrawBtn) {
-      withdrawBtn.addEventListener('click', async () => {
-        if (!activeUser || !activeUser.teamId) return;
-        const res = await AuctionEngine.withdrawFromBattle(activeUser.teamId);
-        if (res.success) {
-          showToast('Withdrew from battle ring.', 'info');
-        } else {
-          showToast(res.error, 'error');
-        }
-      });
+      withdrawBtn.addEventListener('click', window.handleOwnerWithdraw);
     }
 
     // Master Admin Official Gavel Controls (Admin ONLY)

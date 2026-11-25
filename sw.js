@@ -1,4 +1,4 @@
-const CACHE_NAME = 'alamdar-auction-v42';
+const CACHE_NAME = 'alamdar-auction-v43';
 const PRECACHE_ASSETS = [
   './',
   './index.html',
@@ -52,14 +52,31 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 1. External Tailwind CDN & static assets: Cache-First for instant 0ms load
-  const isStaticAsset =
+  // 1. Application JS and CSS: NETWORK-FIRST to guarantee zero-latency deployment of new code
+  const isCodeAsset = url.match(/\.(js|css)(\?.*)?$/i);
+  if (isCodeAsset) {
+    event.respondWith(
+      fetch(event.request)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const clone = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          }
+          return networkResponse;
+        })
+        .catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
+  // 2. Images, fonts, and heavy media: Cache-First for instant speed
+  const isMediaAsset =
     url.includes('cdn.tailwindcss.com') ||
     url.includes('/images/') ||
     url.includes('/icons/') ||
-    url.match(/\.(css|js|png|jpg|jpeg|webp|svg|ico)(\?.*)?$/i);
+    url.match(/\.(png|jpg|jpeg|webp|svg|ico)(\?.*)?$/i);
 
-  if (isStaticAsset) {
+  if (isMediaAsset) {
     event.respondWith(
       caches.match(event.request).then((cachedResponse) => {
         if (cachedResponse) {
