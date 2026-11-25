@@ -539,21 +539,12 @@ const AuctionEngine = {
     }
 
     const expectedPass = (team.password || '').toLowerCase();
-    const simplePass = (team.username || '').toLowerCase();
-    const teamCompact = team.name.toLowerCase().replace(/[^a-z0-9]/g, '');
 
-    let isPassValid =
-      cleanPass === expectedPass ||
-      cleanPass === simplePass ||
-      cleanPass === simplePass + '@2026' ||
-      cleanPass === simplePass + '2026' ||
-      cleanPass === teamCompact ||
-      cleanPass === teamCompact + '@2026' ||
-      cleanPass === '2026' ||
-      cleanPass === 'alamdar' ||
-      cleanPass === 'alamdar@2026';
+    // Strictly validate against the franchise password (no username-as-password bypass)
+    let isPassValid = (cleanPass === expectedPass);
 
-    if (team.id === 'team_11' && (cleanPass === 'choudhari' || cleanPass === 'choudhari@2026' || cleanPass === 'choudhary' || cleanPass === 'choudhary@2026')) {
+    // Support alternate spelling for choudhari / choudhary with full updated password
+    if (team.id === 'team_11' && (cleanPass === 'choudhari@alamdar2026' || cleanPass === 'choudhary@alamdar2026')) {
       isPassValid = true;
     }
 
@@ -587,19 +578,12 @@ const AuctionEngine = {
       return { success: false, error: 'Please enter the Master Admin password.' };
     }
 
-    const cleanPass = password.trim().toLowerCase();
+    const cleanPass = password.trim();
     const adminCfg = window.ALAMDAR_DATA.ADMIN_CREDENTIALS;
-    const expectedPass = adminCfg.password.toLowerCase();
+    const expectedPass = adminCfg.password;
 
-    const isPassValid =
-      cleanPass === expectedPass ||
-      cleanPass === 'admin' ||
-      cleanPass === 'admin2026' ||
-      cleanPass === 'admin@2026' ||
-      cleanPass === 'alamdar' ||
-      cleanPass === 'alamdar2026' ||
-      cleanPass === 'alamdar@admin2026' ||
-      cleanPass === '2026';
+    // Strictly validate against master admin password (no default/simple bypass)
+    const isPassValid = (cleanPass === expectedPass || cleanPass.toLowerCase() === expectedPass.toLowerCase());
 
     if (!isPassValid) {
       return {

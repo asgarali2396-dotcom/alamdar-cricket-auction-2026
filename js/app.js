@@ -609,7 +609,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const adminUserInp = document.getElementById('login-admin-user');
         const adminPassInp = document.getElementById('login-admin-password');
         if (adminUserInp) adminUserInp.value = 'admin';
-        if (adminPassInp) adminPassInp.value = 'alamdar@admin2026';
+        if (adminPassInp) adminPassInp.value = 'aliasgar@1347K';
         showToast('Admin credentials filled!', 'gold');
       });
     }
