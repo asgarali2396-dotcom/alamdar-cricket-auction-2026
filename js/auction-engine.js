@@ -97,7 +97,7 @@ const AuctionEngine = {
     // Local Fallback (file:// or standalone offline mode)
     const players = StorageManager.get(STORAGE_KEYS.PLAYERS);
 
-    if (!state || state.status !== 'BIDDING') {
+    if (!state || (state.status !== 'BIDDING' && state.status !== 'COUNTDOWN')) {
       return { success: false, error: 'Auction is not actively accepting bids right now.' };
     }
 
@@ -122,13 +122,17 @@ const AuctionEngine = {
       return { success: false, error: affordCheck.reason };
     }
 
-    const { slot1, slot2 } = state.activeBidders || {};
+    state.activeBidders = state.activeBidders || { slot1: null, slot2: null };
+    const { slot1, slot2 } = state.activeBidders;
 
-    if (slot1?.teamId === teamId || slot2?.teamId === teamId) {
+    const isSlot1Occupied = Boolean(slot1?.teamId);
+    const isSlot2Occupied = Boolean(slot2?.teamId);
+
+    if ((isSlot1Occupied && slot1.teamId === teamId) || (isSlot2Occupied && slot2.teamId === teamId)) {
       return { success: true, message: 'Already in the active bidding ring.' };
     }
 
-    if (!slot1) {
+    if (!isSlot1Occupied) {
       state.activeBidders.slot1 = {
         teamId,
         teamName: team.name,
@@ -137,7 +141,7 @@ const AuctionEngine = {
         icon: team.icon || '🏏',
         joinedAt: Date.now()
       };
-    } else if (!slot2) {
+    } else if (!isSlot2Occupied) {
       state.activeBidders.slot2 = {
         teamId,
         teamName: team.name,
@@ -177,7 +181,7 @@ const AuctionEngine = {
     const players = StorageManager.get(STORAGE_KEYS.PLAYERS);
     const team = teams.find((t) => t.id === teamId);
 
-    if (!state || state.status !== 'BIDDING') {
+    if (!state || (state.status !== 'BIDDING' && state.status !== 'COUNTDOWN')) {
       return { success: false, error: 'Auction is not in active bidding phase.' };
     }
 

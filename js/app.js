@@ -852,6 +852,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const raiseBidBtn = document.getElementById('owner-raise-bid-btn');
     if (raiseBidBtn) {
       raiseBidBtn.addEventListener('click', async () => {
+        const raiseBtn = raiseBidBtn;
         if (!activeUser || !activeUser.teamId) {
           showToast('Please sign in as a franchise owner first.', 'error');
           openLoginModal('owner');
@@ -884,12 +885,18 @@ document.addEventListener('DOMContentLoaded', () => {
           raiseBtn.disabled = true;
           raiseBtn.innerHTML = '<span class="animate-pulse">⚔️ ENTERING BATTLE RING...</span>';
 
-          // Join Battle Ring
-          const joinRes = await AuctionEngine.joinBattle(teamId);
-          if (joinRes.success) {
-            showToast('Entered the Bidding Ring!', 'success');
-          } else {
-            showToast(joinRes.error || 'Failed to enter ring.', 'error');
+          try {
+            // Join Battle Ring
+            const joinRes = await AuctionEngine.joinBattle(teamId);
+            if (joinRes && joinRes.success) {
+              showToast('Entered the Bidding Ring!', 'success');
+            } else {
+              showToast((joinRes && joinRes.error) || 'Failed to enter ring.', 'error');
+            }
+          } catch (err) {
+            console.error('Error joining battle:', err);
+            showToast('Connection error while entering ring.', 'error');
+          } finally {
             renderLiveAuctionView();
           }
         } else {
@@ -897,11 +904,17 @@ document.addEventListener('DOMContentLoaded', () => {
           raiseBtn.disabled = true;
           raiseBtn.innerHTML = '<span class="animate-pulse">⏳ RAISING BID...</span>';
 
-          const res = await AuctionEngine.placeBid(teamId);
-          if (res.success) {
-            showToast(`Bid raised to ₹${(res.newBid || 0).toLocaleString()}!`, 'gold');
-          } else {
-            showToast(res.error || 'Failed to place bid.', 'error');
+          try {
+            const res = await AuctionEngine.placeBid(teamId);
+            if (res && res.success) {
+              showToast(`Bid raised to ₹${(res.newBid || 0).toLocaleString()}!`, 'gold');
+            } else {
+              showToast((res && res.error) || 'Failed to place bid.', 'error');
+            }
+          } catch (err) {
+            console.error('Error placing bid:', err);
+            showToast('Connection error while raising bid.', 'error');
+          } finally {
             renderLiveAuctionView();
           }
         }
@@ -1626,7 +1639,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const isSlot1 = slot1?.teamId === team.id;
     const isSlot2 = slot2?.teamId === team.id;
     const isInBattle = isSlot1 || isSlot2;
-    const isBattleFull = Boolean(slot1 && slot2);
+    const isBattleFull = Boolean(slot1?.teamId && slot2?.teamId);
     const isLeading = currentAuctionState.highestBidderTeamId === team.id;
 
     const raiseBtn = document.getElementById('owner-raise-bid-btn');

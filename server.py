@@ -570,10 +570,10 @@ class AuctionSyncHandler(SimpleHTTPRequestHandler):
                             if not curr_ply or curr_ply.get('status') == 'SOLD':
                                 result = {"success": False, "error": "Player is already SOLD."}
                             else:
-                                slot1 = state.get('activeBidders', {}).get('slot1')
-                                slot2 = state.get('activeBidders', {}).get('slot2')
-                                is_slot1 = slot1 and slot1.get('teamId') == team_id
-                                is_slot2 = slot2 and slot2.get('teamId') == team_id
+                                slot1 = (state.get('activeBidders') or {}).get('slot1')
+                                slot2 = (state.get('activeBidders') or {}).get('slot2')
+                                is_slot1 = bool(slot1 and slot1.get('teamId') == team_id)
+                                is_slot2 = bool(slot2 and slot2.get('teamId') == team_id)
                                 if not is_slot1 and not is_slot2:
                                     result = {"success": False, "error": "You must join the 2-player battle ring first."}
                                 elif state.get('highestBidderTeamId') == team_id:
@@ -608,7 +608,7 @@ class AuctionSyncHandler(SimpleHTTPRequestHandler):
                         team = next((t for t in teams if t['id'] == team_id), None)
                         if not team:
                             result = {"success": False, "error": "Team not found."}
-                        elif state.get('status') != 'BIDDING':
+                        elif state.get('status') not in ('BIDDING', 'COUNTDOWN'):
                             result = {"success": False, "error": "Auction is not actively accepting bids."}
                         elif state.get('biddingLocked'):
                             result = {"success": False, "error": "🔒 Bidding is locked during introduction."}
@@ -621,9 +621,12 @@ class AuctionSyncHandler(SimpleHTTPRequestHandler):
                             s1 = active_bidders.get('slot1')
                             s2 = active_bidders.get('slot2')
 
-                            if (s1 and s1.get('teamId') == team_id) or (s2 and s2.get('teamId') == team_id):
+                            s1_occupied = bool(s1 and s1.get('teamId'))
+                            s2_occupied = bool(s2 and s2.get('teamId'))
+
+                            if (s1_occupied and s1.get('teamId') == team_id) or (s2_occupied and s2.get('teamId') == team_id):
                                 result = {"success": True, "message": "Already in the battle ring."}
-                            elif s1 and s2:
+                            elif s1_occupied and s2_occupied:
                                 result = {"success": False, "error": "Battle Ring Full! Two teams are already locked in this bidding war."}
                             else:
                                 # Budget & Reserve Check: Team must be able to afford the next valid bid to enter ring
@@ -638,7 +641,7 @@ class AuctionSyncHandler(SimpleHTTPRequestHandler):
                                 elif team.get('remainingBudget', 0) - next_bid < min_reserve:
                                     max_allowed = max(0, team.get('remainingBudget', 0) - min_reserve)
                                     result = {"success": False, "error": f"Reserve Violation: Next bid (₹{next_bid:,}) leaves only ₹{(team.get('remainingBudget', 0) - next_bid):,}, but you must retain at least ₹{min_reserve:,} to buy remaining {remaining_slots} player(s). Max allowable bid: ₹{max_allowed:,}. Cannot enter bidding ring."}
-                                elif not s1:
+                                elif not s1_occupied:
                                     active_bidders['slot1'] = {
                                         'teamId': team_id,
                                         'teamName': team.get('name'),
@@ -652,7 +655,7 @@ class AuctionSyncHandler(SimpleHTTPRequestHandler):
                                     update_cache()
                                     trigger_async_save()
                                     result = {"success": True, "version": server_data['version']}
-                                elif not s2:
+                                elif not s2_occupied:
                                     active_bidders['slot2'] = {
                                         'teamId': team_id,
                                         'teamName': team.get('name'),
@@ -673,9 +676,9 @@ class AuctionSyncHandler(SimpleHTTPRequestHandler):
                             result = {"success": False, "error": "The highest bidder cannot withdraw while holding the lead."}
                         else:
                             active_bidders = state.setdefault('activeBidders', {'slot1': None, 'slot2': None})
-                            if active_bidders.get('slot1', {}).get('teamId') == team_id:
+                            if (active_bidders.get('slot1') or {}).get('teamId') == team_id:
                                 active_bidders['slot1'] = None
-                            elif active_bidders.get('slot2', {}).get('teamId') == team_id:
+                            elif (active_bidders.get('slot2') or {}).get('teamId') == team_id:
                                 active_bidders['slot2'] = None
                             state['lastActionTimestamp'] = int(time.time() * 1000)
                             server_data['version'] = int(server_data.get('version', 0)) + 1
